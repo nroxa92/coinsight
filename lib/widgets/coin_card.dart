@@ -8,12 +8,14 @@ class CoinCard extends StatelessWidget {
   final Coin coin;
   final bool isWatchlisted;
   final VoidCallback onToggleWatchlist;
+  final bool show1hChange;
 
   const CoinCard({
     super.key,
     required this.coin,
     required this.isWatchlisted,
     required this.onToggleWatchlist,
+    this.show1hChange = false,
   });
 
   @override
@@ -109,6 +111,13 @@ class CoinCard extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      if (show1hChange && coin.priceChangePercentage1h != null) ...[
+                        _buildChangeBadge(
+                          coin.priceChangePercentage1h!,
+                          '1H',
+                        ),
+                        const SizedBox(width: 4),
+                      ],
                       Icon(
                         isPositive
                             ? Icons.arrow_drop_up
@@ -149,6 +158,32 @@ class CoinCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildChangeBadge(double change, String label) {
+    final isPos = change >= 0;
+    final color = isPos ? AppTheme.green : AppTheme.red;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(width: 2),
+          Text(
+            '${isPos ? '+' : ''}${change.toStringAsFixed(1)}%',
+            style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w500),
+          ),
+        ],
       ),
     );
   }

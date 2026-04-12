@@ -10,6 +10,7 @@ void main() {
     Hive.init(tempDir.path);
     await Hive.openBox('settings');
     await Hive.openBox('watchlist');
+    await Hive.openBox('analysis_logs');
   });
 
   tearDownAll(() async {

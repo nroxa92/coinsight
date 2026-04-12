@@ -222,6 +222,76 @@ main.dart
 
 ---
 
+---
+
+## Session 2: 2026-04-12
+
+### Zadatak 1 — New Listings Tab (CORE FEATURE)
+**Status:** Completed
+
+**Opis:** Novi tab "New Listings" kao default pri otvaranju, prikazuje coinove s early momentum profilom.
+
+**Ažurirani fajlovi:**
+- `lib/models/coin.dart` — dodan `priceChangePercentage1h` (double?) field. `fromJson()` čita `price_change_percentage_1h_in_currency`
+- `lib/services/coingecko_service.dart` — nova metoda `getNewListings()`. Endpoint: `GET /coins/markets?order=volume_desc&per_page=100&sparkline=true&price_change_percentage=1h,24h`. Frontend filter: marketCapRank null ili >500, volume 50K-50M USD, 24h change != 0. Sort po 1h change descending
+- `lib/models/watchlist_provider.dart` — dodani: `_newListings` lista, `newListings` getter, `fetchNewListings()`, `startNewListingsAutoRefresh()` (Timer 3 min), `stopNewListingsAutoRefresh()`, `dispose()` za timer cleanup
+- `lib/screens/watchlist_screen.dart` — 3 taba umjesto 2: "New Listings" (default) | "My Watchlist" | "Top Coins". Auto-refresh aktivan samo dok je New Listings tab aktivan. Skeleton loader, error state, empty state za novi tab
+- `lib/widgets/coin_card.dart` — dodan `show1hChange` prop (default false). `_buildChangeBadge()` metoda — prikazuje badge "1H +X.X%" sa zelenom/crvenom pozadinom. Prikazuje se lijevo od 24h change
+
+**Verifikacija:** `flutter analyze` — 0 issues
+
+---
+
+### Zadatak 2 — Claude Sistemski Prompt
+**Status:** Completed
+
+**Opis:** Zamjena generičkog system prompta s precizno kalibriranim promptom za momentum coin analizu.
+
+**Ažurirani fajlovi:**
+- `lib/models/analysis_provider.dart` — `_systemPrompt` konstanta zamijenjena. Novi prompt: CoinSight specijalizirani analitičar, 3 objektiva (Profil Listinga, Rizik Profil, Preporuka), tri oznake (WATCH/SKIP/INTERESTING), konkretni sljedeći koraci, HR/EN jezik podrška
+
+---
+
+### Zadatak 3 — Analysis Logging
+**Status:** Completed
+
+**Opis:** Automatsko logiranje Claude AI analiza s WATCH/SKIP/INTERESTING preporukama.
+
+**Kreirani fajlovi:**
+- `lib/models/analysis_log.dart` — AnalysisLog model (timestamp, coinId, coinSymbol, priceAtAnalysis, claudeRecommendation, recommendationType). `parseRecommendationType()` statička metoda traži `**INTERESTING**`, `**WATCH**`, `**SKIP**` u tekstu. `toMap()`/`fromMap()` za Hive serijalizaciju
+
+**Ažurirani fajlovi:**
+- `lib/services/storage_service.dart` — novi Hive box `analysis_logs`. `saveAnalysisLog(AnalysisLog)` i `getAnalysisLogs()` (sortirano desc po timestamp)
+- `lib/models/analysis_provider.dart` — `_tryLogAnalysis()` poziva se automatski nakon svakog Claude response-a. Logira samo ako response sadrži WATCH/SKIP/INTERESTING. Sprema coin podatke (id, symbol, price) iz watchlista
+- `test/widget_test.dart` — dodan `Hive.openBox('analysis_logs')` u setUpAll
+
+---
+
+### Zadatak 4 — CHATLOG.md
+**Status:** Completed
+
+**Opis:** Kreiran template fajl za ručno bilježenje analitičkih sesija.
+
+**Kreirani fajlovi:**
+- `CHATLOG.md` — template s formatom: datum, coin symbol, podaci pri analizi, Claude preporuka, razlog, ishod (za naknadno popunjavanje)
+
+---
+
+### Zadatak 5 — Android Build Verifikacija
+**Status:** Completed
+
+**Rezultat:** `flutter build apk --debug` — USPJEŠAN. Built `build/app/outputs/flutter-apk/app-debug.apk`. Nema Android-specifičnih errora.
+
+---
+
+### Session 2 Finalna Verifikacija
+- `flutter analyze` — 0 issues
+- `flutter test` — 2/2 passed
+- `flutter build windows` — verified (prethodna sesija)
+- `flutter build apk --debug` — uspješan
+
+---
+
 ## Identified Issues
 
 _No unresolved issues at this time._

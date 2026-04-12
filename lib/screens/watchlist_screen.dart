@@ -17,13 +17,28 @@ class _WatchlistScreenState extends State<WatchlistScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(_onTabChanged);
     final provider = context.read<WatchlistProvider>();
-    Future.microtask(() => provider.fetchTopCoins());
+    Future.microtask(() {
+      provider.fetchNewListings();
+      provider.fetchTopCoins();
+      provider.startNewListingsAutoRefresh();
+    });
+  }
+
+  void _onTabChanged() {
+    final provider = context.read<WatchlistProvider>();
+    if (_tabController.index == 0) {
+      provider.startNewListingsAutoRefresh();
+    } else {
+      provider.stopNewListingsAutoRefresh();
+    }
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_onTabChanged);
     _tabController.dispose();
     super.dispose();
   }
@@ -35,17 +50,21 @@ class _WatchlistScreenState extends State<WatchlistScreen>
         TabBar(
           controller: _tabController,
           tabs: const [
+            Tab(text: 'New Listings'),
             Tab(text: 'My Watchlist'),
             Tab(text: 'Top Coins'),
           ],
           indicatorColor: Theme.of(context).colorScheme.primary,
           labelColor: Theme.of(context).colorScheme.primary,
           unselectedLabelColor: Colors.grey,
+          labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          unselectedLabelStyle: const TextStyle(fontSize: 13),
         ),
         Expanded(
           child: TabBarView(
             controller: _tabController,
             children: [
+              _buildNewListingsTab(),
               _buildWatchlistTab(),
               _buildTopCoinsTab(),
             ],
@@ -60,6 +79,80 @@ class _WatchlistScreenState extends State<WatchlistScreen>
       padding: const EdgeInsets.only(top: 8, bottom: 16),
       itemCount: 8,
       itemBuilder: (context, index) => const CoinCardSkeleton(),
+    );
+  }
+
+  Widget _buildNewListingsTab() {
+    return Consumer<WatchlistProvider>(
+      builder: (context, provider, _) {
+        if (provider.isLoading && provider.newListings.isEmpty) {
+          return _buildSkeletonList();
+        }
+
+        if (provider.error != null && provider.newListings.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.cloud_off, size: 64, color: Colors.grey[700]),
+                  const SizedBox(height: 16),
+                  Text(
+                    provider.error!,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey[500], fontSize: 14),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: provider.fetchNewListings,
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        if (provider.newListings.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.new_releases_outlined,
+                    size: 64, color: Colors.grey[700]),
+                const SizedBox(height: 16),
+                Text(
+                  'No new listings found',
+                  style: TextStyle(color: Colors.grey[500], fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Pull to refresh or check back later',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: provider.fetchNewListings,
+          child: ListView.builder(
+            padding: const EdgeInsets.only(top: 8, bottom: 16),
+            itemCount: provider.newListings.length,
+            itemBuilder: (context, index) {
+              final coin = provider.newListings[index];
+              return CoinCard(
+                coin: coin,
+                isWatchlisted: provider.isInWatchlist(coin.id),
+                onToggleWatchlist: () => provider.toggleWatchlist(coin.id),
+                show1hChange: true,
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -83,7 +176,7 @@ class _WatchlistScreenState extends State<WatchlistScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Star coins from Top Coins tab to add them',
+                  'Star coins from other tabs to add them',
                   style: TextStyle(color: Colors.grey[600], fontSize: 13),
                 ),
               ],

@@ -53,6 +53,58 @@ class CoinGeckoService {
     }
   }
 
+  Future<List<Coin>> getNewListings({
+    String vsCurrency = 'usd',
+    int perPage = 100,
+  }) async {
+    final queryParams = {
+      'vs_currency': vsCurrency,
+      'order': 'volume_desc',
+      'per_page': perPage.toString(),
+      'page': '1',
+      'sparkline': 'true',
+      'price_change_percentage': '1h,24h',
+    };
+
+    final uri = Uri.parse('$_baseUrl/coins/markets')
+        .replace(queryParameters: queryParams);
+
+    final http.Response response;
+    try {
+      response = await _client.get(uri).timeout(_timeout);
+    } on TimeoutException {
+      throw CoinGeckoException('Request timed out. Check your connection.');
+    }
+
+    if (response.statusCode == 200) {
+      try {
+        final List<dynamic> data = json.decode(response.body);
+        final allCoins = data.map((item) => Coin.fromJson(item)).toList();
+
+        return allCoins.where((coin) {
+          final rankIsNew = coin.marketCapRank == 0 || coin.marketCapRank > 500;
+          final volumeInRange =
+              coin.totalVolume >= 50000 && coin.totalVolume <= 50000000;
+          final hasChange = coin.priceChangePercentage24h != 0;
+          return rankIsNew && volumeInRange && hasChange;
+        }).toList()
+          ..sort((a, b) {
+            final a1h = a.priceChangePercentage1h ?? 0;
+            final b1h = b.priceChangePercentage1h ?? 0;
+            return b1h.compareTo(a1h);
+          });
+      } on FormatException {
+        throw CoinGeckoException('Invalid response from server.');
+      }
+    } else if (response.statusCode == 429) {
+      throw CoinGeckoException('Rate limited. Please wait a moment.');
+    } else {
+      throw CoinGeckoException(
+        'Failed to fetch new listings (${response.statusCode})',
+      );
+    }
+  }
+
   Future<List<Coin>> searchAndFetch(String query) async {
     final searchUri = Uri.parse('$_baseUrl/search')
         .replace(queryParameters: {'query': query});
