@@ -1,0 +1,31 @@
+name: coinsight
+description: "AI-powered cryptocurrency insights with CoinGecko data and Claude analysis."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  # HTTP & API
+  http: ^1.4.0
+  # State management
+  provider: ^6.1.0
+  # Local storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  # Utilities
+  intl: ^0.20.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.0
+
+flutter:
+  uses-material-design: true
