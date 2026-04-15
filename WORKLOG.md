@@ -685,8 +685,93 @@ main.dart
 
 ---
 
+---
+
+### Session 3 — Decisions Log (2026-04-15, kraj sesije)
+
+Razgovor s developerom nakon Faze F, prije live testa:
+
+**Odluka 1 — Exchange izbor:** Ostajemo na Binanceu. Razmatrane alternative: Kraken (SEPA→Revolut OK, ali premalo new listingsa), Bitpanda, Coinbase, Revolut Crypto (nema public API). Zaključak: Binance jedini ima small-cap momentum listinge koji su core funkcija appa. Isplate ići će kroz Binance → SEPA EUR withdraw → Revolut IBAN (KYC ime mora matchati).
+
+**Odluka 2 — Testnet se preskače:** Developer odbio testnet, ide odmah na LIVE trading. Rizik prihvaćen. Preporuka dana u chatu: za prvi live trade postaviti `maxTradeAmountUsdt=5`, `maxOpenPositions=1`, `stopLoss=10%`, `autoTradeEnabled=false` — ručni BUY NOW kroz Analysis tab za prvih par sesija.
+
+**Odluka 3 — API ključevi se NE hardkodiraju:** Developer pitao mogu li ključevi ići direktno u source. Odbijeno kategorički — repo je javan na GitHubu, Binance leak-detection auto-disable, ključevi zauvijek u git historyju čak nakon brisanja. Postojeći flow preko Settings → Binance sekcija → Hive storage je jedini prihvatljiv. Nema promjena u kodu po ovoj točki.
+
+**Blocker 1 — Binance 2FA zaključan:**
+- SMS kod za verifikaciju ne stiže na telefon
+- Telefonski broj linkan na drugi (nepoznati duplicate) Binance account, ne može se unbindati
+- API Management sekcija uklonjena iz Binance mobilne app-a (~2023), dostupna samo na desktop webu
+- Desktop web login prolazi, ali 2FA za kreiranje API ključa traži drugi verifikacijski kanal (SMS ili Google Authenticator)
+- Developer nema postavljen Google Authenticator na Binance accountu
+
+**Plan za recovery (po preporuci):**
+1. Binance live chat (binance.com dolje desno → `human agent`) — najbrže, 10–30 min čekanja, potencijalni privremeni disable SMS 2FA uz ID selfie verifikaciju
+2. Account Appeal form: binance.com/en/my/security/account-appeal (24–72h) — opcija "Lost access to phone / cannot receive SMS", traži selfie s dokumentom + rukom pisanu cedulju s datumom
+3. Desktop mode u mobilnom browseru kao pokušaj pristupa API Management-u
+4. Nakon resetiranja SMS 2FA, postaviti Google Authenticator kao primary metoda
+
+**Trenutno stanje:** Faza F završena, kod sav implementiran i verificiran (`flutter analyze` 0 issues, `flutter test` 2/2). **App nije testiran na stvarnim Binance API pozivima** jer developer nije uspio generirati ključeve. Sav Binance kod čeka ključeve da bi se verificirao.
+
+**Sljedeći korak:** developer rješava Binance 2FA recovery u pozadini. Kada dobije API Key + Secret, upisuje ih u Settings → Binance sekciju, testira "Test Connection" button, a onda se pokušava prvi mali live trade kroz Analysis Trade Action Bar.
+
+---
+
+---
+
+### Session 3 — Documentation Pass (2026-04-15, nakon Faze F)
+
+Razgovor nakon Faze F dok je live test blokiran Binance 2FA-om. Developer zatražio dva opsežna dokumenta:
+
+**1. `PROJECT_OVERVIEW.md` (kreiran)** — sveobuhvatni dev-facing dokument kroz sve sesije.
+
+Struktura (9 poglavlja, ~650 linija):
+- **0. Svrha dokumenta** — diferencijacija od WORKLOG-a (narativ vs forenzika)
+- **1. Što je CoinSight** — value proposition, što NIJE, tko je target user
+- **2. Stack / arhitektura** — tech tablica, 19-fajl tree, dependency graph, 3 providera, 4 Hive boxa, 4 eksterna API-ja s rate limitima
+- **3. Session 1 (Faze 1-5)** — per-faza opis s arhitekturalnim razlozima (zašto IndexedStack, zašto skeleton umjesto CircularProgressIndicator, zašto SelectableText)
+- **4. Session 2** — 5 zadataka, bitna napomena o **machine-parsable `**INTERESTING**` markeru** kao podlozi za kasnije Trade Action Bar i logging taksonomiju
+- **5. Session 3 (Faze A-F)** — uključene **tri arhitekturalne odluke** prije koda: izbor Binancea, preskakanje testneta, odbijanje hardkodiranja ključeva
+- **6. Trenutno stanje** — što radi, što čeka, verifikacija, git stanje (Session 3 izmjene NE-commitane), Identified Issues summary
+- **7. Dokumentacija u repou** — tablica svih .md fajlova i uloga
+- **8. Sljedeći koraci** — 3 nivoa horizonta (neposredni, Session 4 kandidati, dugoročno)
+- **9. Rezime**
+
+Ključni dodani insight-i (nisu bili eksplicitni u WORKLOG-u):
+- Zašto SL nije server-side na Binanceu (trenutno timer-based s 5-min zakašnjenjem)
+- Kako `parseRecommendationType()` redoslijed (`INTERESTING` → `WATCH` → `SKIP`) **nije** random — bitno zbog preklapanja
+- `show1hChange: true` prop u CoinCard je samo za New Listings tab
+- Zašto je `_providerRef` u `PortfolioScreen.dispose` ne-trivijalan (context.read u dispose puca)
+
+**2. `USER_MANUAL.md` (kreiran, zatim prepisan)** — user-facing priručnik.
+
+**Prva verzija** (~650 linija) — napravljena pod pogrešnom pretpostavkom da je reader "iskusan crypto korisnik" (što Claude system prompt pretpostavlja). Sadržavala je žargon bez objašnjenja, brze tutorijale, malo edukacije.
+
+**Druga verzija** (~1050 linija, trenutna) — potpuno prepisana nakon developer feedback-a ("kao za nekoga tko prvi puta vidi app"). Struktura pomaknuta u edukativni / tutorial mode:
+
+- 18 sekcija s uvedenim ▶ **"Napravi sad"** koracima za tutorial feel
+- Dodana **sekcija 2 "Osnovne crypto pojmove"** — objašnjava market cap, volume, Spot vs Futures, slippage, API ključ, stop-loss, take-profit — sve što pretpostavljena prethodna verzija nije pokrivala
+- Dodana **sekcija 6.2 Binance setup** s KOMPLETNIM step-by-stepom (registracija → KYC → deposit → API ključ → restrictions). Uključen mobilni fallback (desktop mode u browseru jer Binance mobile nema API Management)
+- Dodana **sekcija 7 "Tvoja prva analiza"** — tutorial s očekivanim Claude outputom kao primjerom
+- Dodana **sekcija 9 "Tvoj prvi trade"** — korak po korak s konzervativnim parametrima ($5, 1 poz, 10% SL)
+- Dodana **sekcija 10.4 "Flash crash scenarij"** — realna edukacija o tome kako SL ponekad daje gori ishod nego očekivano
+- Dodana **sekcija 11.2 "Fazni risk management"** (tjedan 1-2-3-4 postupna eskalacija)
+- Dodana **sekcija 12.3 "Kada Fazu 3 uključiti"** — eksplicitna preporuka "tek nakon 2-4 tjedna ručnog"
+- **Rječnik** proširen s 36 pojmova (vs 19 u prvoj verziji)
+- Dodani ASCII mockup-i svakog glavnog ekrana za vizualnu navigaciju bez screenshotova
+
+**Kreirani fajlovi:**
+- `PROJECT_OVERVIEW.md` (~650 linija) — dev-facing, narativno, kroz sve sesije
+- `USER_MANUAL.md` (~1050 linija, druga verzija) — user-facing, pretpostavlja nula crypto iskustva
+
+**Nisu modificirani** lib/ fajlovi — čista dokumentacija.
+
+**Verifikacija:** ne primjenjivo (dokumentacijski fajlovi, nema koda).
+
+---
+
 ## Identified Issues
 
-- **Binance account lockout (developer):** SMS 2FA ne stiže, duplicate account na broju — blokira live testing. Nije bug u appu, ali blocker za verifikaciju Session 3 rada.
+- **Binance account lockout (developer):** SMS 2FA ne stiže, duplicate account na broju — blokira live testing. Nije bug u appu, ali blocker za verifikaciju Session 3 rada. Status: developer planira live chat / Account Appeal.
+- **API Management only on desktop web:** Binance je uklonio API sekciju iz mobilne app-a, pa se ključevi mogu generirati samo preko desktop weba — što traži prolazak 2FA. Nije naš bug, ali ograničenje tooling-a.
 - **LOT_SIZE precision hardcoded:** `placeSellOrder` koristi fiksno 6 decimala — Binance može vratiti -1013 za neke simbole. Rješenje: fetch `/api/v3/exchangeInfo` i cache LOT_SIZE stepSize per simbol. Popravak čeka live test da potvrdi realnu pojavu.
 - **Timestamp drift:** ako sistemski sat driftuje, Binance vraća -1021. Trenutno sa `recvWindow=5000ms`. Za robusnost dodati `/api/v3/time` offset calc pri prvoj konekciji.
