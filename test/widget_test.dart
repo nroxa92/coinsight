@@ -11,6 +11,7 @@ void main() {
     await Hive.openBox('settings');
     await Hive.openBox('watchlist');
     await Hive.openBox('analysis_logs');
+    await Hive.openBox('positions');
   });
 
   tearDownAll(() async {
@@ -39,6 +40,6 @@ void main() {
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
     expect(find.text('Anthropic API Key'), findsOneWidget);
-    expect(find.text('About CoinSight'), findsOneWidget);
+    expect(find.text('Binance API'), findsOneWidget);
   });
 }

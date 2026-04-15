@@ -444,6 +444,249 @@ main.dart
 
 ---
 
+---
+---
+
+## Session 3: 2026-04-15 — Binance + Telegram + Portfolio (SESSION_3.md)
+
+**Kontekst:** Session 2 završio s 3 taba i Analysis loggingom. Session 3 dodaje Binance Spot API za trading (Faza 2 manual + Faza 3 auto), Telegram Bot notifikacije i Portfolio screen kao 4. tab. Developer ima problem s Binance login (SMS 2FA + duplikatni account) — Faze A–F implementirane bez live test verifikacije, testnet live test ostaje TODO dok developer ne vrati pristup.
+
+---
+
+### Faza A — pubspec + StorageService credential extension
+**Status:** Completed
+
+**Ažurirani fajlovi:**
+
+`pubspec.yaml` — dodane 3 dependencies:
+- `flutter_local_notifications: ^18.0.0` (za buduće lokalne notifikacije)
+- `crypto: ^3.0.3` (HMAC-SHA256 za Binance potpis)
+- `convert: ^3.1.1`
+
+`flutter pub get` — 9 paketa dodano, bez konflikata.
+
+`lib/services/storage_service.dart` (60→147 linija):
+- Nova konstanta `_positionsBox = 'positions'`, dodana u `init()` kao 4. Hive box
+- Nove konstante: `_binanceApiKeyField`, `_binanceSecretField`, `_binanceTestnetField`, `_telegramTokenField`, `_telegramChatIdField`
+- Metode: `getBinanceApiKey/Secret`, `getBinanceTestnet` (default true), `saveBinanceCredentials`, `deleteBinanceCredentials`, `setBinanceTestnet`
+- Metode: `getTelegramToken/ChatId`, `saveTelegramCredentials`, `deleteTelegramCredentials`
+
+`test/widget_test.dart` — dodano `Hive.openBox('positions')` u setUpAll.
+
+---
+
+### Faza B — Modeli (CoinPosition, RiskParameters, TradeProposal, TradeResult)
+**Status:** Completed
+
+**Kreirani fajlovi:**
+
+`lib/models/coin_position.dart` (52 linije):
+- 9 polja: coinId, symbol, binanceSymbol, quantity, entryPrice, entryTotal, entryTime, currentPrice (mutable), stopLossOrderId
+- Computed getteri: `currentValue`, `pnlAbsolute`, `pnlPercent`, `isProfit`
+- `toMap/fromMap` za Hive
+
+`lib/models/risk_parameters.dart` (84 linije):
+- 8 polja s defaultima: maxTradeAmountUsdt (10.0), maxOpenPositions (3), stopLossPercent (15.0), takeProfitPercent (30.0), autoTradeEnabled (false), telegramNotifications (false), quietHoursStart (23), quietHoursEnd (7)
+- `isQuietHours` getter s wraparound logikom (23-7 prijelaz preko ponoći)
+- `copyWith()`, `toMap/fromMap`
+
+`lib/models/trade_proposal.dart` (26 linija):
+- 8 polja: coin, amountUsdt, estimatedQty, currentPrice, stopLossPrice, takeProfitPrice, claudeRecommendation, createdAt
+- `isExpired` getter (>60s od kreiranja)
+
+`lib/models/trade_result.dart` (20 linija):
+- 6 polja: success, orderId?, executedPrice?, executedQty?, totalUsdt?, errorMessage?
+- `.failure(String)` factory
+
+**Ažurirani fajlovi:**
+
+`lib/services/storage_service.dart` — dodane metode:
+- `getRiskParameters()` → vraća default `RiskParameters()` ako nema spremljenog
+- `saveRiskParameters(RiskParameters)`
+- `savePosition(CoinPosition)` — keyed po `coinId`
+- `removePosition(String coinId)`
+- `getPositions()` → sortirano po entryTime descending
+- Konstanta `_riskParamsField = 'risk_parameters'`
+
+---
+
+### Faza C — BinanceService
+**Status:** Completed (code only — live test TODO, vidi dolje)
+
+**Kreirani fajlovi:**
+
+`lib/services/binance_service.dart` (~270 linija):
+- `BinanceException` — custom exception, optional `code` (Binance error code)
+- `BinanceOrder` — orderId, symbol, side, status, executedQty, cummulativeQuoteQty, transactTime. Computed getter `avgPrice = cummulativeQuoteQty / executedQty`. `fromJson()` parsira i `transactTime` i `time` polja
+- `BinanceService`:
+  - URL switch `_prodUrl` (api.binance.com) / `_testnetUrl` (testnet.binance.vision) ovisno o `StorageService.getBinanceTestnet()`
+  - `reloadCredentials()` za refresh nakon Settings save
+  - Hasgetter `hasCredentials`, `isTestnet`
+  - `_sign(queryString)` — HMAC-SHA256 s `crypto` paketom, UTF-8 encode, hex digest
+  - `_signedQuery()` — dodaje `timestamp` (Unix ms) + `recvWindow=5000` + `signature`
+  - Header `X-MBX-APIKEY` za signed pozive
+  - `_throwForResponse()` — mapira kodove -1021 (timestamp sync), -2010 (insufficient balance), -1100/-1121 (bad symbol), ostalo fallback na `msg`
+  - Metode: `ping()` (public), `getUsdtBalance()`, `getCurrentPrice(symbol)`, `placeBuyOrder(symbol, quoteAmount)` koristi `quoteOrderQty` (kupuješ za X USDT), `placeSellOrder(symbol, quantity)` 6 decimala, `getOpenPositions()` delegira na StorageService, `getOrderHistory(symbol)` limit 10
+  - Timeout 15s svuda, TimeoutException → BinanceException
+
+---
+
+### Faza D — TradeService + TelegramService
+**Status:** Completed (code only — live test TODO)
+
+**Kreirani fajlovi:**
+
+`lib/services/trade_service.dart` (~160 linija):
+- `TradeService({BinanceService?})` — koristi injected ili default
+- `_binanceSymbol(Coin)` → `${SYMBOL.toUpperCase()}USDT`
+- `prepareTradeProposal()`: fetch price, izračuna estimatedQty = amount/price, stopLossPrice = price*(1-sl/100), takeProfitPrice = price*(1+tp/100). Vraća TradeProposal
+- `executeTrade(proposal)`: provjerava isExpired, maxOpenPositions, duplicate position, USDT balance. Ako OK, `placeBuyOrder`, kreira `CoinPosition`, sprema u Hive, logira AnalysisLog tipa **ENTERED** (novi tip — marker za buduće dashbording). Vraća `TradeResult`
+- `autoExecuteIfEligible()`: gate na autoTradeEnabled + !isQuietHours + hasCredentials + !maxOpenPositions + !duplicate. Zove prepare + execute, vraća null ako ne eligibilan ili pukne
+- `checkStopLosses()`: iterira pozicije, fetcha cijenu, ako price <= SL ili >= TP poziva closePosition
+- `closePosition(position)`: market sell po `quantity`, brise iz Hive, logira AnalysisLog tipa **EXITED** s P&L u poruci
+
+`lib/services/telegram_service.dart` (~185 linija):
+- `TelegramService({http.Client?})` — konstruira, reloadCredentials iz StorageService
+- `isConfigured` getter (token i chatId set)
+- `setCommandHandler(TelegramCommandHandler)` — callback za procesiranje komandi
+- `sendMessage(text)` → Markdown parse, sends `/sendMessage`, timeout 15s, swallow greške vraća false
+- `sendInterestingSignal(coin, claudeRecommendation, riskParams)` — formatira 10-line Markdown poruku s 🚨 headerom, brojkama i quick commands `/buy_SYM /skip_SYM /analyze_SYM`
+- `sendTradeExecuted(position, result)`, `sendStopLossTriggered(position, result)`, `sendDailySummary(positions, logs)`
+- `startPolling()`: Timer.periodic 5s → `_poll()` poziva `getUpdates?offset=${lastUpdateId+1}&timeout=0`, procesira updates preko `_processUpdate`. Parsing: `/command_ARG` → splitta na prvom `_`, filtrira po chatId, poziva handler
+- `stopPolling()`: cancel timer
+
+---
+
+### Faza E — Portfolio screen + Settings update
+**Status:** Completed
+
+**Kreirani fajlovi:**
+
+`lib/models/portfolio_provider.dart` (~95 linija):
+- Extends ChangeNotifier
+- State: `_usdtBalance`, `_positions`, `_isLoading`, `_error`, `_priceTimer`
+- Computed getteri: `totalInvested`, `totalValue`, `totalPnl`, `totalPnlPercent`
+- `refresh()`: reload positions + getUsdtBalance + refresh prices za sve pozicije
+- `startAutoRefresh()`: Timer.periodic 30s poziva `_refreshPrices` + notify
+- `stopAutoRefresh()`, `reloadCredentials()`, `closePosition(position)`
+- `dispose()` cancela timer
+
+`lib/screens/portfolio_screen.dart` (~290 linija):
+- StatefulWidget s `AutomaticKeepAliveClientMixin` (`wantKeepAlive: true`)
+- `initState` microtask — gate na `hasCredentials` prije start (važno za testove koji nemaju credentialse)
+- `_providerRef` čuva provider za safe `dispose()` (izbjegava context.read u dispose)
+- **Sekcija 1 — Header Card:** Portfolio title + refresh icon, USDT balance, Open positions count, Total P&L (obojeno zeleno/crveno)
+- **Sekcija 2 — Open Positions:** lista CoinPosition cardova (symbol, entry→now, qty+invested, P&L, SL/TP). Close button → confirm dialog → `provider.closePosition()`
+- **Sekcija 3 — Analysis History:** zadnjih 20 AnalysisLog zapisa, chip boja po tipu (INTERESTING=green, ENTERED=blue, EXITED=purple, WATCH=orange, SKIP=grey)
+- RefreshIndicator wrapa cijeli ListView
+- No-credentials state: wallet icon + poruka "Binance nije konfiguriran"
+
+**Ažurirani fajlovi:**
+
+`lib/screens/settings_screen.dart` (247→~700 linija, praktički prepisan):
+- Očuvana postojeća Anthropic API Key sekcija + About
+- Nova **Binance sekcija**: warning banner (nema withdrawal perm), API Key + Secret (oba obscured, `••` trick za preskip), Testnet SwitchListTile (s confirm dialogom za prebacivanje na LIVE), Save/Test/Remove buttons. Test button poziva `ping() + getUsdtBalance()` i prikazuje SnackBar rezultat
+- Nova **Risk Parameters sekcija**: TextField za maxTradeAmountUsdt, Dropdown 1-10 za maxOpenPositions, Slider 5-30% stop-loss, Slider 10-100% take-profit, SwitchListTile za auto-trade (samo ako Binance konfiguriran, s narančastim warningom), TimePicker za quiet hours start/end
+- Nova **Telegram sekcija**: Bot Token (obscured), Chat ID, Save + Test button
+- `_sectionHeader()` helper widget s icon/title/status badge pattern
+
+**Ažurirani widget_test.dart:** `expect(find.text('About CoinSight'), ...)` → `expect(find.text('Binance API'), ...)` (About sad off-screen u dužem settings listu).
+
+---
+
+### Faza F — Analysis Trade Action Bar + main.dart 4 taba + polling/stop-loss timer
+**Status:** Completed
+
+**Ažurirani fajlovi:**
+
+`lib/screens/analysis_screen.dart` (329→~480 linija):
+- Dodan `TradeService`, `_amountController`, `_dismissedActionBarIndex`, `_executingTrade`
+- Novi widget `_buildTradeActionBarIfEligible()` između MessageList i ErrorBar:
+  - Prikazuje se ako: postoji last message, nije dismissed, role='assistant', sadrži `**INTERESTING**`, Binance hasCredentials, !autoTradeEnabled, watchlist nije prazan
+  - Zeleni okvir s naslovom `🚨 INTERESTING signal — SYMBOL/USDT`, editable amount TextField (prefilano maxTradeAmountUsdt), SL/TP info, 3 buttona: **BUY NOW** (green), **SKIP**, **TELEGRAM**
+  - X dismiss tracka indeks zadnje poruke u `_dismissedActionBarIndex`
+- `_buyNow()`: poziva `prepareTradeProposal`, otvara confirm dialog (`_showProposalDialog`), ako OK poziva `executeTrade`, prikazuje SnackBar rezultat, dismissa bar
+- `_skip()`: logira AnalysisLog tipa SKIP s `[SKIPPED]` prefixom
+- `_sendToTelegram()`: poziva `TelegramService.sendInterestingSignal()`
+- `_confirmClearChat`: resetira `_dismissedActionBarIndex = -1`
+
+`lib/main.dart` (90→125 linija):
+- MultiProvider dobio `PortfolioProvider`
+- `_titles` proširen: `['Watchlist', 'Analysis', 'Portfolio', 'Settings']`
+- Novi field `_tradeService`, `_telegramService`, `_stopLossTimer`
+- `initState` zove `_startBackgroundServices()`:
+  - Telegram polling start ako `isConfigured` + setCommandHandler
+  - StopLoss Timer.periodic 5min — **gated na `BinanceService().hasCredentials`** (izbjegava pending timer u testovima bez credentialsa)
+- `_handleTelegramCommand()` — minimalna implementacija za `/status`, `/stop`, `/start`, fallback help (prošireno u budućim sesijama za /buy_/skip_/analyze_)
+- `dispose()` cancela timer + telegram polling
+- BottomNavigationBar: `type: BottomNavigationBarType.fixed` (sprječava label sakrivanje kod 4 taba), 4 taba s ikonama (Portfolio koristi `Icons.account_balance_wallet_outlined/account_balance_wallet`)
+- IndexedStack s 4 screena
+
+---
+
+### Session 3 — Finalna Verifikacija
+- `flutter analyze` — **0 issues**
+- `flutter test` — **2/2 passed** (widget_test.dart)
+- `flutter build apk --debug` — **NIJE POKRENUT** (vidi TODO)
+- `flutter build windows` — **NIJE POKRENUT** (vidi TODO)
+
+---
+
+### Session 3 — TODO (za kad developer vrati Binance pristup)
+
+1. **Binance account recovery:** developer ima problem s SMS 2FA + duplicate account na broju. Moraju se riješiti putem binance.com Account Appeal ili live chata prije testiranja.
+2. **Live test na testnetu:**
+   - Otvoriti account na testnet.binance.vision (GitHub auth)
+   - Generirati test API ključeve (Enable Spot Trading)
+   - U CoinSight Settings upisati ključeve, Testnet ON, kliknuti "Test" → očekivani rezultat: `OK — USDT balance: $XXX.XX (testnet)`
+3. **End-to-end workflow test:**
+   - Konfigurirati Binance testnet + Telegram bota (kreirati preko @BotFather)
+   - Otvoriti New Listings tab, zatražiti od Claudea INTERESTING signal za neki watchlist coin
+   - Testirati BUY NOW → potvrda → provjera Portfolio taba (pozicija vidljiva s current price)
+   - Testirati Close Position
+   - Testirati Telegram /status komandu
+   - Uključiti auto-trade toggle, provjeriti Faza 3 flow
+4. **flutter build apk --debug** i **flutter build windows** — pokrenuti nakon live testa, dokumentirati u WORKLOG.
+5. **Potencijalno potrebne prilagodbe nakon live testa:**
+   - Preciznost LOT_SIZE — Binance vraća grešku -1013 ako qty ne poštuje lot step. Trenutno se koristi fiksno 6 decimala za sell — možda treba per-symbol `exchangeInfo` fetch
+   - Timestamp sync (-1021) — ako sustav ima skew, treba `/api/v3/time` offset adjustment
+   - Binance EU regulatorne restrikcije — neke funkcije možda nedostupne u HR s produkcijskog Binance.com endpointa (potreba prebacivanja na Binance.eu domain?)
+
+---
+
+### File Manifest (lib/) — Stanje nakon Session 3
+
+| Fajl | Linije | Opis |
+|------|--------|------|
+| `main.dart` | 125 | 4-tab nav, PortfolioProvider, telegram polling, stop-loss timer |
+| `models/coin.dart` | 52 | (unchanged) |
+| `models/analysis_log.dart` | 42 | (unchanged) |
+| `models/coin_position.dart` | 52 | **NEW** — Binance spot pozicija, P&L getteri |
+| `models/risk_parameters.dart` | 84 | **NEW** — risk config, isQuietHours, copyWith |
+| `models/trade_proposal.dart` | 26 | **NEW** — pending trade, 60s expiry |
+| `models/trade_result.dart` | 20 | **NEW** — execute outcome |
+| `models/watchlist_provider.dart` | 132 | (unchanged) |
+| `models/analysis_provider.dart` | 131 | (unchanged) |
+| `models/portfolio_provider.dart` | 95 | **NEW** — Binance balance + positions + 30s price refresh |
+| `services/coingecko_service.dart` | 146 | (unchanged) |
+| `services/claude_service.dart` | 122 | (unchanged) |
+| `services/storage_service.dart` | 147 | Binance + Telegram credentials, positions box, risk params |
+| `services/binance_service.dart` | ~270 | **NEW** — HMAC-SHA256 signed REST, testnet/prod switch |
+| `services/trade_service.dart` | ~160 | **NEW** — prepare/execute/auto/checkSL/close |
+| `services/telegram_service.dart` | ~185 | **NEW** — send signals + 5s polling getUpdates |
+| `screens/watchlist_screen.dart` | 256 | (unchanged) |
+| `screens/analysis_screen.dart` | ~480 | + Trade Action Bar (INTERESTING trigger) |
+| `screens/settings_screen.dart` | ~700 | + Binance + Risk Params + Telegram sekcije |
+| `screens/portfolio_screen.dart` | ~290 | **NEW** — header summary + positions + history |
+| `widgets/coin_card.dart` | 306 | (unchanged) |
+| `widgets/chat_bubble.dart` | 50 | (unchanged) |
+| `widgets/sparkline_chart.dart` | 68 | (unchanged) |
+| `theme/app_theme.dart` | 78 | (unchanged) |
+
+---
+
 ## Identified Issues
 
-_No unresolved issues at this time._
+- **Binance account lockout (developer):** SMS 2FA ne stiže, duplicate account na broju — blokira live testing. Nije bug u appu, ali blocker za verifikaciju Session 3 rada.
+- **LOT_SIZE precision hardcoded:** `placeSellOrder` koristi fiksno 6 decimala — Binance može vratiti -1013 za neke simbole. Rješenje: fetch `/api/v3/exchangeInfo` i cache LOT_SIZE stepSize per simbol. Popravak čeka live test da potvrdi realnu pojavu.
+- **Timestamp drift:** ako sistemski sat driftuje, Binance vraća -1021. Trenutno sa `recvWindow=5000ms`. Za robusnost dodati `/api/v3/time` offset calc pri prvoj konekciji.

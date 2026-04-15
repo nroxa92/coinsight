@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:coinsight/models/analysis_provider.dart';
 import 'package:coinsight/models/watchlist_provider.dart';
+import 'package:coinsight/models/coin.dart';
+import 'package:coinsight/models/analysis_log.dart';
+import 'package:coinsight/models/trade_proposal.dart';
+import 'package:coinsight/services/binance_service.dart';
+import 'package:coinsight/services/storage_service.dart';
+import 'package:coinsight/services/trade_service.dart';
+import 'package:coinsight/services/telegram_service.dart';
 import 'package:coinsight/widgets/chat_bubble.dart';
 
 class AnalysisScreen extends StatefulWidget {
@@ -14,13 +21,18 @@ class AnalysisScreen extends StatefulWidget {
 class _AnalysisScreenState extends State<AnalysisScreen> {
   final _controller = TextEditingController();
   final _scrollController = ScrollController();
+  final _amountController = TextEditingController();
+  final _tradeService = TradeService();
   bool _disposed = false;
+  int _dismissedActionBarIndex = -1;
+  bool _executingTrade = false;
 
   @override
   void dispose() {
     _disposed = true;
     _controller.dispose();
     _scrollController.dispose();
+    _amountController.dispose();
     super.dispose();
   }
 
@@ -62,6 +74,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                   ? _buildEmptyState()
                   : _buildMessageList(provider),
             ),
+            _buildTradeActionBarIfEligible(provider),
             if (provider.error != null) _buildErrorBar(provider),
             _buildInputBar(provider),
           ],
@@ -213,6 +226,262 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     );
   }
 
+  // ───────── Trade Action Bar ─────────
+  Widget _buildTradeActionBarIfEligible(AnalysisProvider provider) {
+    if (provider.messages.isEmpty) return const SizedBox.shrink();
+    final lastIndex = provider.messages.length - 1;
+    if (lastIndex == _dismissedActionBarIndex) {
+      return const SizedBox.shrink();
+    }
+    final last = provider.messages[lastIndex];
+    if (last.role != 'assistant') return const SizedBox.shrink();
+    if (!last.content.contains('**INTERESTING**')) {
+      return const SizedBox.shrink();
+    }
+
+    final binance = BinanceService();
+    if (!binance.hasCredentials) return const SizedBox.shrink();
+
+    final riskParams = StorageService.getRiskParameters();
+    if (riskParams.autoTradeEnabled) return const SizedBox.shrink();
+
+    final coins = context.read<WatchlistProvider>().watchlistCoins;
+    if (coins.isEmpty) return const SizedBox.shrink();
+    final coin = coins.first;
+
+    if (_amountController.text.isEmpty) {
+      _amountController.text = riskParams.maxTradeAmountUsdt.toStringAsFixed(2);
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.green.withValues(alpha: 0.08),
+        border: Border.all(color: Colors.green.withValues(alpha: 0.4)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('🚨 ',
+                  style: TextStyle(fontSize: 14)),
+              Text(
+                'INTERESTING signal — ${coin.symbol.toUpperCase()}/USDT',
+                style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.green),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () =>
+                    setState(() => _dismissedActionBarIndex = lastIndex),
+                child: Icon(Icons.close,
+                    size: 16, color: Colors.grey[500]),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Text('Uloži:', style: TextStyle(fontSize: 12)),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 80,
+                height: 36,
+                child: TextField(
+                  controller: _amountController,
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  style: const TextStyle(fontSize: 13),
+                  decoration: const InputDecoration(
+                    contentPadding: EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 6),
+                    isDense: true,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+              const Text('USDT', style: TextStyle(fontSize: 12)),
+              const Spacer(),
+              Text(
+                'SL -${riskParams.stopLossPercent.toStringAsFixed(0)}% | TP +${riskParams.takeProfitPercent.toStringAsFixed(0)}%',
+                style:
+                    TextStyle(fontSize: 11, color: Colors.grey[500]),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  onPressed: _executingTrade
+                      ? null
+                      : () => _buyNow(coin, last.content),
+                  child: _executingTrade
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white))
+                      : const Text('BUY NOW',
+                          style:
+                              TextStyle(fontWeight: FontWeight.w600)),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => _skip(coin, last.content, lastIndex),
+                  child: const Text('SKIP'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => _sendToTelegram(coin, last.content),
+                  child: const Text('TELEGRAM',
+                      style: TextStyle(fontSize: 11)),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _buyNow(Coin coin, String recommendation) async {
+    final amount = double.tryParse(_amountController.text);
+    if (amount == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unesi valjani iznos')),
+      );
+      return;
+    }
+    setState(() => _executingTrade = true);
+    try {
+      final riskParams = StorageService.getRiskParameters();
+      final proposal = await _tradeService.prepareTradeProposal(
+        coin: coin,
+        claudeRecommendation: recommendation,
+        riskParams: riskParams.copyWith(maxTradeAmountUsdt: amount),
+      );
+      if (!mounted) return;
+      final ok = await _showProposalDialog(proposal);
+      if (!ok) return;
+      final result = await _tradeService.executeTrade(proposal);
+      if (!mounted) return;
+      if (result.success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Bought ${result.executedQty?.toStringAsFixed(6)} ${coin.symbol.toUpperCase()} @ \$${result.executedPrice?.toStringAsFixed(6)}')),
+        );
+        setState(() =>
+            _dismissedActionBarIndex = context
+                    .read<AnalysisProvider>()
+                    .messages
+                    .length -
+                1);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result.errorMessage ?? 'Trade failed')),
+        );
+      }
+    } on BinanceException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
+    } finally {
+      if (mounted) setState(() => _executingTrade = false);
+    }
+  }
+
+  Future<bool> _showProposalDialog(TradeProposal p) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF252525),
+        title: Text('Potvrdi kupnju ${p.coin.symbol.toUpperCase()}'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Cijena: \$${p.currentPrice.toStringAsFixed(6)}'),
+            Text('Iznos: \$${p.amountUsdt.toStringAsFixed(2)}'),
+            Text('Qty: ~${p.estimatedQty.toStringAsFixed(6)}'),
+            const SizedBox(height: 8),
+            Text('SL: \$${p.stopLossPrice.toStringAsFixed(6)}',
+                style:
+                    const TextStyle(color: Color(0xFFEF5350), fontSize: 12)),
+            Text('TP: \$${p.takeProfitPrice.toStringAsFixed(6)}',
+                style: const TextStyle(color: Colors.green, fontSize: 12)),
+            const SizedBox(height: 8),
+            Text(
+              'Market order — izvršava se po trenutnoj cijeni.',
+              style: TextStyle(color: Colors.grey[500], fontSize: 11),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('CONFIRM BUY',
+                style: TextStyle(color: Colors.green)),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
+  Future<void> _skip(Coin coin, String recommendation, int idx) async {
+    await StorageService.saveAnalysisLog(AnalysisLog(
+      timestamp: DateTime.now(),
+      coinId: coin.id,
+      coinSymbol: coin.symbol.toUpperCase(),
+      priceAtAnalysis: coin.currentPrice,
+      claudeRecommendation: '[SKIPPED] ${recommendation.length > 200 ? '${recommendation.substring(0, 200)}...' : recommendation}',
+      recommendationType: 'SKIP',
+    ));
+    if (!mounted) return;
+    setState(() => _dismissedActionBarIndex = idx);
+  }
+
+  Future<void> _sendToTelegram(Coin coin, String recommendation) async {
+    final tg = TelegramService();
+    if (!tg.isConfigured) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Telegram nije konfiguriran')),
+      );
+      return;
+    }
+    await tg.sendInterestingSignal(
+      coin: coin,
+      claudeRecommendation: recommendation,
+      riskParams: StorageService.getRiskParameters(),
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Sent to Telegram')),
+    );
+  }
+
   Widget _buildErrorBar(AnalysisProvider provider) {
     return Dismissible(
       key: ValueKey(provider.error),
@@ -316,6 +585,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
             onPressed: () {
               provider.clearChat();
               Navigator.of(ctx).pop();
+              setState(() => _dismissedActionBarIndex = -1);
             },
             child: Text(
               'Clear',
