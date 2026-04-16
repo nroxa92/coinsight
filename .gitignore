@@ -1,4 +1,4 @@
-# Miscellaneous
+# ─── Miscellaneous ────────────────────────────────────────────
 *.class
 *.log
 *.pyc
@@ -12,52 +12,71 @@
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ related
+# ─── IntelliJ / Android Studio ────────────────────────────────
 *.iml
 *.ipr
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# ─── VSCode ───────────────────────────────────────────────────
+.vscode/
 
-# Flutter/Dart/Pub related
+# ─── Flutter / Dart / Pub ─────────────────────────────────────
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
 /build/
 /coverage/
 
-# Symbolication related
+# ─── Symbolication & Obfuscation ──────────────────────────────
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
+# ─── Android build artifacts ──────────────────────────────────
 /android/app/debug
 /android/app/profile
 /android/app/release
 
-# Environment & secrets
+# ─── Android signing (NIKAD ne commitaj!) ─────────────────────
+*.jks
+*.keystore
+key.properties
+/android/key.properties
+
+# ─── Secrets & Environment ────────────────────────────────────
 .env
 .env.*
 *.env
+*.secret
+*.pem
+*.p12
 
-# Hive local data
+# ─── Hive local database ──────────────────────────────────────
+*.hive
+*.lock.hive
 .hive/
 
-# Dev logs
+# ─── Platforme koje ne koristimo (Android only projekt) ───────
+/ios/
+/linux/
+/macos/
+/windows/
+/web/
+
+# ─── Flutter metadata ─────────────────────────────────────────
+.metadata
+
+# ─── Development session dokumenti (interno) ──────────────────
+SESSION_*.md
+CHATLOG.md
 chat_log.md
 work_log.md
 
-# CoinSight specific
-*.hive
-*.lock.hive
-/archive/*.md
-*.secret
+# ─── Archive i temp ───────────────────────────────────────────
+/archive/
+*.tmp
+*.bak

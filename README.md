@@ -1,203 +1,140 @@
+<div align="center">
+
 # CoinSight
 
-> AI-powered three-tier cryptocurrency investment platform
+### AI-powered Three-Tier Cryptocurrency Investment Platform
 
-CoinSight je open source Flutter Android aplikacija koja kombinira
-real-time trzisne podatke, multi-source intelligence monitoring, Claude AI
-analizu i automatsko trgovanje — organizirano kroz tri investicijska
-horizonta (SHORT/MID/LONG) s interaktivnim chart prikazima i push
-notifikacijama.
+[![Flutter](https://img.shields.io/badge/Flutter-3.41+-02569B?logo=flutter)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.11+-0175C2?logo=dart)](https://dart.dev)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/Version-7.0.0-blue)](pubspec.yaml)
+[![Tests](https://img.shields.io/badge/Tests-280%2F280-brightgreen)]()
+[![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android)](https://android.com)
 
-## Three-Tier Investment Framework
+**CoinSight** kombinira multi-source intelligence monitoring, Claude AI analizu
+i automatski trading organiziran kroz tri investicijska horizonta.
 
-| Tier | Horizont | Egzekucija |
-|------|----------|------------|
-| **SHORT** | Sati do dani | Auto-trade, stop-loss/take-profit, DEX listinzi |
-| **MID** | Tjedni do mjeseci | GitHub verifikacija, tokenomics, projekt biljeske |
-| **LONG** | Mjeseci do godina | DCA akumulacija, fundamentalna analiza, tim/partneri |
+[Preuzmi APK](#instalacija) | [Vodic za pocetnike](NEWBIE_GUIDE.md) | [Prirucnik](MANUAL.md) | [Arhitektura](OVERVIEW.md)
 
-Persistent Tier Mode Selector omogucava brzo prebacivanje — svi screenovi
-se adaptiraju aktivnom tieru.
+</div>
 
-## Features
+---
+
+## Sto je CoinSight?
+
+CoinSight je Android aplikacija koja detektira cryptocurrency prilike **ranije od ostalih** pracenjem DEX listinga koji prethode CEX listingima za 1-14 dana, a zatim koristi Claude AI za duboku analizu kroz tri razlicita investicijska pristupa.
+
+### Tri tiera — jedna aplikacija
+
+| | **SHORT** | **MID** | **LONG** |
+|---|---|---|---|
+| **Horizont** | Sati-dani | Tjedni-mjeseci | Mjeseci-godine |
+| **Filozofija** | Early momentum na DEX-u | Value discovery pre-CEX | Fundamental hold |
+| **Intelligence** | DEX listinzi, Telegram, Reddit | GitHub aktivnost, tokenomics | Tim, investitori, partnerstva |
+| **Egzekucija** | Auto-trade + SL/TP | Manualni entry | DCA akumulacija |
+
+Jedan tap na **Tier Mode Selector** ispod AppBara — cijela app se adaptira aktivnom tieru.
+
+---
+
+## Znacajke
 
 ### Intelligence Layer
-- **DEX Early Detection** — Uniswap, PancakeSwap, Raydium i ostali DEX-ovi
-- **GitHub Intelligence** — legitimacy signal kroz crypto repo aktivnost
-- **Reddit Monitoring** — community sentiment iz crypto subreddita
-- **Telegram Monitoring** — javni kanali s keyword filteringom
-- **Cross-Channel Scoring** — confluence score 0-6.0 iz 5 izvora
+Simultano skenira **5 izvora** i kalkulira **confluence score (0-6.0)**:
+
+- **DEX Early Detection** — Uniswap, PancakeSwap, Raydium, Camelot, Aerodrome, QuickSwap (6 blockchaina)
+- **GitHub Intelligence** — legitimacy signal kroz crypto repo aktivnost i star velocity
+- **Reddit Monitor** — community sentiment iz r/CryptoMoonShots, r/altcoin i srodnih
+- **Telegram Monitor** — javni kanali (@whale_alert, @binance, @coingecko...)
+- **CoinGecko** — market data, new listings, price confirmation
 
 ### Trading & Portfolio
-- **Binance Spot** — market buy/sell s HMAC-SHA256 potpisom
-- **Auto-trade** — autonomni mod unutar risk parametara
-- **Stop-Loss / Take-Profit** — automatski monitoring (5min tick)
-- **DEX Position Tracking** — rucno pracenje decentraliziranih trade-ova
-- **Portfolio** — live P&L, open positions, analysis history
+- Binance Spot auto-trade s HMAC-SHA256 potpisom
+- Automatski stop-loss i take-profit (5-min monitoring tick)
+- DEX position tracking — manualni entry, auto price refresh
+- WalletConnect v2 — spajanje MetaMask/Trust Wallet
+- P&L Dashboard — equity curve, win rate, R/R ratio, trade historija
 
-### Charts & Visualization (v6.0.0)
-- **Tier-specific chartovi** — SHORT: 10d + 24h, MID: 6m + 30d, LONG: 2y + 6m
-- **Interaktivni price chart** — CustomPainter s touch crosshair-om
-- **Prediction overlay** — AI-generirane projekcije (disclaimer ukljucen)
-- **Pristup** — ikona chart na CoinCard-u ili iz Analysis screena
+### Grafovi i Vizualizacija
 
-### P&L Dashboard (v7.0.0)
-- **Equity curve** — vizualni prikaz rasta/pada ukupnog portfolija kroz vrijeme
-- **Win rate** — postotak uspjesnih (profitabilnih) trade-ova
-- **Risk/Reward ratio** — prosjecni omjer profita naspram gubitka
-- **Per-tier breakdown** — P&L statistike po investicijskom tieru (SHORT/MID/LONG)
-- **Trade history** — kompletna povijest zatvorenih trade-ova s exit cijenama
+| Tier | Historija | Predikcija |
+|------|-----------|------------|
+| SHORT | 10 dana (hourly) | 24h |
+| MID | 6 mjeseci (daily) | 30 dana |
+| LONG | 2 godine (daily) | 6 mjeseci |
 
-### WalletConnect v2 (v7.0.0)
-- **Wallet connection** — spajanje eksternog walleta putem WalletConnect v2 protokola
-- **Address display** — prikaz spojene wallet adrese u aplikaciji
-- **Swap initiation** — pokretanje token swapova iz CoinSight-a
+### Push Notifikacije
+- Stop-Loss i Take-Profit alertovi
+- INTERESTING signal alert (confluence score)
 
-### Push Notifications (v6.0.0)
-- **SL/TP alerte** — notifikacija kad pozicija dostigne stop-loss ili take-profit
-- **INTERESTING signali** — push kad Claude oznaci coin kao INTERESTING
-- **High-score intelligence** — alert za visok confluence score
-- **Konfiguracijski** — toggle po tipu notifikacije u Settings
-
-### Detail Screens
-- **MidProjectDetailScreen** — thesis, GitHub, entry plan, status, biljeske
+### Detail Screeni
+- **MidProjectDetailScreen** — thesis, GitHub, entry plan, notes
 - **LongHoldingDetailScreen** — 4 taba: Osnove, Fundamentali, DCA, Biljeske
-- **ChartScreen** — full-screen tier-aware price chart s predikcijom
+- **ChartScreen** — tier-aware chart s predikcijom
+- **PnlDashboardScreen** — equity curve, per-tier breakdown
 
-Novi u CoinSightu? Pogledaj [NEWBIE_GUIDE.md](NEWBIE_GUIDE.md) za korak-po-korak uvod.
-
-## Tehnicki stack
-
-| Komponenta | Tehnologija |
-|---|---|
-| Framework | Flutter 3.41+ / Dart 3.11+ |
-| State management | Provider |
-| Trzisni podaci | CoinGecko API v3 (besplatno) |
-| AI analiza | Anthropic Claude API |
-| Trading | Binance Spot REST API |
-| Intelligence | Telegram + Dexscreener + GitHub + Reddit |
-| Notifikacije | flutter_local_notifications |
-| Storage | Hive (lokalno, na uredaju) |
-
-## Preduvjeti
-
-- Android uredaj (API 21+) ili emulator
-- Flutter SDK 3.41+
-- Anthropic API kljuc — [console.anthropic.com](https://console.anthropic.com)
-- Binance account s API kljucem (Spot Trading, bez Withdrawal dozvole)
-- Telegram bot token (opcionalno, za channel monitoring)
+---
 
 ## Instalacija
 
+### Preuzimanje APK-a
+1. Preuzmi `coinsight-v7.0.0.apk` (Assets sekcija)
+2. Android: Postavke -> Sigurnost -> Dopusti nepoznate izvore
+3. Instaliraj i pokreni
+
+### Iz izvora
 ```bash
 git clone https://github.com/nroxa92/claude_coinsight.git
 cd claude_coinsight
 flutter pub get
-flutter build apk --release
+flutter build apk --debug
 ```
 
-APK se nalazi u `build/app/outputs/flutter-apk/app-release.apk`
+---
 
 ## Konfiguracija
 
-1. Instaliraj APK na Android uredaj
-2. Otvori **Settings** tab
-3. Unesi Anthropic API kljuc
-4. Unesi Binance API kljuceve (preporuceno: pocni s Testnetom)
-5. Opcionalno: konfiguriraj Telegram bot za channel monitoring
+| Servis | Obavezno | Namjena |
+|--------|----------|---------|
+| **Anthropic API Key** | Da | Claude AI analiza |
+| **Binance API Key** | Za trading | Spot auto-trade |
+| **Telegram Bot Token** | Preporuceno | Channel monitoring |
+| **GitHub Token** | Preporuceno | Rate limit 60->5000 req/h |
+| **WalletConnect Project ID** | Za DEX | MetaMask spajanje |
 
-Detaljne upute: [MANUAL.md](MANUAL.md)
+Novi korisnik? [NEWBIE_GUIDE.md](NEWBIE_GUIDE.md)
 
-## Arhitektura
+---
 
-```
-lib/
-├── main.dart                    # Entry point, navigation, background services
-├── models/
-│   ├── coin.dart                # CoinGecko data model
-│   ├── coin_position.dart       # Otvorena trading pozicija
-│   ├── closed_trade.dart        # Zatvoreni trade (P&L history)
-│   ├── pnl_analytics.dart       # P&L analitika (win rate, R/R, equity curve)
-│   ├── dex_position.dart        # DEX pozicija model
-│   ├── risk_parameters.dart     # Risk management konfiguracija
-│   ├── analysis_log.dart        # Log Claude analiza
-│   ├── trade_proposal.dart      # Pripremljeni order (pre-execution)
-│   ├── trade_result.dart        # Rezultat izvrsenog ordera
-│   ├── telegram_signal.dart     # Signal iz Telegram kanala
-│   ├── dexscreener_signal.dart  # DEX listing signal
-│   ├── github_signal.dart       # GitHub repo signal
-│   ├── reddit_signal.dart       # Reddit post signal
-│   ├── intelligence_report.dart # Agregirani multi-source report
-│   ├── investment_tier.dart     # SHORT/MID/LONG enum + config
-│   ├── mid_term_project.dart    # MID projekt model
-│   ├── long_term_holding.dart   # LONG holding model
-│   ├── price_chart_data.dart    # Chart data model (OHLC + predikcija)
-│   ├── monitored_channel.dart   # Telegram kanal s reliability scoring
-│   ├── watchlist_provider.dart  # Watchlist state
-│   ├── analysis_provider.dart   # Chat/AI state + intelligence
-│   ├── portfolio_provider.dart  # Portfolio state + live prices
-│   └── tier_provider.dart       # Tier state + MID/LONG CRUD
-├── services/
-│   ├── coingecko_service.dart   # CoinGecko HTTP client
-│   ├── claude_service.dart      # Anthropic Claude HTTP client
-│   ├── binance_service.dart     # Binance REST API + HMAC signing
-│   ├── trade_service.dart       # Trade execution logic
-│   ├── telegram_monitor.dart    # Telegram public channel monitor
-│   ├── storage_service.dart     # Hive local storage wrapper
-│   ├── dexscreener_service.dart # DEX listing discovery
-│   ├── github_intelligence.dart # GitHub crypto repo monitoring
-│   ├── reddit_monitor.dart      # Reddit sentiment monitoring
-│   ├── intelligence_aggregator.dart # Multi-source koordinator
-│   ├── chart_data_service.dart  # CoinGecko historical data + predikcija
-│   ├── notification_service.dart # Push notifikacije (SL/TP/INTERESTING)
-│   └── wallet_service.dart      # WalletConnect v2 integracija
-├── screens/
-│   ├── watchlist_screen.dart    # DEX Early, New Listings, Watchlist, Top Coins
-│   ├── analysis_screen.dart     # Claude AI chat + Trade Action Bar
-│   ├── portfolio_screen.dart    # Pozicije, P&L, History
-│   ├── settings_screen.dart     # API keys, Risk params, Telegram monitor
-│   ├── bot_manager_screen.dart  # Channel management + stats
-│   ├── mid_project_detail_screen.dart  # MID projekt detail
-│   ├── long_holding_detail_screen.dart # LONG holding detail
-│   ├── dex_position_screen.dart # DEX pozicije management
-│   ├── chart_screen.dart        # Full-screen tier-aware price chart
-│   └── pnl_dashboard_screen.dart # P&L dashboard s equity curve i statistikama
-├── widgets/
-│   ├── coin_card.dart           # Coin display + skeleton loader
-│   ├── chat_bubble.dart         # Chat poruka
-│   ├── sparkline_chart.dart     # 7-day sparkline
-│   ├── dex_signal_card.dart     # DEX pair kartica
-│   ├── tier_mode_selector.dart  # SHORT/MID/LONG selector banner
-│   ├── price_chart_widget.dart  # Interaktivni price chart (CustomPainter)
-│   ├── wallet_connect_button.dart # WalletConnect spajanje buttona
-│   └── settings/
-│       ├── api_settings_tab.dart
-│       ├── bot_settings_tab.dart
-│       ├── trade_settings_tab.dart
-│       ├── tier_settings_tab.dart
-│       └── app_settings_tab.dart
-└── theme/
-    └── app_theme.dart           # Dark tema
-```
+## Tehnicki stack
 
-## Sigurnost
+| Komponenta | Tehnologija |
+|-----------|-------------|
+| Framework | Flutter 3.41+ / Dart 3.11+ |
+| AI | Anthropic Claude API (claude-sonnet-4) |
+| Market data | CoinGecko + Dexscreener |
+| Trading | Binance Spot REST + WalletConnect v2 |
+| Intelligence | Telegram + GitHub + Reddit |
+| Charts | fl_chart |
+| Storage | Hive (lokalno) |
 
-- API kljucevi se cuvaju **iskljucivo lokalno** na uredaju (Hive)
-- Nema servera, nema telemetrije, nema cloud pohrane
-- Binance API kljuc NIKAD ne smije imati Withdrawal dozvolu
-- Testnet mode za sigurno testiranje bez pravog novca
+---
 
-## Upozorenje
+## Dokumentacija
 
-Ovo je eksperimentalni alat za osobnu upotrebu. Nije financijski savjet.
-Crypto trading nosi visok rizik gubitka kapitala. Koristi iskljucivo iznose
-koje mozes priustiti izgubiti. DYOR (Do Your Own Research).
+| Dokument | Namjena |
+|----------|---------|
+| [NEWBIE_GUIDE.md](NEWBIE_GUIDE.md) | Vodic za pocetnike |
+| [MANUAL.md](MANUAL.md) | Korisnicki prirucnik |
+| [OVERVIEW.md](OVERVIEW.md) | Tehnicka arhitektura |
+| [WORKLOG.md](WORKLOG.md) | Development log (10 sesija) |
+
+---
 
 ## Licenca
 
-MIT — vidi [LICENSE](LICENSE)
+MIT (c) 2026 Neven Roksandic — [LICENSE](LICENSE)
 
-## Razvoj
-
-Projekt je razvijen kao eksperiment u AI-assisted development koristeci
-Claude Code kroz strukturirane sesije s CLAUDE.md workflow-om.
+<div align="center">
+Izradeno s Claude AI
+</div>

@@ -1594,19 +1594,51 @@ Dodano na kraj system prompta: confluence analiza instrukcije (score 5-6 / 3-4.9
 
 ---
 
-## Identified Issues
+## SESSION FINAL: 2026-04-16 — v7.0.0-final GitHub Cleanup & Release
 
-- **Binance account lockout (developer):** SMS 2FA ne stiže — blokira live testing.
-- ~~**LOT_SIZE precision**~~ — FIXED Session 5
-- ~~**Timestamp drift**~~ — FIXED Session 5
-- ~~**GitHub API rate limit**~~ — FIXED Session 7
-- ~~**Reddit rate limiting**~~ — FIXED Session 7
-- ~~**Dexscreener pair age**~~ — FIXED Session 7
-- ~~**MID Discovery placeholder**~~ — FIXED Session 8
-- ~~**LONG Research basic**~~ — FIXED Session 8
-- ~~**DEX auto-sell**~~ — SL/TP now auto-closes + saves ClosedTrade (Session 10 Faza 4)
-- ~~**Push notifikacije**~~ — FIXED Session 9
-- **CoinGecko historical data limited:** besplatni tier ograničen na 1 godinu za hourly data.
-- **Chart prediction accuracy:** Claude predikcija je sentiment-based, ne matematički model.
-- **WalletConnect stub:** reown_appkit zahtijeva platform konfiguraciju. Trenutno stub — full implementacija u SESSION_11 s web3dart.
-- **P&L historical data:** closed_trades box se popunjava samo za DEX pozicije. Binance close (TradeService.closePosition) još ne kreira ClosedTrade — dodati u SESSION_11.
+**Kontekst:** Prefinal cleanup sesija. Nema novih featurea — samo organizacija repoa za javni GitHub release.
+
+---
+
+### Faza 1 — .gitignore Ažuriranje
+**Status:** Completed
+- Kompletna zamjena .gitignore: platforme (ios/linux/macos/windows/web), signing files, .metadata, SESSION_*.md, archive/, dev logs
+
+### Faza 2 — Brisanje Nepotrebnih Fajlova
+**Status:** Completed
+- Obrisano: SESSION_5.md, CHATLOG.md, SESSION_FINAL.md
+
+### Faza 3 — README.md Rewrite
+**Status:** Completed
+- Profesionalni README s badgeovima (Flutter/Dart/License/Version/Tests/Platform)
+- Three-tier tablica, feature sekcije, instalacija, konfiguracija, tech stack, docs index
+
+### Faza 4 — APK Build
+**Status:** Completed
+- `coinsight-v7.0.0.apk` (145MB debug build) kreiran u root direktoriju
+- `flutter build apk --debug` uspješan
+
+### Faza 5 — Finalni Commit
+**Status:** Prepared (čeka developerovu potvrdu)
+
+**Finalno stanje:**
+- `flutter analyze` — **0 issues**
+- `flutter test` — **280/280 passed**
+- `flutter build apk --debug` — **uspješan**
+- APK u rootu: `coinsight-v7.0.0.apk`
+
+---
+
+---
+
+## Identified Issues (Final State)
+
+**Aktivni:**
+- **CoinGecko historical data limited:** besplatni tier, hourly ograničen na 90 dana
+- **Chart prediction accuracy:** sentiment-based, ne matematički model
+- **WalletConnect stub:** full swap implementacija zahtijeva web3dart + ABI encoding
+- **P&L historical data:** Binance close ne kreira ClosedTrade još
+- **Binance account lockout:** developer 2FA problem
+
+**Riješeni kroz 10 sesija:**
+- ~~LOT_SIZE precision~~ (S5), ~~Timestamp drift~~ (S5), ~~GitHub rate limit~~ (S7), ~~Reddit rate limiting~~ (S7), ~~Dexscreener pair age~~ (S7), ~~MID Discovery~~ (S8), ~~LONG Research~~ (S8), ~~DEX auto-sell~~ (S10), ~~Push notifikacije~~ (S9)
