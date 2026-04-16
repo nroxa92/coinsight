@@ -1290,14 +1290,110 @@ Dodano na kraj system prompta: confluence analiza instrukcije (score 5-6 / 3-4.9
 
 ---
 
+## Session 8: 2026-04-16 — v5.0.0 Detail Screens, DEX Tracking, Discovery Feeds
+
+**Kontekst:** Session 7 dodala Three-Tier framework. Session 8 implementira detail screene za MID/LONG projekte, DEX position tracking, i poboljšane discovery tabove.
+
+---
+
+### Faza 1 — MidProjectDetailScreen
+**Status:** Completed
+
+- `lib/screens/mid_project_detail_screen.dart` — kompletan screen: basic info (symbol/name), GitHub sekcija (fetch via GitHubIntelligence), investment thesis (multiline + Claude analiza), entry plan (target/SL/TP + return preview), notes timeline, status management (PopupMenu), save
+
+### Faza 2 — LongHoldingDetailScreen
+**Status:** Completed
+
+- `lib/screens/long_holding_detail_screen.dart` — 4-tab screen (Osnove/Fundamentali/DCA/Bilješke). Osnove: symbol/name/thesis/targets/confidence. Fundamentali: 7 TextArea (team/investors/partnerships/use case/tokenomics/competitors/roadmap). DCA: purchase list + add form. Bilješke: note types + timeline. Status management + save
+
+### Faza 3 — Navigacija na Detail Screene
+**Status:** Completed
+
+- Watchlist: MID "Otvori" → MidProjectDetailScreen, LONG card → LongHoldingDetailScreen
+- Portfolio: MID/LONG kartice navigiraju na detail screene
+- FAB gumbi u MID/LONG portfolio za nove projekte/holdinge
+- `_navigateToAnalysis()` helper metoda
+
+### Faza 4 — MID Discovery Tab (GitHub Trending)
+**Status:** Completed
+
+- FutureBuilder + `_fetchMidDiscoveryCandidates()`: GitHubIntelligence.getTrendingCryptoToday() filtriran (stars 50-50k, active, crypto). GitHub Discovery kartice s repo info, "Istraži →" gumb → MidProjectDetailScreen
+
+### Faza 5 — LONG Research Tab
+**Status:** Completed
+
+- Top 200 coinova filtriranih za LONG: vol/mcap ratio < 0.5, 24h change -20% do +20%. "LONG" badge gumb → LongHoldingDetailScreen
+
+### Faza 6 — DEX Wallet Integration
+**Status:** Completed
+
+- `lib/models/dex_position.dart` — DexPosition model (SL/TP/P&L computed), DexPositionStatus enum, full toMap/fromMap/copyWith
+- `lib/screens/dex_position_screen.dart` — form za manualni DEX trade entry, pre-fill iz signala
+- StorageService: dex_positions Hive box + CRUD + wallet address storage
+- Portfolio: DEX Positions sekcija u SHORT portfolio
+- DexSignalCard: "Prati +" gumb → DexPositionScreen
+
+### Faza 7 — DEX Position Price Refresh
+**Status:** Completed
+
+- DexscreenerService.getPriceByContract() za live price po contract adresi
+- main.dart: _dexPriceTimer (5min, gated na existing positions), auto-close na SL/TP
+
+### Faza 8 — Settings Wallet Address
+**Status:** Completed
+
+- ApiSettingsTab: Web3 Wallet sekcija (address + save/remove)
+- settings_screen.dart: wallet state + callbacks
+
+### Faza 9 — Testovi
+**Status:** Completed
+
+- `test/unit/models/dex_position_test.dart` (11 testova)
+- Svi Hive test setups ažurirani za dex_positions box
+- _dexPriceTimer gated u main.dart
+- **243/243 passed**
+
+### Faza 10 — Finalizacija
+**Status:** Completed
+
+- `pubspec.yaml` — version 4.0.0+5 → 5.0.0+6
+- `README.md` — Detail Screens & DEX Tracking sekcija
+- `flutter analyze` — **0 issues**
+- `flutter test` — **243/243 passed**
+- `flutter build apk --debug` — **uspješan**
+
+**Novi fajlovi (4):**
+- `lib/models/dex_position.dart`
+- `lib/screens/mid_project_detail_screen.dart`
+- `lib/screens/long_holding_detail_screen.dart`
+- `lib/screens/dex_position_screen.dart`
+- `test/unit/models/dex_position_test.dart`
+
+**Promijenjeni fajlovi (10):**
+- `lib/models/long_term_holding.dart` (copyWith fix)
+- `lib/services/storage_service.dart` (dex box + wallet CRUD)
+- `lib/services/dexscreener_service.dart` (getPriceByContract)
+- `lib/screens/watchlist_screen.dart` (navigation + discovery + research)
+- `lib/screens/portfolio_screen.dart` (DEX positions + navigation + FABs)
+- `lib/widgets/dex_signal_card.dart` (Prati + button)
+- `lib/widgets/settings/api_settings_tab.dart` (wallet section)
+- `lib/screens/settings_screen.dart` (wallet state)
+- `lib/main.dart` (dex price timer)
+- `pubspec.yaml`, `README.md`
+
+---
+
+---
+
 ## Identified Issues
 
 - **Binance account lockout (developer):** SMS 2FA ne stiže — blokira live testing.
-- **API Management only on desktop web:** Binance ograničenje.
-- ~~**LOT_SIZE precision hardcoded**~~ — FIXED Session 5
+- ~~**LOT_SIZE precision**~~ — FIXED Session 5
 - ~~**Timestamp drift**~~ — FIXED Session 5
-- ~~**GitHub API rate limit**~~ — **FIXED Session 7 Faza 1** — optional token u Settings
-- ~~**Reddit rate limiting**~~ — **FIXED Session 7 Faza 1** — exponential backoff retry
-- ~~**Dexscreener pair age accuracy**~~ — **FIXED Session 7 Faza 1** — timestamp validacija
-- **MID Discovery tab placeholder:** trenutno prikazuje samo basic tekst, trebalo bi integrirati GitHub trending filtriran za MID kriterije (rank 100-500, aktivan repo)
-- **LONG Research tab basic:** prikazuje top 100 coinove, trebalo bi dodati dublje filtriranje po fundamentalima
+- ~~**GitHub API rate limit**~~ — FIXED Session 7
+- ~~**Reddit rate limiting**~~ — FIXED Session 7
+- ~~**Dexscreener pair age**~~ — FIXED Session 7
+- ~~**MID Discovery placeholder**~~ — **FIXED Session 8 Faza 4** — GitHub trending feed
+- ~~**LONG Research basic**~~ — **FIXED Session 8 Faza 5** — filtered top 200
+- **DEX auto-sell not implemented:** SL/TP hit samo logira u console, ne izvršava prodaju (DEX swap zahtijeva WalletConnect — SESSION_9)
+- **Push notifikacije za SL/TP:** flutter_local_notifications dodan ali nije integriran — SESSION_9

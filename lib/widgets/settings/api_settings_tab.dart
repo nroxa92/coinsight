@@ -29,6 +29,11 @@ class ApiSettingsTab extends StatelessWidget {
   final VoidCallback onSaveGithubToken;
   final VoidCallback onRemoveGithubToken;
 
+  final TextEditingController walletController;
+  final bool walletConfigured;
+  final VoidCallback onSaveWallet;
+  final VoidCallback onRemoveWallet;
+
   const ApiSettingsTab({
     super.key,
     required this.apiKeyController,
@@ -56,6 +61,10 @@ class ApiSettingsTab extends StatelessWidget {
     required this.githubConfigured,
     required this.onSaveGithubToken,
     required this.onRemoveGithubToken,
+    required this.walletController,
+    required this.walletConfigured,
+    required this.onSaveWallet,
+    required this.onRemoveWallet,
   });
 
   @override
@@ -70,6 +79,8 @@ class ApiSettingsTab extends StatelessWidget {
         _buildBinanceSection(context),
         const SizedBox(height: 16),
         _buildGithubSection(context),
+        const SizedBox(height: 16),
+        _buildWalletSection(context),
       ],
     );
   }
@@ -101,6 +112,12 @@ class ApiSettingsTab extends StatelessWidget {
               'GitHub',
               githubConfigured ? 'Authenticated' : 'Public (60 req/h)',
               githubConfigured,
+            ),
+            const SizedBox(height: 8),
+            _statusRow(
+              'Web3 Wallet',
+              walletConfigured ? 'Connected' : 'Not set',
+              walletConfigured,
             ),
           ],
         ),
@@ -364,6 +381,58 @@ class ApiSettingsTab extends StatelessWidget {
                   const SizedBox(width: 8),
                   OutlinedButton(
                     onPressed: onRemoveGithubToken,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.error,
+                      side: BorderSide(
+                          color: Theme.of(context).colorScheme.error),
+                    ),
+                    child: const Text('Remove'),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWalletSection(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _sectionHeader(
+                context, Icons.account_balance_wallet, 'Web3 Wallet',
+                statusLabel: walletConfigured ? 'Connected' : 'Not set',
+                statusActive: walletConfigured),
+            const SizedBox(height: 8),
+            Text(
+              'Wallet adresa za praćenje DEX pozicija. Podržava EVM (ETH, BSC, Polygon, Arbitrum, Base) i Solana.',
+              style: TextStyle(color: Colors.grey[500], fontSize: 12),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: walletController,
+              decoration: const InputDecoration(
+                labelText: 'Wallet Address (0x... ili Sol...)',
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: onSaveWallet,
+                    child: const Text('Save'),
+                  ),
+                ),
+                if (walletConfigured) ...[
+                  const SizedBox(width: 8),
+                  OutlinedButton(
+                    onPressed: onRemoveWallet,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Theme.of(context).colorScheme.error,
                       side: BorderSide(

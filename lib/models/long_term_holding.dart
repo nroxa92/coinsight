@@ -61,13 +61,16 @@ class LongTermHolding {
       DateTime.now().difference(firstResearchDate).inDays;
 
   LongTermHolding copyWith({
+    String? symbol, String? name, String? coinGeckoId,
     LongTermStatus? status, List<LongTermPurchase>? purchases,
     double? targetPriceMin, double? targetPriceMax,
     String? investmentThesis, LongTermFundamentals? fundamentals,
     List<LongTermNote>? notes, int? claudeConfidenceScore,
   }) => LongTermHolding(
-    id: id, symbol: symbol, name: name, coinGeckoId: coinGeckoId,
-    firstResearchDate: firstResearchDate,
+    id: id, firstResearchDate: firstResearchDate,
+    symbol: symbol ?? this.symbol,
+    name: name ?? this.name,
+    coinGeckoId: coinGeckoId ?? this.coinGeckoId,
     status: status ?? this.status,
     purchases: purchases ?? this.purchases,
     targetPriceMin: targetPriceMin ?? this.targetPriceMin,

@@ -5,11 +5,13 @@ import 'package:coinsight/models/dexscreener_signal.dart';
 class DexSignalCard extends StatelessWidget {
   final DexscreenerSignal signal;
   final VoidCallback? onAnalyze;
+  final VoidCallback? onTrack;
 
   const DexSignalCard({
     super.key,
     required this.signal,
     this.onAnalyze,
+    this.onTrack,
   });
 
   @override
@@ -121,6 +123,17 @@ class DexSignalCard extends StatelessWidget {
                 _stat('V/L',
                     '${signal.volumeLiquidityRatio.toStringAsFixed(1)}x'),
                 const Spacer(),
+                TextButton.icon(
+                  onPressed: onTrack,
+                  icon: const Icon(Icons.add_circle_outline, size: 14),
+                  label: const Text('Prati +',
+                      style: TextStyle(fontSize: 12)),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.green,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
+                  ),
+                ),
                 TextButton.icon(
                   onPressed: onAnalyze,
                   icon: const Icon(Icons.auto_awesome, size: 14),

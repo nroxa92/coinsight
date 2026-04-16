@@ -2,7 +2,7 @@
 
 **Za koga je ovaj priručnik:** netko tko prvi put otvara CoinSight. Ne pretpostavljamo da znaš što je market cap, što je Spot trading, niti kako funkcionira API ključ. Sve se objašnjava u hodu.
 
-**Verzija aplikacije:** 4.0.0
+**Verzija aplikacije:** 5.0.0
 **Licenca:** MIT (open source)
 **Platforma:** Android (primarno) + Windows desktop
 **Datum priručnika:** 2026-04-16
@@ -24,6 +24,9 @@
 2. [Osnovne crypto pojmove koje trebaš razumjeti](#2-osnovne-crypto-pojmove)
 3. [Što ti treba prije nego kreneš](#3-što-ti-treba-prije-nego-kreneš)
 3A. [Three-Tier Investment Framework (v4.0.0)](#3a-three-tier-investment-framework)
+3B. [MidProjectDetailScreen (v5.0.0)](#3b-midprojectdetailscreen)
+3C. [LongHoldingDetailScreen (v5.0.0)](#3c-longholdingdetailscreen)
+3D. [DEX Position Tracking (v5.0.0)](#3d-dex-position-tracking)
 4. [Prvo pokretanje aplikacije — što ćeš vidjeti](#4-prvo-pokretanje-aplikacije)
 5. [Turneja po aplikaciji — 4 taba + DEX Early](#5-turneja-po-aplikaciji)
 6. [Postavljanje API ključeva — korak po korak](#6-postavljanje-api-ključeva)
@@ -69,6 +72,8 @@ Traje 10-15 minuta po coinu. **CoinSight sve to radi u jednoj app-i u ~60 sekund
 Verzija 3.0.0 dodala je **Intelligence Layer** — sustav koji prati DEX listinge, GitHub aktivnost, Reddit diskusije i Telegram kanale, te sve to objedinjuje u obavještajni izvještaj za Claude analizu.
 
 Verzija 4.0.0 uvodi **Three-Tier Investment Framework** — umjesto jednog pristupa za sve, sada imas tri razlicita investicijska moda: **SHORT** (kratkorocni momentum, do 48h), **MID** (srednjorocni projekti, tjedni do mjeseci) i **LONG** (dugorocna fundamentalna ulaganja, mjeseci do godine). Svaki tier ima vlastite alate, analizu i portfolio prikaz.
+
+Verzija 5.0.0 dodaje **detail screenove** za MID projekte i LONG holdinge, **DEX Position Tracking** za rucno pracenje trade-ova s decentraliziranih burzi, te **MID Discovery** (GitHub trending) i **LONG Research** (filtrirani top 200) pod-tabove u Watchlistu.
 
 ### 1.3 Što CoinSight NIJE
 
@@ -277,6 +282,104 @@ Claude prilagodava analizu ovisno o aktivnom tier-u:
 
 ---
 
+## 3B. MidProjectDetailScreen (v5.0.0)
+
+### 3B.1 Sto je MidProjectDetailScreen
+
+MidProjectDetailScreen je **detaljan ekran za upravljanje pojedinacnim MID tier projektom**. Otvara se tapom na projekt iz Portfolio MID sekcije ili kreiranjem novog projekta iz Analysis MID action bara ili Discovery taba.
+
+### 3B.2 Kako koristiti
+
+**Kreiranje projekta:**
+1. Prebaci na **MID** tier u TierModeSelector-u
+2. U **Analysis tabu**, kad Claude identificira MID-term priliku, tapni **CREATE PROJECT** u MID Action Baru
+3. Alternativno: u **Watchlist → MID Discovery** tabu pronadi coin i kreiraj projekt direktno
+
+**Sto mozes raditi na detail screenu:**
+- **Editiraj thesis** — upisi zasto pratis ovaj projekt, koji je tvoj investicijski teorem
+- **Editiraj GitHub link** — dodaj link na GitHub repozitorij projekta za pracenje razvoja
+- **Editiraj entry plan** — definisi plan ulaza (cijena, uvjeti, iznos)
+- **Upravljaj statusom** — prebaci projekt izmedu statusa: ACTIVE / COMPLETED / ABANDONED
+- **Dodaj biljeske** — zapisuj zapazanja, vijesti, katalyst update-ove
+
+### 3B.3 Status lifecycle
+
+| Status | Znacenje |
+|--------|----------|
+| **ACTIVE** | Projekt se aktivno prati, katalyst u tijeku |
+| **COMPLETED** | Uspjesno zavrsen (profit ostvaren ili cilj postignut) |
+| **ABANDONED** | Napusten (uvjeti se promijenili, projekt propao) |
+
+---
+
+## 3C. LongHoldingDetailScreen (v5.0.0)
+
+### 3C.1 Sto je LongHoldingDetailScreen
+
+LongHoldingDetailScreen je **detaljan ekran za upravljanje pojedinacnim LONG tier holdingom** s cetiri taba za organizirane informacije.
+
+### 3C.2 Cetiri taba
+
+| Tab | Sadrzaj |
+|-----|---------|
+| **Osnove** | Osnovne informacije o holdingu: coin info, thesis, prosjecna cijena, ukupna kolicina, ukupna investicija |
+| **Fundamentali** | Pracenje fundamentala projekta: team, tehnologija, adoption, tokenomics, competitive positioning |
+| **DCA** | Pregled i dodavanje DCA kupnji — svaka kupnja s cijenom, kolicinom i datumom. Prikaz prosjecne DCA cijene |
+| **Biljeske** | Slobodne biljeske o holdingu — zapazanja, makro trendovi, rebalancing planovi |
+
+### 3C.3 Kako dodati DCA kupnju
+
+1. Otvori LongHoldingDetailScreen za zeljeni holding
+2. Prebaci na **DCA** tab
+3. Tapni **+ Dodaj DCA kupnju** button
+4. Unesi **cijenu**, **kolicinu** i **datum** kupnje
+5. Potvrdi — kupnja se sprema i prosjecna cijena se automatski preracunava
+
+### 3C.4 Upravljanje fundamentalima
+
+Na **Fundamentali** tabu mozes pratiti kljucne aspekte projekta:
+- Team kvaliteta i track record
+- Tehnoloska inovacija i roadmap progress
+- Adoption metrke (korisnici, TVL, transakcije)
+- Tokenomics (supply, distribucija, unlock schedule)
+
+---
+
+## 3D. DEX Position Tracking (v5.0.0)
+
+### 3D.1 Sto je DEX Position Tracking
+
+DEX Position Tracking omogucava **rucno pracenje trade-ova s decentraliziranih burzi** (Dexscreener). Buduci da CoinSight ne moze direktno izvrsavati trade-ove na DEX-ovima (za razliku od Binance Spot-a), korisnik rucno unosi podatke o trade-ovima.
+
+### 3D.2 Kako koristiti
+
+1. Izvrsi trade na DEX-u (Uniswap, PancakeSwap, Raydium, itd.) koristeci svoj wallet
+2. U CoinSight-u, otvori **Portfolio → SHORT** sekciju → **DEX pozicije**
+3. Tapni **+ Nova DEX pozicija**
+4. Unesi podatke s Dexscreenera: token adresa/simbol, entry cijena, kolicina, DEX, chain
+5. Postavi **SL (Stop-Loss)** i **TP (Take-Profit)** razine
+
+### 3D.3 Automatski price refresh
+
+- CoinSight automatski osvjezava cijenu DEX pozicija putem Dexscreener API-ja
+- P&L se racuna u realnom vremenu na osnovu trenutne cijene
+
+### 3D.4 SL/TP monitoring
+
+- App prati SL i TP razine za DEX pozicije
+- Kad cijena dosegne SL ili TP, **dobivas vizualno upozorenje** (app ne moze automatski prodati na DEX-u)
+- Ti rucno zatvaras poziciju na DEX-u i oznacavas je kao zatvorenu u CoinSight-u
+
+### 3D.5 Vazna razlika od Binance pozicija
+
+| Binance Spot | DEX pozicije |
+|-------------|-------------|
+| App automatski kupuje/prodaje | Rucni unos trade-ova |
+| SL/TP automatski izvrsava sell | SL/TP samo upozorava (vizualno) |
+| Podaci iz Binance API-ja | Podaci iz Dexscreener-a + rucni unos |
+
+---
+
 ## 4. Prvo pokretanje aplikacije
 
 ### 4.1 Instalacija
@@ -376,9 +479,17 @@ Kad tapneš tab, ikona se "puni" (outline verzija postaje solidna).
 
 Sada ćemo proći svaki tab da vidiš što je gdje. **Ne treba ništa konfigurirati još** — samo upoznaj ekrane.
 
-### 5.1 Tab [*] Watchlist — 4 pod-taba
+### 5.1 Tab [*] Watchlist — pod-tabi (tier-zavisni)
 
-Prvi tab koji vidiš kad otvoriš app. Tab bar je **scrollable** (isScrollable: true) jer ima 4 pod-taba — swipe lijevo-desno ako ti ne stanu svi na ekran.
+Prvi tab koji vidiš kad otvoriš app. Tab bar je **scrollable** (isScrollable: true) — swipe lijevo-desno ako ti ne stanu svi na ekran. Broj i sadrzaj pod-tabova ovisi o aktivnom tier-u.
+
+**SHORT tier:** DEX Early | New Listings | My Watchlist | Top Coins
+**MID tier:** DEX Early | New Listings | My Watchlist | **MID Discovery** | Projekti | Top Coins
+**LONG tier:** DEX Early | New Listings | My Watchlist | **LONG Research** | Top Coins
+
+**MID Discovery (v5.0.0):** Prikazuje **live GitHub trending** kripto projekte — repozitorije s naglim porastom zvjezdica i aktivnosti u zadnjih 24h. Korisno za otkrivanje novih projekata s razvojnim momentumom.
+
+**LONG Research (v5.0.0):** Prikazuje **filtrirani top 200** coinova po market capu, optimizirano za fundamentalnu analizu — fokus na etablirane projekte s dokazanim track recordom pogodne za dugorocno drzanje.
 
 **Pod-tab 1: DEX Early (default, prvi) — NOVO u v3.0.0**
 
@@ -562,13 +673,17 @@ S pozicijom:
 +----------------------------------+
 ```
 
-**MID Portfolio prikaz (v4.0.0):**
+**SHORT Portfolio prikaz (v5.0.0):**
 
-Kad je aktivan MID tier, Portfolio tab prikazuje tvoje **MidTermProject** zapise umjesto kratkorocnih pozicija — svaki projekt s coin info, katalyst opisom, target cijenom, deadline-om, i progress barom do katalysta.
+Uz Binance Spot pozicije, SHORT tier sada prikazuje i **DEX pozicije** — rucno unesene trade-ove s decentraliziranih burzi s automatskim price refreshom i SL/TP monitoringom. Vidi sekciju 3D za detalje.
 
-**LONG Portfolio prikaz (v4.0.0):**
+**MID Portfolio prikaz (v4.0.0+):**
 
-Kad je aktivan LONG tier, Portfolio tab prikazuje tvoje **LongTermHolding** zapise — svaki holding s prosjecnom DCA cijenom, ukupnom kolicinom, thesis opisom, i listom svih DCA kupnji.
+Kad je aktivan MID tier, Portfolio tab prikazuje tvoje **MidTermProject** zapise — svaki projekt s coin info, katalyst opisom, target cijenom, deadline-om, i progress barom do katalysta. **Novo u v5.0.0:** FAB (Floating Action Button) za brzo kreiranje novog MID projekta direktno iz Portfolio taba. Tap otvara MidProjectDetailScreen.
+
+**LONG Portfolio prikaz (v4.0.0+):**
+
+Kad je aktivan LONG tier, Portfolio tab prikazuje tvoje **LongTermHolding** zapise — svaki holding s prosjecnom DCA cijenom, ukupnom kolicinom, thesis opisom, i listom svih DCA kupnji. **Novo u v5.0.0:** FAB (Floating Action Button) za brzo kreiranje novog LONG holdinga direktno iz Portfolio taba. Tap otvara LongHoldingDetailScreen.
 
 **Intelligence Dashboard (v3.0.0):**
 
@@ -610,6 +725,7 @@ Ispod pozicija, Portfolio tab sada prikazuje **Intelligence Dashboard** — zadn
 Konfiguracija API ključeva:
 - **Anthropic API Key** — za Claude AI analizu
 - **Binance API** — za Spot trading (ključ + secret + testnet toggle + Test button)
+- **Web3 Wallet address (v5.0.0)** — adresa tvog Web3 walleta (MetaMask, Trust Wallet, Phantom...) za povezivanje s DEX pozicijama
 
 **Pod-tab 2: Bot**
 
@@ -1757,7 +1873,7 @@ A: Mjera koliko nezavisnih izvora se slaže oko signala za coin. Score ide od 0 
 A: Koristi Manage → App → Export logs before reset. Za potpuni reset: Manage → App → Full reset. Binance pozicije ostaju na Binanceu neovisno o app-u.
 
 **Q: Koliko testova ima CoinSight?**
-A: Test suite sadrži **232 testova** koji pokrivaju servise, widgete i integracije.
+A: Test suite sadrži **243 testova** koji pokrivaju servise, widgete i integracije.
 
 **Q: Što znači "Timestamp out of sync" greška?**
 A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 automatski sinkronizira putem `/api/v3/time`. Ako se greška ponovi, provjeri da je automatsko vrijeme uključeno na uredjaju.
@@ -1779,6 +1895,8 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 | **DCA (Dollar-Cost Averaging)** | Strategija kupnje fiksnog iznosa u redovitim intervalima, neovisno o cijeni — smanjuje utjecaj volatilnosti |
 | **DEX** | Decentralizirana burza (Decentralized Exchange) — trgovanje bez posrednika, direktno na blockchainu (npr. Uniswap, PancakeSwap) |
 | **DEX Early** | Prvi pod-tab Watchlist-a, prikazuje svježe DEX listinge detektirane putem Dexscreenera |
+| **DEX Position Screen** | Ekran za upravljanje DEX pozicijama — rucni unos trade-ova, automatski price refresh, SL/TP monitoring |
+| **DexPosition** | Model za rucno pracenu DEX poziciju: token, entry cijena, kolicina, DEX, chain, SL/TP razine |
 | **Dexscreener** | Servis koji prati nove tokene na decentraliziranim burzama. Intelligence Layer ga koristi za DEX Early tab |
 | **ENTERED** | Oznaka u Analysis History za trenutak kad si otvorio poziciju |
 | **EXITED** | Oznaka u Analysis History za trenutak kad si zatvorio poziciju |
@@ -1796,11 +1914,15 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 | **Keyword filtering** | Filtriranje Telegram poruka po ključnim riječima (listing, whale, alert...) |
 | **KYC** | "Know Your Customer" — Binance verifikacija identiteta (osobna + selfie) |
 | **Liquidity** | Količina sredstava dostupnih u DEX pool-u za trgovanje. Veća likvidnost = manji slippage |
+| **LONG Research** | Pod-tab u Watchlist-u (LONG tier), prikazuje filtrirani top 200 coinova po market capu za fundamentalnu analizu |
 | **LONG tier** | Dugorocni investicijski mod (mjeseci do godine+) — fokus na fundamentalnu analizu, DCA kupnje, i praćenje fundamentala |
+| **LongHoldingDetailScreen** | Detaljan ekran za LONG holding s 4 taba: Osnove, Fundamentali, DCA, Biljeske |
 | **LOT_SIZE** | Binance filter koji definira minimalnu i maksimalnu količinu tokena te stepSize za trade |
-| **Manage tab** | Četvrti tab u navigaciji (ikona tune), sadrži 4 pod-taba: API, Bot, Trade, App |
+| **Manage tab** | Četvrti tab u navigaciji (ikona tune), sadrži 5 pod-tabova: API, Bot, Trade, Tiers, App |
 | **Market cap** | Ukupna vrijednost svih coinova u opticaju u USD |
+| **MID Discovery** | Pod-tab u Watchlist-u (MID tier), prikazuje live GitHub trending kripto projekte |
 | **MID tier** | Srednjorocni investicijski mod (tjedni do mjeseci) — fokus na projekte s katalystom, target price, i deadline praćenje |
+| **MidProjectDetailScreen** | Detaljan ekran za MID projekt — editiranje thesis, GitHub linka, entry plana, upravljanje statusom i biljeske |
 | **Market order** | Kupnja/prodaja **po trenutnoj tržišnoj cijeni** (ne limit) |
 | **MIT licenca** | Open source licenca koja dozvoljava slobodno korištenje, modifikaciju i distribuciju |
 | **My Watchlist** | Tvoj izbor coinova (označeni zvjezdicom) |
@@ -1852,8 +1974,8 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 
 **Ako si ovo pročitao sve:** spreman si za prvi dan. Kreni s malim iznosima, bilježi rezultate, i **ne žuri povećavati rizik**. Konzistentnost kroz tjedne pobjeduje naglu agresivnost.
 
-**CoinSight v4.0.0** — Open Source, MIT License
-**Test suite:** 232 testova
+**CoinSight v5.0.0** — Open Source, MIT License
+**Test suite:** 243 testova
 **Izvorni kod:** javno dostupan
 
 Sretno!

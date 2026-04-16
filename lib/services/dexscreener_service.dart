@@ -106,6 +106,52 @@ class DexscreenerService {
     }
   }
 
+  /// Dohvaća trenutnu cijenu tokena po contract adresi i chainu
+  Future<double?> getPriceByContract(
+      String contractAddress, String chainId) async {
+    final uri = Uri.parse(
+      '$_baseUrl/tokens/$contractAddress',
+    );
+
+    try {
+      final res = await _client.get(uri).timeout(_timeout);
+      if (res.statusCode != 200) return null;
+
+      final data = json.decode(res.body) as Map<String, dynamic>;
+      final pairs = data['pairs'] as List<dynamic>? ?? [];
+      if (pairs.isEmpty) return null;
+
+      // Filter to matching chain, sort by liquidity, return highest priceUsd
+      final matching = pairs
+          .map((p) => p as Map<String, dynamic>)
+          .where((p) => (p['chainId'] as String?) == chainId)
+          .toList();
+
+      if (matching.isEmpty) {
+        // Fallback: use any chain pair
+        final firstPrice =
+            double.tryParse(pairs.first['priceUsd']?.toString() ?? '');
+        return firstPrice;
+      }
+
+      // Sort by liquidity descending
+      matching.sort((a, b) {
+        final liqA =
+            (a['liquidity'] as Map<String, dynamic>?)?['usd'] as num? ?? 0;
+        final liqB =
+            (b['liquidity'] as Map<String, dynamic>?)?['usd'] as num? ?? 0;
+        return liqB.compareTo(liqA);
+      });
+
+      return double.tryParse(
+          matching.first['priceUsd']?.toString() ?? '');
+    } on TimeoutException {
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   bool _isRelevant(DexscreenerSignal signal) {
     if (!signal.hasMinimumLiquidity) return false;
     if (signal.volumeUsd24h < _minVolumeUsd) return false;

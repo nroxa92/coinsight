@@ -14,6 +14,8 @@ import 'package:coinsight/screens/watchlist_screen.dart';
 import 'package:coinsight/screens/analysis_screen.dart';
 import 'package:coinsight/screens/settings_screen.dart';
 import 'package:coinsight/screens/portfolio_screen.dart';
+import 'package:coinsight/services/dexscreener_service.dart';
+import 'package:coinsight/models/dex_position.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,6 +62,8 @@ class _MainNavigationState extends State<MainNavigation> {
 
   final TradeService _tradeService = TradeService();
   Timer? _stopLossTimer;
+  Timer? _dexPriceTimer;
+  final DexscreenerService _dexService = DexscreenerService();
 
   @override
   void initState() {
@@ -79,11 +83,54 @@ class _MainNavigationState extends State<MainNavigation> {
         (_) => _tradeService.checkStopLosses(),
       );
     }
+
+    // Start DEX position price refresh (only if positions exist)
+    _dexPriceTimer?.cancel();
+    if (StorageService.getDexPositions().isNotEmpty) {
+      _dexPriceTimer = Timer.periodic(
+        const Duration(minutes: 5),
+        (_) => _refreshDexPrices(),
+      );
+    }
+  }
+
+  Future<void> _refreshDexPrices() async {
+    final positions = StorageService.getDexPositions()
+        .where((p) => p.status == DexPositionStatus.open)
+        .toList();
+    if (positions.isEmpty) return;
+
+    for (final pos in positions) {
+      try {
+        final price = await _dexService.getPriceByContract(
+          pos.contractAddress,
+          pos.chainId,
+        );
+        if (price == null) continue;
+
+        var updated = pos.copyWith(currentPrice: price);
+
+        // Check SL/TP
+        if (updated.isStopLossHit) {
+          updated = updated.copyWith(status: DexPositionStatus.closedSL);
+        } else if (updated.isTakeProfitHit) {
+          updated = updated.copyWith(status: DexPositionStatus.closedTP);
+        }
+
+        await StorageService.saveDexPosition(updated);
+      } catch (_) {
+        continue;
+      }
+
+      // Rate limit courtesy
+      await Future.delayed(const Duration(milliseconds: 300));
+    }
   }
 
   @override
   void dispose() {
     _stopLossTimer?.cancel();
+    _dexPriceTimer?.cancel();
     super.dispose();
   }
 

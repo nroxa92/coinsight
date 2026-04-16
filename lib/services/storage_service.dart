@@ -6,6 +6,7 @@ import 'package:coinsight/models/risk_parameters.dart';
 import 'package:coinsight/models/investment_tier.dart';
 import 'package:coinsight/models/mid_term_project.dart';
 import 'package:coinsight/models/long_term_holding.dart';
+import 'package:coinsight/models/dex_position.dart';
 
 class StorageService {
   static const _settingsBox = 'settings';
@@ -25,6 +26,8 @@ class StorageService {
   static const _midProjectsBox = 'mid_term_projects';
   static const _longHoldingsBox = 'long_term_holdings';
   static const _githubTokenField = 'github_personal_token';
+  static const _dexPositionsBox = 'dex_positions';
+  static const _walletAddressField = 'wallet_address';
 
   static Future<void> init() async {
     await Hive.initFlutter();
@@ -35,6 +38,7 @@ class StorageService {
     await Hive.openBox(_monitoredChannelsDetailBox);
     await Hive.openBox(_midProjectsBox);
     await Hive.openBox(_longHoldingsBox);
+    await Hive.openBox(_dexPositionsBox);
   }
 
   // API Key
@@ -251,6 +255,7 @@ class StorageService {
     await Hive.box(_monitoredChannelsDetailBox).clear();
     await Hive.box(_midProjectsBox).clear();
     await Hive.box(_longHoldingsBox).clear();
+    await Hive.box(_dexPositionsBox).clear();
   }
 
   // ─── Active Tier ─────────────────────────────────
@@ -367,5 +372,39 @@ class StorageService {
       notes: [...holding.notes, note],
     );
     await box.put(holdingId, updated.toMap());
+  }
+
+  // ─── DEX Positions ────────────────────────────────
+  static List<DexPosition> getDexPositions() {
+    final box = Hive.box(_dexPositionsBox);
+    return box.values
+        .map((item) => DexPosition.fromMap(item as Map<dynamic, dynamic>))
+        .toList()
+      ..sort((a, b) => b.entryTime.compareTo(a.entryTime));
+  }
+
+  static Future<void> saveDexPosition(DexPosition position) async {
+    final box = Hive.box(_dexPositionsBox);
+    await box.put(position.id, position.toMap());
+  }
+
+  static Future<void> deleteDexPosition(String id) async {
+    await Hive.box(_dexPositionsBox).delete(id);
+  }
+
+  // ─── Wallet Address ───────────────────────────────
+  static String? getWalletAddress() {
+    final box = Hive.box(_settingsBox);
+    return box.get(_walletAddressField) as String?;
+  }
+
+  static Future<void> saveWalletAddress(String address) async {
+    final box = Hive.box(_settingsBox);
+    await box.put(_walletAddressField, address);
+  }
+
+  static Future<void> deleteWalletAddress() async {
+    final box = Hive.box(_settingsBox);
+    await box.delete(_walletAddressField);
   }
 }

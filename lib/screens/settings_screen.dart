@@ -35,6 +35,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _githubTokenController = TextEditingController();
   bool _obscureGithubToken = true;
   bool _githubConfigured = false;
+  final _walletController = TextEditingController();
+  bool _walletConfigured = false;
 
   // Trade tab state
   late RiskParameters _risk;
@@ -67,6 +69,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _githubTokenController.text = '••••••••••••••••';
     }
 
+    _walletConfigured = StorageService.getWalletAddress()?.isNotEmpty ?? false;
+    if (_walletConfigured) {
+      _walletController.text = StorageService.getWalletAddress() ?? '';
+    }
+
     _risk = StorageService.getRiskParameters();
     _maxTradeController.text = _risk.maxTradeAmountUsdt.toStringAsFixed(2);
 
@@ -87,6 +94,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _monitorTokenController.dispose();
     _addChannelController.dispose();
     _githubTokenController.dispose();
+    _walletController.dispose();
     super.dispose();
   }
 
@@ -143,6 +151,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       githubConfigured: _githubConfigured,
                       onSaveGithubToken: _saveGithubToken,
                       onRemoveGithubToken: _removeGithubToken,
+                      walletController: _walletController,
+                      walletConfigured: _walletConfigured,
+                      onSaveWallet: _saveWallet,
+                      onRemoveWallet: _removeWallet,
                     ),
                     const TierSettingsTab(),
                     BotSettingsTab(
@@ -371,6 +383,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('GitHub token removed')),
+    );
+  }
+
+  // ───────── Wallet actions ─────────
+  Future<void> _saveWallet() async {
+    final address = _walletController.text.trim();
+    if (address.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unesi wallet adresu')),
+      );
+      return;
+    }
+    await StorageService.saveWalletAddress(address);
+    if (!mounted) return;
+    setState(() => _walletConfigured = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Wallet adresa spremljena')),
+    );
+  }
+
+  Future<void> _removeWallet() async {
+    await StorageService.deleteWalletAddress();
+    if (!mounted) return;
+    setState(() {
+      _walletConfigured = false;
+      _walletController.clear();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Wallet adresa uklonjena')),
     );
   }
 

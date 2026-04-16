@@ -39,6 +39,13 @@ CoinSight podržava tri investicijske strategije unutar jedne aplikacije:
 
 Persistent Tier Mode Selector omogućava brzo prebacivanje — svi screenovi se adaptiraju aktivnom tieru.
 
+### Detail Screens & DEX Tracking (v5.0)
+- **MidProjectDetailScreen** — thesis, GitHub analiza, entry plan, notes timeline, status management
+- **LongHoldingDetailScreen** — 4 taba: Osnove, Fundamentali, DCA History, Bilješke
+- **DEX Position Tracking** — manualno evidentiraj kupnje s DEX-ova, auto price refresh svakih 5min
+- **GitHub Discovery** — live GitHub trending feed za MID kandidate
+- **LONG Research** — filtrirani top coinovi za fundamentalnu analizu
+
 ## Tehnički stack
 
 | Komponenta | Tehnologija |
