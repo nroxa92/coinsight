@@ -83,7 +83,7 @@ class _MainNavigationState extends State<MainNavigation> {
     // Initialize WalletConnect if Project ID is configured
     final wcProjectId = StorageService.getWalletConnectProjectId();
     if (wcProjectId != null && wcProjectId.isNotEmpty) {
-      context.read<WalletService>().initialize();
+      context.read<WalletService>().initialize(context: context);
     }
 
     // Start stop-loss checker if Binance is configured

@@ -1660,14 +1660,54 @@ Dodano na kraj system prompta: confluence analiza instrukcije (score 5-6 / 3-4.9
 
 ---
 
+## Session 11: 2026-04-16 — v8.0.0 Full Completion
+
+**Kontekst:** Finalna sesija. WalletConnect real implementacija, P&L complete, pubspec cleanup.
+
+### Faza 1 — pubspec.yaml Cleanup
+**Status:** Completed
+- Uklonjeno: `html`, `convert` (nekorišteni)
+- Dodano: `reown_appkit: ^1.5.0` (WalletConnect v2 real)
+- android/app/build.gradle.kts: minSdk >= 23
+
+### Faza 2 — WalletConnect Real Implementation
+**Status:** Completed
+- `lib/services/wallet_service.dart` — prepisano s pravom ReownAppKitModal integracijom
+- Session persistence, QR/deep link connect, eth_sendTransaction za swap
+- AndroidManifest: coinsight://wc deep link, MetaMask/Trust Wallet queries
+
+### Faza 3 — trade_service.dart ClosedTrade
+**Status:** Completed
+- `closePosition()` sada kreira ClosedTrade (tier SHORT, type BINANCE) prije AnalysisLog
+- P&L Dashboard sada vidi sve Binance trades
+
+### Faza 4 — StorageService WC Project ID
+**Status:** Skipped (već postoji)
+
+### Faza 5 — Testovi
+**Status:** Completed — 280/280 passed
+
+### Faza 6 — Dokumentacija
+**Status:** Completed — README v8.0.0, CLAUDE.md v8.0.0, WORKLOG ažuriran
+
+### Faza 7 — Finalni Build
+**Status:** Completed
+- `pubspec.yaml` — version 8.0.0+9
+- `coinsight-v8.0.0.apk` — 158MB debug build u root
+- `flutter analyze` — **0 issues**
+- `flutter test` — **280/280 passed**
+- `flutter build apk --debug` — **uspješan**
+
+---
+
+---
+
 ## Identified Issues (Final State)
 
-**Aktivni:**
+**Aktivni (external, ne kod):**
 - **CoinGecko historical data limited:** besplatni tier, hourly ograničen na 90 dana
 - **Chart prediction accuracy:** sentiment-based, ne matematički model
-- **WalletConnect stub:** full swap implementacija zahtijeva web3dart + ABI encoding
-- **P&L historical data:** Binance close ne kreira ClosedTrade još
-- **Binance account lockout:** developer 2FA problem
+- **Binance account lockout:** developer 2FA problem — blokira live Binance testiranje
 
-**Riješeni kroz 10 sesija:**
-- ~~LOT_SIZE precision~~ (S5), ~~Timestamp drift~~ (S5), ~~GitHub rate limit~~ (S7), ~~Reddit rate limiting~~ (S7), ~~Dexscreener pair age~~ (S7), ~~MID Discovery~~ (S8), ~~LONG Research~~ (S8), ~~DEX auto-sell~~ (S10), ~~Push notifikacije~~ (S9)
+**Riješeni kroz 11 sesija:**
+- ~~LOT_SIZE precision~~ (S5), ~~Timestamp drift~~ (S5), ~~GitHub rate limit~~ (S7), ~~Reddit rate limiting~~ (S7), ~~Dexscreener pair age~~ (S7), ~~MID Discovery~~ (S8), ~~LONG Research~~ (S8), ~~DEX auto-sell~~ (S10), ~~Push notifikacije~~ (S9), ~~P&L historical data~~ (S11), ~~Nekorišteni pubspec paketi~~ (S11), ~~WalletConnect stub~~ (S11 — reown_appkit 1.5.0 integriran)

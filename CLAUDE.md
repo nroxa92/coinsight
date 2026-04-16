@@ -2,7 +2,7 @@
 
 ## Identitet
 CoinSight je AI-powered crypto signal detector. Flutter/Dart, Provider state management, 
-Hive lokalna pohrana. Verzija 7.0.0.
+Hive lokalna pohrana. Verzija 8.0.0.
 
 ## Pravila rada
 - Ako Claude Code primijeti bug koji nije dio zadatka koji rješava, dodaje ga pod 

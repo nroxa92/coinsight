@@ -7,7 +7,7 @@
 [![Flutter](https://img.shields.io/badge/Flutter-3.41+-02569B?logo=flutter)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.11+-0175C2?logo=dart)](https://dart.dev)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-7.0.0-blue)](pubspec.yaml)
+[![Version](https://img.shields.io/badge/Version-8.0.0-blue)](pubspec.yaml)
 [![Tests](https://img.shields.io/badge/Tests-280%2F280-brightgreen)]()
 [![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android)](https://android.com)
 
@@ -78,7 +78,7 @@ Simultano skenira **5 izvora** i kalkulira **confluence score (0-6.0)**:
 ## Instalacija
 
 ### Preuzimanje APK-a
-1. Preuzmi `coinsight-v7.0.0.apk` (Assets sekcija)
+1. Preuzmi `coinsight-v8.0.0.apk` (Assets sekcija)
 2. Android: Postavke -> Sigurnost -> Dopusti nepoznate izvore
 3. Instaliraj i pokreni
 
@@ -127,7 +127,7 @@ Novi korisnik? [NEWBIE_GUIDE.md](NEWBIE_GUIDE.md)
 | [NEWBIE_GUIDE.md](NEWBIE_GUIDE.md) | Vodic za pocetnike |
 | [MANUAL.md](MANUAL.md) | Korisnicki prirucnik |
 | [OVERVIEW.md](OVERVIEW.md) | Tehnicka arhitektura |
-| [WORKLOG.md](WORKLOG.md) | Development log (10 sesija) |
+| [WORKLOG.md](WORKLOG.md) | Development log (11 sesija) |
 
 ---
 

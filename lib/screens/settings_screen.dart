@@ -443,7 +443,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     // Initialize WalletService with new project ID
     if (!mounted) return;
-    await context.read<WalletService>().initialize();
+    await context.read<WalletService>().initialize(context: context);
     if (!mounted) return;
 
     setState(() {

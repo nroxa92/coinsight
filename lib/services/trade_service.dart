@@ -1,5 +1,7 @@
 import 'package:coinsight/models/coin.dart';
 import 'package:coinsight/models/coin_position.dart';
+import 'package:coinsight/models/closed_trade.dart';
+import 'package:coinsight/models/investment_tier.dart';
 import 'package:coinsight/models/risk_parameters.dart';
 import 'package:coinsight/models/trade_proposal.dart';
 import 'package:coinsight/models/trade_result.dart';
@@ -173,6 +175,27 @@ class TradeService {
       final pnlPct = position.entryTotal == 0
           ? 0
           : (pnl / position.entryTotal) * 100;
+
+      final closedTrade = ClosedTrade(
+        id: '${position.coinId}_${DateTime.now().millisecondsSinceEpoch}',
+        tier: InvestmentTier.short,
+        symbol: position.symbol,
+        name: position.symbol,
+        tradeType: ClosedTradeType.binance,
+        openedAt: position.entryTime,
+        closedAt: DateTime.now(),
+        entryPrice: position.entryPrice,
+        exitPrice: order.avgPrice,
+        quantity: order.executedQty,
+        investedUsdt: position.entryTotal,
+        returnedUsdt: exitTotal,
+        result: pnl > 0.01
+            ? ClosedTradeResult.profit
+            : pnl < -0.01
+                ? ClosedTradeResult.loss
+                : ClosedTradeResult.breakeven,
+      );
+      await StorageService.saveClosedTrade(closedTrade);
 
       await StorageService.saveAnalysisLog(AnalysisLog(
         timestamp: DateTime.now(),
