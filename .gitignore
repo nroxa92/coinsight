@@ -55,6 +55,11 @@ key.properties
 *.pem
 *.p12
 
+# ─── APK i build outputi ──────────────────────────────────────
+*.apk
+*.aab
+*.ipa
+
 # ─── Hive local database ──────────────────────────────────────
 *.hive
 *.lock.hive

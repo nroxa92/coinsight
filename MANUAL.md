@@ -488,6 +488,24 @@ Dashboard prikazuje odvojene statistike za svaki tier:
 
 Ovo ti pomaze identificirati koji tier je tvoja najjaca strategija i gdje trebas prilagoditi pristup.
 
+### 3G.6 Kad početi pratiti Dashboard
+
+P&L Dashboard postaje koristan **nakon 10+ zatvorenih trejdova**. S manje podataka, win rate i R/R ratio su statistički nepouzdani — 3 trejda od 5 profitabilnih (60% win rate) može biti slučajnost.
+
+Preporučeni ritam: pregledaj Dashboard **jednom tjedno** (npr. nedjelja večer). Tražiš trendove, ne dnevne fluktuacije.
+
+Ako equity curve konzistentno pada kroz 3+ tjedna — **stani i analiziraj** zašto, ne nastavljaj s istom strategijom.
+
+### 3G.7 Zatvaranje DEX pozicija i trade history
+
+Kad zatvoriš DEX poziciju tapom na **CLOSE** u Portfolio tabu:
+1. App traži **exit cijenu** (predlaže trenutnu tržišnu cijenu, možeš promijeniti)
+2. P&L se kalkulira: `(exit_cijena × količina) - uloženi_USDT`
+3. Trad se sprema u `closed_trades` — pojavljuje se u P&L Dashboardu
+4. DEX pozicija dobiva status `CLOSED`
+
+Ako SL ili TP automatski triggeraju — app automatski zatvara poziciju i sprema je u historiju bez tvoje intervencije.
+
 ---
 
 ## 3H. WalletConnect v2 (v7.0.0)
@@ -1990,6 +2008,14 @@ Ako nadješ sigurnosni problem u kodu, prijavi ga kao GitHub Issue.
 - Bot **ne može** slati poruke u tvoje ime
 - Bot **ne može** pristupiti tvom Telegram accountu
 
+### 17.7 WalletConnect sigurnosna pravila
+
+- **Nikad ne odobravaj transakciju** u MetaMask/Phantom ako ne prepoznaješ što se traži
+- **Provjeri iznos i token** u MetaMask potvrdi prije tapanja "Confirm"
+- **Diskonektaj wallet** iz CoinSight kad ga ne koristiš (Portfolio tab → WalletConnect button → Disconnect)
+- **Koristit manji wallet** za DEX trading — nemoj spajati wallet s većinom svojih sredstava. Drži samo iznos koji planiraš koristiti za trading (npr. $50-100 u BNB/SOL za gas + tradeable iznos)
+- **Seed phrase ostaje offline** — WalletConnect nikad ne traži seed phrase. Ako itko ili ikoja app traži seed phrase, to je scam.
+
 ---
 
 ## 18. Često postavljana pitanja
@@ -2055,10 +2081,19 @@ A: Mjera koliko nezavisnih izvora se slaže oko signala za coin. Score ide od 0 
 A: Koristi Manage → App → Export logs before reset. Za potpuni reset: Manage → App → Full reset. Binance pozicije ostaju na Binanceu neovisno o app-u.
 
 **Q: Koliko testova ima CoinSight?**
-A: Test suite sadrži **291+ testova** koji pokrivaju servise, widgete i integracije.
+A: Test suite sadrži **280 testova** koji pokrivaju servise, widgete i integracije.
 
 **Q: Što znači "Timestamp out of sync" greška?**
 A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 automatski sinkronizira putem `/api/v3/time`. Ako se greška ponovi, provjeri da je automatsko vrijeme uključeno na uredjaju.
+
+**Q: Trebam li WalletConnect za korištenje CoinSighta?**
+A: Ne. WalletConnect je opcionalan. App savršeno radi bez njega — možeš analizirati, pratiti i trgovati kroz Binance. WalletConnect dodaješ samo ako planiraš DEX trading s MetaMask walletom.
+
+**Q: Je li moj wallet siguran s WalletConnectom?**
+A: Da. WalletConnect **nikad** ne daje CoinSightu pristup tvojim privatnim ključevima ili seed phrase-u. Svaka transakcija zahtijeva tvoje eksplicitno odobrenje u MetaMask/Phantom aplikaciji. Bez tvog tapa "Approve" — ništa se ne događa.
+
+**Q: Što je P&L Dashboard i komu služi?**
+A: P&L Dashboard (Manage → Portfolio → banner) prikazuje ukupne performanse svih tvojih trade-ova: equity curve (grafikon rasta/pada), win rate (% profitabilnih trejdova), R/R ratio (prosječni profit vs gubitak), i breakdown po tieru. Koristan nakon prvih 5-10 trejdova — do tada je previše malo podataka za smislene zaključke.
 
 ---
 
@@ -2149,22 +2184,30 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 
 ## Kraj priručnika
 
-**Sažetak ključnih poruka:**
+### Korak-po-korak za prvi dan
 
-1. **Instaliraj app** → otvori → Manage → API pod-tab → postavi Anthropic + Binance ključeve
-2. **Manage → Bot pod-tab** → postavi Telegram Monitor (opcionalno, ali preporučeno)
-3. **Watchlist tab** → pregledaj coinove u 4 pod-taba (DEX Early, New Listings, My Watchlist, Top Coins)
-4. **DEX Early tab** → pregledaj svježe DEX listinge, tapni "Analiziraj" za intelligence analizu
-5. **Analysis tab** → pitaj Claudea, dobij INTERESTING/WATCH/SKIP (s Intelligence Report kontekstom)
-6. **Trade Action Bar** → BUY NOW za kupnju jednim tapom, SKIP za preskakanje
-7. **Portfolio tab** → prati pozicije, SL/TP rade automatski, Intelligence Dashboard za zadnji report
-8. **Manage → Trade pod-tab** → kreni konzervativno ($5, 1 pozicija, 10% SL)
-9. **Bot Manager** → prati reliability kanala, dodaj/ukloni kanale po potrebi
+```
+1. Instaliraj APK → pokreni → prihvati dozvole
+2. Manage → API → Anthropic API Key → zalijepi → Save
+3. Manage → API → Binance API → zalijepi oba ključa → Testnet ON → Save → Test
+4. Manage → Bot → Bot Token → zalijepi → Save → uključi monitoring
+5. (Opcionalno) Manage → API → WalletConnect Project ID → Save
+6. Watchlist → DEX Early → pregledaj svježe listinge
+7. Analysis → tapni suggestion chip → pročitaj Claude analizu
+8. Portfolio → provjeri balans
+9. Manage → Trade → postavi konzervativno (5 USDT, 1 pozicija, 10% SL)
+10. Analysis → INTERESTING signal → BUY NOW → CONFIRM → prva pozicija
+```
 
-**Ako si ovo pročitao sve:** spreman si za prvi dan. Kreni s malim iznosima, bilježi rezultate, i **ne žuri povećavati rizik**. Konzistentnost kroz tjedne pobjeduje naglu agresivnost.
+### Ključna pravila koja ne smiješ zaboraviti
 
-**CoinSight v7.0.0** — Open Source, MIT License
-**Test suite:** 291+ testova
-**Izvorni kod:** javno dostupan
+1. **Binance API** — Withdrawal dozvola mora biti **ISKLJUČENA**
+2. **Seed phrase** — samo na papiru, nikad digitalno, nikad ne dijeli
+3. **Počni malim** — $5 po trejdu, 1 pozicija, prvih 2 tjedna
+4. **Stop-loss je obavezan** — uvijek postavljaj, bez iznimke
+5. **INTERESTING nije garancija** — 30-40% trejdova će biti gubitnici (normalno)
+6. **Konzistentnost pobjeđuje** — bolje 60% win rate s malim iznosima nego 90% win rate koji se ne može ponoviti
+
+**CoinSight v7.0.0** — Open Source, MIT License, 280/280 testova
 
 Sretno!

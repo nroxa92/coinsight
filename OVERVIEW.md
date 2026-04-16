@@ -2,7 +2,7 @@
 
 **Verzija:** 7.0.0
 **Datum generiranja:** 2026-04-16
-**Status projekta:** v7.0.0 release — 291+ testova, 10 sesija, Three-Tier Investment Framework (SHORT/MID/LONG) + Intelligence Layer + Detail Screens + DEX Position Tracking + Charts & Visualization + Push Notifications + P&L Dashboard + WalletConnect v2
+**Status projekta:** v7.0.0 release — 280 testova, 10 sesija, Three-Tier Investment Framework (SHORT/MID/LONG) + Intelligence Layer + Detail Screens + DEX Position Tracking + Charts & Visualization + Push Notifications + P&L Dashboard + WalletConnect v2
 **Autor:** Neven (developer) + Claude Code (implementacija)
 **Licenca:** MIT (Copyright (c) 2026 Neven Roksandic)
 
@@ -1083,7 +1083,7 @@ Pristup iz Portfolio taba putem P&L bannera.
 
 **Session 10 verifikacija:**
 
-- `flutter test` — **291+/291+ passed** (+24 od v6.0.0)
+- `flutter test` — **280/280 passed** (+24 od v6.0.0)
 - `flutter analyze` — 0 issues
 
 **Session 10 rezultat:** CoinSight prosiren s P&L Dashboard-om za centralizirani pregled performansi (equity curve, win rate, R/R ratio, per-tier breakdown), WalletConnect v2 za spajanje eksternih walleta i iniciranje swapova, te Trade History za kompletnu evidenciju zatvorenih trade-ova.
@@ -1230,7 +1230,7 @@ Pristup iz Portfolio taba putem P&L bannera.
 
 ```
 flutter analyze      → 0 issues
-flutter test         → 291+/291+ passed
+flutter test         → 280/280 passed
 flutter build apk    → OK (debug)
 flutter build windows → OK (Session 1)
 ```
@@ -1252,7 +1252,7 @@ flutter build windows → OK (Session 1)
 | v4.0.0 | 2026-04-16 | Session 7: Three-Tier Investment Framework (SHORT/MID/LONG) + 232 testova |
 | v5.0.0 | 2026-04-16 | Session 8: Detail Screens + DEX Position Tracking + MID Discovery/LONG Research + 243 testova |
 | v6.0.0 | 2026-04-16 | Session 9: Charts & Visualization + Push Notifications + 267 testova |
-| v7.0.0 | 2026-04-16 | Session 10: P&L Dashboard + WalletConnect v2 + Trade History + 291+ testova |
+| v7.0.0 | 2026-04-16 | Session 10: P&L Dashboard + WalletConnect v2 + Trade History + 280 testova |
 
 ### 9.5 Test Coverage Breakdown
 
@@ -1264,7 +1264,7 @@ flutter build windows → OK (Session 1)
 | Integration | 1 | 4 | app navigation (4 tabs, sections) |
 | Screen | 3 | 10 | dex_position_screen, detail_screens, **chart_screen**, **pnl_dashboard_screen** |
 | Legacy | 1 | 9 | widget_test navigation + tab switching |
-| **UKUPNO** | **41** | **291+** | |
+| **UKUPNO** | **41** | **280** | |
 
 ### 9.6 Identified Issues
 
@@ -1563,7 +1563,7 @@ CoinSight je u **10 sesija** narastao od praznog Flutter scaffolda do **multi-st
 
 **v7.0.0 milestone:**
 - **55 lib/ fajl** rasporeden u 6 direktorija (+5 fajlova od v6.0.0)
-- **291+ testova** (unit models, unit services, widget, screen, integration) s mocktail
+- **280 testova** (unit models, unit services, widget, screen, integration) s mocktail
 - **9 Hive box-ova** za persistenciju (+closed_trades od v7.0.0)
 - **8 eksternih API-ja** integrirano (CoinGecko, Anthropic, Binance, Telegram, Dexscreener, GitHub, Reddit, WalletConnect)
 - **5-source intelligence agregacija** s confluence scoring (0–6.0)

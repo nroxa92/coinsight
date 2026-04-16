@@ -80,6 +80,11 @@ Vise o svakom tieru u [poglavlju 9](#9-razumijevanje-tri-tiera-shortmidlong).
 
 ## 2. Sto ti treba za pocetak
 
+> **Kratka verzija za nestrpljive:**
+> Jedino što je **obavezno** je **Anthropic API ključ** (sekcija 3).
+> Sve ostalo (Telegram, MetaMask, Phantom, Binance) dodaješ po potrebi.
+> Možeš početi koristiti CoinSight za analizu i praćenje **bez ijednog drugog servisa**.
+
 ### Minimalni zahtjevi
 
 - 📱 **Smartphone** (Android ili iOS) ili **racunalo** s browserom
@@ -1221,6 +1226,45 @@ Ovo ti pomaze vidjeti koja strategija ti najbolje lezi.
 - **Per-tier breakdown** koristiti za fokusiranje na tier koji ti
   najbolje ide
 
+### Kako čitati equity curve
+
+Equity curve je tvoj "financijski dnevnik u grafikonu". Svaki zatvoreni trade dodaje točku.
+
+**Primjer čitanja:**
+
+```
+$+15  |                    *---*
+$+10  |           *---*---*
+$+5   |      *---*
+$0    |--*---*
+$-5   |
+      +----------------------------
+        Jan  Feb  Mar  Apr  Maj
+```
+
+Ovaj grafikon kaže: počeo si s 2 gubitna trejda, pa si stabilizirao i počeo rasti. Ukupno u plusu $15. Zdravi trend.
+
+**Crveni flag:**
+```
+$0    |--*---*
+$-5   |      *---*
+$-10  |           *---*
+$-15  |                *---*---*
+```
+
+Ovo je problem — konzistentno padanje. Znači strategija ne radi, parametri su krivi, ili tržišni uvjeti su loši za momentum trading. **Stani i analiziraj.**
+
+### Moj prvi tjedan — realna očekivanja
+
+| Tjedan | Cilj | Nije cilj |
+|--------|------|-----------|
+| 1 | Naučiti se koristiti app, razumjeti signale | Zaraditi |
+| 2 | Kalibrirati Risk Parameters na tvoj stil | Biti profitabilan |
+| 3-4 | Pratiti vlastitu win rate statistiku | Dramatično povećati iznose |
+| Mjesec 2+ | Konzistentna profitabilnost s malim iznosima | Brzo bogatstvo |
+
+**Ključna istina:** Momentum trading je vještina. Kao svaka vještina — treba tjedne prakse. CoinSight daje alat, iskustvo dolaziš sam.
+
 ---
 
 ## 13. Rjecnik pojmova
@@ -1736,6 +1780,24 @@ Ako na bilo koji odgovor NE MOZES odgovoriti "DA" — ne trguj.
 | MetaMask trazi seed phrase na webu | Zatvori stranicu — to je phishing |
 | Coin je pao 50%+ odjednom | NE panicaraj. Provjeri vijesti, Claude analizu |
 | Ne razumijes sto se dogadja | ZAUSTAVI SE. Pitaj Claudea za objasnjenje |
+
+---
+
+### 14.7 WalletConnect sigurnosna pravila
+
+- **Nikad ne dijeli seed phrase** — WalletConnect je POTPUNO DRUGAČIJI od seed phrase-a. WalletConnect je privremena veza između app-e i walleta. Seed phrase je master ključ.
+- **Koristit namjenski "trading wallet"** — Kreiraj novi MetaMask wallet samo za CoinSight trading. Na njega stavi samo iznos koji planiraš tradati. Tvoje "glavne" uštedine drži odvojeno.
+- **Disconnect kad ne koristiš** — U Portfolio tabu, kad završiš s tradingom, tapni WalletConnect button → Disconnect.
+- **Provjeri svaku transakciju u MetaMask** — Kad CoinSight inicira swap, MetaMask otvori prozor s detaljima. Pročitaj koji token, koji iznos, koja gas naknada. Tek tada tapni Confirm.
+
+### 14.8 Što napraviti ako posumnjate da ste hakirani
+
+1. **Odmah** — Binance web → API Management → Delete sve ključeve
+2. **Odmah** — Anthropic Console → API Keys → Revoke
+3. **Odmah** — Telegram → @BotFather → `/revoke`
+4. **Odmah** — MetaMask/Phantom → premjesti sredstva na novi wallet s novim seed phrase-om
+5. **Potom** — Manage → App → Full Reset (obriše sve lokalne podatke)
+6. **Potom** — generiraj sve ključeve iznova na čistom uređaju
 
 ---
 

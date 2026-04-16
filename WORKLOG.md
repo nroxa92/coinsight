@@ -1631,6 +1631,35 @@ Dodano na kraj system prompta: confluence analiza instrukcije (score 5-6 / 3-4.9
 
 ---
 
+## SESSION CLEANUP: 2026-04-16
+
+### Faza 1 — .gitignore Final Update
+**Status:** Completed
+- Dodan `*.apk`, `*.aab`, `*.ipa` u .gitignore
+
+### Faza 2 — Git rm cached
+**Status:** Completed
+- `git rm -r --cached ios/` — 40 fajlova
+- `git rm -r --cached linux/` — 10 fajlova
+- `git rm -r --cached macos/` — 28 fajlova
+- `git rm -r --cached windows/` — 18 fajlova
+- `git rm -r --cached web/` — 7 fajlova
+- `git rm --cached .metadata` — 1 fajl
+- Ukupno ~104 fajla uklonjeno iz git trackinga
+
+### Faza 3 — Dokumentacija 11/10
+**Status:** Completed
+- MANUAL.md + OVERVIEW.md: 291+ → 280 (sve instance)
+- MANUAL.md: WalletConnect FAQ, P&L timing (3G.6/3G.7), sigurnost 17.7, ažuriran kraj priručnika
+- NEWBIE_GUIDE.md: kratka verzija za nestrpljive, equity curve interpretacija, hack response protokol
+
+### Faza 4 — Finalni Commit
+**Status:** Prepared
+
+---
+
+---
+
 ## Identified Issues (Final State)
 
 **Aktivni:**
