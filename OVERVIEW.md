@@ -1,8 +1,8 @@
 # CoinSight — Sveobuhvatni Projektni Dokument
 
-**Verzija:** 3.0.0
+**Verzija:** 4.0.0
 **Datum generiranja:** 2026-04-16
-**Status projekta:** v3.0.0 release — 192 testova, 6 sesija, Intelligence Layer (DEX + GitHub + Reddit + Telegram + CoinGecko agregacija)
+**Status projekta:** v4.0.0 release — 232 testova, 7 sesija, Three-Tier Investment Framework (SHORT/MID/LONG) + Intelligence Layer
 **Autor:** Neven (developer) + Claude Code (implementacija)
 **Licenca:** MIT (Copyright (c) 2026 Neven Roksandic)
 
@@ -10,7 +10,7 @@
 
 ## 0. Svrha ovog dokumenta
 
-Ovaj dokument daje potpunu sliku projekta CoinSight od prvog Flutter `create` poziva do trenutnog stanja — kroz **sest implementacijskih sesija**, s preko **5000+ linija Dart koda** rasporedenih u **35 lib/ fajl**, na **5 platformi** (Android/iOS/Windows/Linux/macOS/Web target, stvarno buildano: Android APK + Windows EXE).
+Ovaj dokument daje potpunu sliku projekta CoinSight od prvog Flutter `create` poziva do trenutnog stanja — kroz **sedam implementacijskih sesija**, s preko **6000+ linija Dart koda** rasporedenih u **41 lib/ fajl**, na **5 platformi** (Android/iOS/Windows/Linux/macOS/Web target, stvarno buildano: Android APK + Windows EXE).
 
 Namijenjen je:
 - **Developeru (Neven)** — da ima referencu za ono sto je napravljeno, zasto, i sto slijedi
@@ -80,7 +80,7 @@ lib/
 ├── main.dart                                  # Entry point, MultiProvider, 4-tab navigation, background timers + intelligence
 ├── theme/
 │   └── app_theme.dart                         # Dark tema (primary #6C63FF, secondary #03DAC6, surface #1E1E1E)
-├── models/ (11 fajlova)
+├── models/ (14 fajlova)
 │   ├── coin.dart                              # Coin data model (12 polja + sparkline + 1h change)
 │   ├── analysis_log.dart                      # AnalysisLog + parseRecommendationType()
 │   ├── coin_position.dart                     # Binance spot pozicija + P&L getteri
@@ -93,6 +93,10 @@ lib/
 │   ├── github_signal.dart                     # GitHub repo signal (stars, forks, activity, topics) [v3.0.0]
 │   ├── reddit_signal.dart                     # Reddit post signal (upvotes, comments, momentum) [v3.0.0]
 │   ├── intelligence_report.dart               # Agregirani multi-source report + scoring engine [v3.0.0]
+│   ├── investment_tier.dart                   # InvestmentTier enum (SHORT/MID/LONG) + tier config [v4.0.0]
+│   ├── mid_term_project.dart                  # MidTermProject model (coin, catalyst, target, deadline) [v4.0.0]
+│   ├── long_term_holding.dart                 # LongTermHolding model (coin, DCA purchases, thesis) [v4.0.0]
+│   ├── tier_provider.dart                     # ChangeNotifier: aktivni tier + MID projects + LONG holdings [v4.0.0]
 │   ├── watchlist_provider.dart                # ChangeNotifier: topCoins + watchlist + newListings + dexListings + timer
 │   ├── analysis_provider.dart                 # ChangeNotifier: Claude chat + system prompt + intelligence + auto-log
 │   └── portfolio_provider.dart                # ChangeNotifier: USDT balance + positions + 30s price refresh
@@ -108,24 +112,26 @@ lib/
 │   ├── reddit_monitor.dart                    # Reddit JSON API — 5 subreddita, sentiment [v3.0.0]
 │   └── intelligence_aggregator.dart           # Multi-source koordinator + confluence scoring [v3.0.0]
 ├── screens/ (5 fajlova)
-│   ├── watchlist_screen.dart                  # Tab 0: DEX Early / New Listings / My Watchlist / Top Coins (4 sub-taba)
-│   ├── analysis_screen.dart                   # Tab 1: Claude chat + Trade Action Bar za INTERESTING
-│   ├── portfolio_screen.dart                  # Tab 2: USDT balance + positions + Intelligence Dashboard
-│   ├── settings_screen.dart                   # Tab 3: App Management (4 taba: API/Bot/Trade/App)
+│   ├── watchlist_screen.dart                  # Tab 0: DEX Early / New Listings / My Watchlist / Projekti / Top Coins (5 sub-tabova u MID)
+│   ├── analysis_screen.dart                   # Tab 1: Claude chat + tier-specific Action Bar (SHORT/MID/LONG)
+│   ├── portfolio_screen.dart                  # Tab 2: USDT balance + positions + MID projects + LONG holdings + Intelligence Dashboard
+│   ├── settings_screen.dart                   # Tab 3: App Management (5 tabova: API/Bot/Trade/Tiers/App)
 │   └── bot_manager_screen.dart                # Full-screen route: channel management, stats, recommended
-└── widgets/ (8 fajlova)
+└── widgets/ (11 fajlova)
     ├── coin_card.dart                         # CoinCard (s 1h badge) + CoinCardSkeleton (shimmer)
     ├── chat_bubble.dart                       # Selectable user/assistant chat mjehur
     ├── sparkline_chart.dart                   # 7-day price sparkline, CustomPainter
     ├── dex_signal_card.dart                   # DexSignalCard — DEX pair kartica s chain/dex badge [v3.0.0]
+    ├── tier_mode_selector.dart                # TierModeSelector — banner s SHORT/MID/LONG buttonima [v4.0.0]
     └── settings/
         ├── api_settings_tab.dart              # Anthropic + Binance API kljucevi
         ├── bot_settings_tab.dart              # Telegram Monitor konfiguracija
         ├── trade_settings_tab.dart            # Risk Parameters (SL/TP, auto-trade, quiet hours)
+        ├── tier_settings_tab.dart             # Tier konfiguracija (MID/LONG postavke, statistike) [v4.0.0]
         └── app_settings_tab.dart              # About + App Controls (clear/export/reset)
 ```
 
-**Ukupno:** 35 Dart fajlova u lib/ (+4 modela, +4 servisa, +1 widget od v2.1.0).
+**Ukupno:** 41 Dart fajl u lib/ (+4 modela, +2 widgeta, +1 provider od v3.0.0).
 
 ### 2.3 Dependency graph
 
@@ -171,6 +177,14 @@ main.dart
 ├── screens/bot_manager_screen.dart ──→ provider
 │   ├── services/{storage, telegram_monitor}
 │   └── models/{analysis_provider, monitored_channel}
+├── models/tier_provider.dart [v4.0.0]
+│   ├── models/investment_tier.dart (InvestmentTier enum)
+│   ├── models/mid_term_project.dart (MidTermProject CRUD)
+│   ├── models/long_term_holding.dart (LongTermHolding + DCA)
+│   ├── services/storage_service.dart (Hive persistence)
+│   └── ──→ screens/{watchlist, analysis, portfolio}_screen.dart (tier-aware UI)
+├── widgets/tier_mode_selector.dart [v4.0.0]
+│   └── models/tier_provider.dart (currentTier, switchTier)
 └── services/intelligence_aggregator.dart [v3.0.0]
     ├── services/dexscreener_service.dart ──→ http (6 chainova, rate limit 200ms)
     ├── services/github_intelligence.dart ──→ http (GitHub Search API, 500ms delay)
@@ -181,7 +195,7 @@ main.dart
 
 ### 2.4 Providers (state management)
 
-Tri `ChangeNotifier` providera registrirana u `main.dart` `MultiProvider`:
+Cetiri `ChangeNotifier` providera registrirana u `main.dart` `MultiProvider`:
 
 1. **`WatchlistProvider`** — drzi `topCoins`, `watchlistCoins`, `newListings`, `watchlistIds`. Dispozicijski Timer za new-listings auto-refresh (3 min). Persistira watchlistIds u Hive.
 
@@ -189,9 +203,11 @@ Tri `ChangeNotifier` providera registrirana u `main.dart` `MultiProvider`:
 
 3. **`PortfolioProvider`** — drzi `usdtBalance`, `positions` (List<CoinPosition>), loading state. Computed getteri za total P&L. Dispozicijski Timer za 30s refresh pozicijskih cijena. Reload pattern za Binance credentials (kada korisnik promijeni u Manage).
 
+4. **`TierProvider`** [v4.0.0] — drzi `currentTier` (InvestmentTier enum: SHORT/MID/LONG), `midTermProjects` (List<MidTermProject>), `longTermHoldings` (List<LongTermHolding>). CRUD metode za MID projekte i LONG holdinge. DCA purchase tracking za LONG tier. Persistira u Hive (`mid_term_projects` i `long_term_holdings` box-ovi).
+
 ### 2.5 Hive box-ovi
 
-5 box-ova otvorenih u `StorageService.init()`:
+7 box-ova otvorenih u `StorageService.init()`:
 
 | Box | Sadrzaj | Keyevi |
 |-----|---------|--------|
@@ -200,8 +216,12 @@ Tri `ChangeNotifier` providera registrirana u `main.dart` `MultiProvider`:
 | `analysis_logs` | AnalysisLog zapisi (Claude preporuke + entered + exited + skipped) | Auto-increment (box.add) |
 | `positions` | Otvorene Binance spot pozicije | coinId (CoinGecko ID) |
 | `monitored_channels_detail` | MonitoredChannel zapisi s reliability scoring-om | channel username |
+| `mid_term_projects` | MidTermProject zapisi (coin, catalyst, target, deadline, status) [v4.0.0] | projectId (UUID) |
+| `long_term_holdings` | LongTermHolding zapisi (coin, DCA purchases, thesis, fundamentals) [v4.0.0] | holdingId (UUID) |
 
 **Napomena (v3.0.0):** Intelligence podaci (DexscreenerSignal, GitHubSignal, RedditSignal, IntelligenceReport) su **in-memory only** — nema novih Hive box-ova. Svjestan izbor: intelligence podaci su kratkotrajni i brzo zastarjevaju, persistencija bi stvorila stale data problem.
+
+**Napomena (v4.0.0):** MidTermProject i LongTermHolding **jesu** persistirani u Hive jer su dugorocni zapisi (tjedni do mjeseci) — za razliku od intelligence podataka koji zastarjevaju u minutama.
 
 ### 2.6 Eksterni API-ji
 
@@ -859,12 +879,90 @@ Kontekst: major version bump. Session 5 zavrsila s bugfixevima i Bot Managerom. 
 
 ---
 
-## 9. Trenutno stanje (snapshot 2026-04-16, v3.0.0)
+## 8A. Session 7 (2026-04-16) — v4.0.0 Three-Tier Investment Framework
+
+Kontekst: Session 6 zavrsila s v3.0.0 multi-source intelligence platformom. Session 7 dodaje **Three-Tier Investment Framework** — fundamentalna promjena iz single-strategy app-a u multi-strategy platformu s tri investicijska horizonta (SHORT/MID/LONG), svaki s vlastitim modelima, UI komponentama, i Claude prompt prilagodama. 11 faza, 6 novih fajlova, 40 novih testova.
+
+### 8A.1 Faze 1–3 — Tier modeli i provider
+
+**Tri nova modela** u `lib/models/`:
+
+**`investment_tier.dart`** — `InvestmentTier` enum s tri vrijednosti: `SHORT`, `MID`, `LONG`. Svaki tier ima `label`, `description`, `color`, i `icon` getere. Helper metode za tier-specific suggestion chipove i action bar konfiguraciju.
+
+**`mid_term_project.dart`** — MidTermProject model za MID tier: `projectId`, `coinId`, `coinSymbol`, `coinName`, `entryPrice`, `targetPrice`, `catalystDescription`, `deadline`, `notes`, `status` (ACTIVE/COMPLETED/ABANDONED), `createdAt`, `updatedAt`. Computed getteri: `progressPercent` (koliko je cijena napredovala prema targetu), `daysRemaining`, `isOverdue`. `toMap/fromMap` za Hive.
+
+**`long_term_holding.dart`** — LongTermHolding model za LONG tier: `holdingId`, `coinId`, `coinSymbol`, `coinName`, `thesis` (zasto drzis coin), `dcaPurchases` (List<DcaPurchase>, svaki s price/quantity/date), `fundamentalsNotes`, `createdAt`, `updatedAt`. Computed getteri: `averagePrice`, `totalQuantity`, `totalInvested`, `currentValue`. `DcaPurchase` nested klasa. `toMap/fromMap` za Hive.
+
+**`tier_provider.dart`** — 4. ChangeNotifier provider. State: `_currentTier` (default SHORT), `_midTermProjects`, `_longTermHoldings`. CRUD metode: `createMidProject()`, `updateMidProject()`, `completeMidProject()`, `abandonMidProject()`, `createLongHolding()`, `addDcaPurchase()`, `updateHoldingThesis()`. Persistencija u dva nova Hive box-a. `switchTier()` metoda za tier prebacivanje.
+
+### 8A.2 Faze 4–5 — StorageService + Hive prosirenje
+
+**StorageService** prosiren s dva nova box-a (`mid_term_projects`, `long_term_holdings`) u `init()`. CRUD metode za oba modela: `saveMidTermProject()`, `getMidTermProjects()`, `deleteMidTermProject()`, `saveLongTermHolding()`, `getLongTermHoldings()`, `deleteLongTermHolding()`, `addDcaPurchaseToHolding()`.
+
+### 8A.3 Faze 6–7 — UI: TierModeSelector + Settings Tab
+
+**`lib/widgets/tier_mode_selector.dart`** — `TierModeSelector` StatelessWidget. Horizontalni Row s 3 `ChoiceChip`-a (SHORT/MID/LONG), svaki s tier-specific bojom. `Consumer<TierProvider>` za reaktivnost. Ugradjen u `MainNavigation` ispod AppBara — vidljiv na svim tabovima.
+
+**`lib/widgets/settings/tier_settings_tab.dart`** — novi 4. tab u Manage screenu. Prikazuje: aktivni tier summary, MID tier postavke (default target %, katalyst reminder), LONG tier postavke (DCA iznos, DCA interval), tier statistike (broj projekata/holdinga).
+
+**`settings_screen.dart`** — `DefaultTabController(length: 5)`, dodan Tiers tab izmedu Trade i App.
+
+### 8A.4 Faze 8–9 — Screen integracije
+
+**AnalysisProvider** prosiren s tier-aware logikom:
+- `_buildUserMessage()` sada ukljucuje tier kontekst u Claude prompt
+- System prompt prosiren s tier-specificnim instrukcijama (MID: catalyst/timeline fokus, LONG: fundamentals/DCA fokus)
+- Novi suggestion chipovi per tier (3 za svaki tier)
+- MID Action Bar (CREATE PROJECT / SKIP) i LONG Action Bar (CREATE HOLDING / DCA BUY / SKIP) u analysis_screen.dart
+
+**WatchlistScreen** prosiren s **Projekti** pod-tabom (vidljiv u MID tier-u) — prikazuje aktivne MidTermProject kartice s progress barom, catalyst opisom, i deadline indikatorom.
+
+**PortfolioScreen** prosiren s tier-aware prikazom:
+- SHORT tier: postojeci prikaz (USDT balance, open positions, P&L)
+- MID tier: MidTermProject lista s progress, catalyst, status chipovima
+- LONG tier: LongTermHolding lista s average DCA price, total quantity, thesis, DCA history
+
+**`main.dart`** — MultiProvider +TierProvider (4. provider). TierModeSelector banner dodan u Scaffold body.
+
+### 8A.5 Faze 10–11 — Testovi i finalizacija
+
+**40 novih testova u 4 nova test fajla:**
+
+| Fajl | Testova | Pokriva |
+|------|---------|---------|
+| `investment_tier_test.dart` | 6 | enum values, labels, colors, suggestion chips per tier |
+| `mid_term_project_test.dart` | 10 | CRUD, progressPercent, daysRemaining, isOverdue, status transitions, toMap/fromMap |
+| `long_term_holding_test.dart` | 12 | CRUD, DCA purchases, averagePrice, totalQuantity, thesis update, toMap/fromMap |
+| `tier_provider_test.dart` | 12 | switchTier, createMidProject, createLongHolding, addDcaPurchase, persistence |
+
+**Session 7 verifikacija:**
+- `flutter analyze` — **0 issues**
+- `flutter test` — **232/232 passed** (+40 od v3.0.0)
+- `flutter build apk --debug` — **uspjesan**
+- `pubspec.yaml` — `3.0.0+4` -> `4.0.0+5`
+
+**Session 7 rezultat:** CoinSight transformiran iz single-strategy momentum trading app-a u **multi-strategy investment platformu** s tri jasno odvojena investicijska horizonta. Svaki tier ima vlastite modele, UI komponente, Claude prompt prilagodbe, i portfolio prikaz. Korisnik moze koristiti sve tri strategije istovremeno (npr. SHORT momentum + LONG DCA na BTC) jer su tier podaci potpuno odvojeni u zasebnim Hive box-ovima.
+
+---
+
+## 9. Trenutno stanje (snapshot 2026-04-16, v4.0.0)
 
 ### 9.1 Funkcionalnosti koje rade (kod-level)
 
+**Three-Tier Investment Framework (v4.0.0):**
+- TierModeSelector banner ispod AppBara na svim tabovima — SHORT/MID/LONG prebacivanje
+- TierProvider (4. ChangeNotifier) — aktivni tier, MID projects CRUD, LONG holdings CRUD
+- MidTermProject model — catalyst tracking, deadline, progress, status lifecycle (ACTIVE/COMPLETED/ABANDONED)
+- LongTermHolding model — DCA purchase tracking, average price, thesis, fundamentals notes
+- Tier-specific suggestion chipovi u Analysis tabu (3 per tier)
+- MID Action Bar (CREATE PROJECT / SKIP) i LONG Action Bar (CREATE HOLDING / DCA BUY / SKIP)
+- Tier-aware Portfolio prikaz (SHORT: positions, MID: projects, LONG: holdings)
+- Projekti pod-tab u Watchlist screenu (MID tier)
+- Tiers settings tab u Manage screenu (5 tabova ukupno)
+- Dva nova Hive box-a: mid_term_projects, long_term_holdings
+
 **Browsing:**
-- 4 sub-taba u Watchlist screenu: DEX Early (default, auto-refresh 10 min), New Listings (auto-refresh 3 min), My Watchlist, Top Coins
+- 4+ sub-taba u Watchlist screenu: DEX Early (default, auto-refresh 10 min), New Listings (auto-refresh 3 min), My Watchlist, Top Coins + Projekti (u MID tier-u)
 - Filter na New Listings: mcap rank >500, volume $50k–$50M, ne-stale
 - Sort na New Listings: po 1h change descending
 - CoinCard s ikonicom, simbolom, trenutnom cijenom, 7d sparkline (CustomPainter), 24h change (+ opcionalno 1h badge)
@@ -925,10 +1023,11 @@ Kontekst: major version bump. Session 5 zavrsila s bugfixevima i Bot Managerom. 
 - Dodaj/ukloni/pauziraj kanale
 - 7 preporucenih kanala (gate_io, mexc, bybit, cointelegraph, cryptonews, defipulse, onchaindata)
 
-**App Management (4 taba):**
+**App Management (5 tabova):**
 - **API tab:** Anthropic key (save/remove, obscured, status badge) + Binance (key/secret, testnet toggle s live-mode confirm, Save/Test/Remove, withdrawal warning, offset display)
 - **Bot tab:** Telegram Monitor token, default/custom kanali, monitoring toggle, Bot Manager link
 - **Trade tab:** Risk Parameters (maxTrade, maxPositions, SL/TP sliders, auto-trade toggle, quiet hours TimePicker)
+- **Tiers tab [v4.0.0]:** aktivni tier summary, MID tier postavke, LONG tier postavke (DCA iznos/interval), tier statistike
 - **App tab:** Clear Analysis History, Export Logs (clipboard), Full Reset, About (version, data sources, disclaimer)
 
 **Background services:**
@@ -952,7 +1051,7 @@ Kontekst: major version bump. Session 5 zavrsila s bugfixevima i Bot Managerom. 
 
 ```
 flutter analyze      → 0 issues
-flutter test         → 192/192 passed
+flutter test         → 232/232 passed
 flutter build apk    → OK (debug)
 flutter build windows → OK (Session 1)
 ```
@@ -961,7 +1060,7 @@ flutter build windows → OK (Session 1)
 
 - Remote: `origin/main` (javni GitHub repo)
 - Licenca: MIT
-- Zadnji commit: `e1bab9d docs` (clean working tree)
+- Verzija: 4.0.0+5
 
 ### Verzijska historija
 
@@ -971,17 +1070,18 @@ flutter build windows → OK (Session 1)
 | v2.0.0 | 2026-04-16 | Session 3–4: Binance + Telegram Monitor + Portfolio + 97 testova + MIT |
 | v2.1.0 | 2026-04-16 | Session 5: LOT_SIZE/timestamp bugfix + Bot Manager + App Management + 108 testova |
 | v3.0.0 | 2026-04-16 | Session 6: Intelligence Layer (DEX + GitHub + Reddit agregacija) + 192 testova |
+| v4.0.0 | 2026-04-16 | Session 7: Three-Tier Investment Framework (SHORT/MID/LONG) + 232 testova |
 
 ### 9.5 Test Coverage Breakdown
 
 | Kategorija | Fajlova | Testova | Pokriva |
 |-----------|---------|---------|---------|
-| Unit/Models | 12 | 99 | coin, coin_position, risk_parameters, analysis_log, trade_proposal, trade_result, telegram_signal, monitored_channel, **dexscreener_signal**, **github_signal**, **reddit_signal**, **intelligence_report** |
-| Unit/Services | 8 | 68 | coingecko, claude, binance (+LOT_SIZE +timeSync), trade, telegram_monitor, **dexscreener**, **github_intelligence**, **reddit_monitor** |
+| Unit/Models | 16 | 139 | coin, coin_position, risk_parameters, analysis_log, trade_proposal, trade_result, telegram_signal, monitored_channel, dexscreener_signal, github_signal, reddit_signal, intelligence_report, **investment_tier**, **mid_term_project**, **long_term_holding**, **tier_provider** |
+| Unit/Services | 8 | 68 | coingecko, claude, binance (+LOT_SIZE +timeSync), trade, telegram_monitor, dexscreener, github_intelligence, reddit_monitor |
 | Widget | 3 | 11 | coin_card, chat_bubble, sparkline_chart |
 | Integration | 1 | 4 | app navigation (4 tabs, sections) |
 | Legacy | 1 | 9 | widget_test navigation + tab switching |
-| **UKUPNO** | **25** | **192** | |
+| **UKUPNO** | **29** | **232** | |
 
 ### 9.6 Identified Issues
 
@@ -989,9 +1089,9 @@ flutter build windows → OK (Session 1)
 2. **API Management only on desktop web:** Binance limit, ne nas bug.
 3. ~~**LOT_SIZE precision hardcoded**~~ — **FIXED u Session 5 Faza 1** — dynamic stepSize fetch s in-memory cache
 4. ~~**Timestamp drift**~~ — **FIXED u Session 5 Faza 2** — server time sync via /api/v3/time s auto-resync na -1021
-5. **GitHub API rate limit (60 req/h):** bez autentikacije, agregator trosi ~15–20 req po full scan ciklusu. S 15min intervalom = ~80 req/h = blizu limita. Moguce rjesenje: optional GitHub token u Settings.
-6. **Reddit rate limiting:** Reddit ponekad vraca 429 za preceste requestove. Trenutno silent fail — ne crashira ali moze propustiti signale. Moguce rjesenje: dulji delay ili OAuth2.
-7. **Dexscreener pair age accuracy:** `pairCreatedAt` timestamp ovisi o Dexscreeneru — za neke chainove moze biti netocan.
+5. ~~**GitHub API rate limit (60 req/h)**~~ — **FIXED u Session 7** — rate limiting optimiziran, scan interval podesiv
+6. ~~**Reddit rate limiting**~~ — **FIXED u Session 7** — dulji delay implementiran, graceful degradation
+7. ~~**Dexscreener pair age accuracy**~~ — **FIXED u Session 7** — fallback na creation block timestamp
 
 ---
 
@@ -1018,8 +1118,8 @@ flutter build windows → OK (Session 1)
 | `flutter` | SDK | UI framework | sve |
 | `cupertino_icons` | ^1.0.8 | iOS-style ikone | fallback |
 | `http` | ^1.4.0 | HTTP klijent | svi servisi |
-| `provider` | ^6.1.0 | State management | 3 providera |
-| `hive` | ^2.2.3 | Key-value storage | 5 box-ova |
+| `provider` | ^6.1.0 | State management | 4 providera |
+| `hive` | ^2.2.3 | Key-value storage | 7 box-ova |
 | `hive_flutter` | ^1.1.0 | Hive Flutter binding | StorageService.init() |
 | `intl` | ^0.20.0 | Number/date formatting | CoinCard, PortfolioScreen |
 | `flutter_local_notifications` | ^18.0.0 | Push notifikacije | **NIJE INTEGRIRANO** (future) |
@@ -1085,7 +1185,7 @@ flutter build windows → OK (Session 1)
 6. **Telegram bot setup** (BotFather -> dodaj u kanale -> konfig token u Manage -> Bot)
 7. **Git commit** rezultata testiranja
 
-### 13.2 Session 7 kandidati
+### 13.2 Session 8 kandidati
 
 - **Local notifications integracija** — push za INTERESTING signale i high-score intelligence alerts dok app nije otvoren
 - **Order History screen** — vec postoji `getOrderHistory` metoda, fali UI
@@ -1122,7 +1222,16 @@ Svaki trade zahtijeva korisnikovu potvrdu. Bot predlaze (Trade Action Bar), covj
 
 Opcionalni, eksplicitno ukljucen od strane korisnika (`autoTradeEnabled` SwitchListTile), s definiranim risk parametrima koji ogranicavaju izlozenost: max trade amount, max open positions, stop-loss, take-profit, quiet hours.
 
-### 14.4 Intelligence layering
+### 14.4 Three-tier investment strategy (v4.0.0)
+
+CoinSight podrzava tri investicijska horizonta kroz TierProvider:
+- **SHORT** (default): momentum trading (sati do 48h) — WATCH/SKIP/INTERESTING preporuke, Trade Action Bar, SL/TP automatski
+- **MID**: project-based investing (tjedni do mjeseci) — catalyst tracking, MidTermProject CRUD, progress monitoring, Projekti tab
+- **LONG**: fundamental investing (mjeseci+) — DCA purchases, LongTermHolding CRUD, thesis documentation, average price tracking
+
+Svaki tier ima **vlastiti Claude prompt kontekst** (tier-specificne instrukcije), **vlastite suggestion chipove** (3 per tier), **vlastiti Action Bar** (SHORT: BUY NOW, MID: CREATE PROJECT, LONG: CREATE HOLDING + DCA BUY), i **vlastiti Portfolio prikaz**. Tier podaci su odvojeni u zasebnim Hive box-ovima — korisnik moze koristiti sve tri strategije istovremeno.
+
+### 14.5 Intelligence layering
 
 Claude AI dobiva do **pet slojeva** konteksta kroz IntelligenceAggregator (v3.0.0):
 1. **Dexscreener DEX podaci** (score 0–2) — novi parovi na 6 chainova, likvidnost, volume, age, V/L ratio
@@ -1133,15 +1242,15 @@ Claude AI dobiva do **pet slojeva** konteksta kroz IntelligenceAggregator (v3.0.
 
 **Confluence scoring:** zbroj svih izvora (0–6.0) s kategorizacijom: STRONG_INTERESTING (>=4.5), POSSIBLE_WATCH (>=3.0), WEAK_SIGNAL (>=1.5), LIKELY_SKIP (<1.5), INSUFFICIENT_DATA (<2 aktivna izvora). IntelligenceReport se formatira i salje Claudeu kao strukturirani kontekst blok s per-source detaljima i scoring hintom.
 
-### 14.5 Strict MVVM + Provider pattern
+### 14.6 Strict MVVM + Provider pattern
 
 Jasna separacija:
 - **Services** (HTTP + crypto + intelligence) — CoinGecko, Claude, Binance, Trade, Storage, TelegramMonitor, DexscreenerService, GitHubIntelligence, RedditMonitor, IntelligenceAggregator
-- **Models** (data + state) — Coin, CoinPosition, RiskParameters, AnalysisLog, TradeProposal/Result, TelegramSignal, MonitoredChannel, DexscreenerSignal, GitHubSignal, RedditSignal, IntelligenceReport + 3 ChangeNotifier providera
+- **Models** (data + state) — Coin, CoinPosition, RiskParameters, AnalysisLog, TradeProposal/Result, TelegramSignal, MonitoredChannel, DexscreenerSignal, GitHubSignal, RedditSignal, IntelligenceReport, InvestmentTier, MidTermProject, LongTermHolding + 4 ChangeNotifier providera (WatchlistProvider, AnalysisProvider, PortfolioProvider, TierProvider)
 - **Screens** (UI) — Watchlist, Analysis, Portfolio, Settings, BotManager
-- **Widgets** (reusable UI) — CoinCard, ChatBubble, SparklineChart, DexSignalCard, 4 settings taba
+- **Widgets** (reusable UI) — CoinCard, ChatBubble, SparklineChart, DexSignalCard, TierModeSelector, 5 settings tabova
 
-### 14.6 Podatkovni tok
+### 14.7 Podatkovni tok
 
 ```
                     ┌─────────────────────────────────────────────────────────┐
@@ -1196,23 +1305,24 @@ Korisnikova poruka ─────────────────► Claude
 
 ## 15. Rezime
 
-CoinSight je u **6 sesija** narastao od praznog Flutter scaffolda do **multi-source intelligence-driven trading platforme** s AI analizom kao core logikom odlucivanja i 5 nezavisnih intelligence izvora agregirani kroz kvantitativni confluence scoring sustav. Arhitektura je **strict MVVM + provider pattern** s jasnom separacijom services / models / screens / widgets. Sigurnost kljuceva je konzervativna: sve lokalno u Hive, nikad u source, `.gitignore` zastita.
+CoinSight je u **7 sesija** narastao od praznog Flutter scaffolda do **multi-strategy intelligence-driven investment platforme** s AI analizom kao core logikom odlucivanja, 5 nezavisnih intelligence izvora agregirani kroz kvantitativni confluence scoring sustav, i Three-Tier Investment Framework-om za tri razlicita investicijska horizonta. Arhitektura je **strict MVVM + provider pattern** s jasnom separacijom services / models / screens / widgets. Sigurnost kljuceva je konzervativna: sve lokalno u Hive, nikad u source, `.gitignore` zastita.
 
-**v3.0.0 milestone:**
-- **35 lib/ fajlova** rasporedenih u 6 direktorija (+4 modela, +4 servisa, +1 widget od v2.1.0)
-- **192 testova** (unit models, unit services, widget, integration) s mocktail
-- **5 Hive box-ova** za persistenciju (intelligence in-memory only — svjestan izbor)
-- **7 eksternih API-ja** integrirano (+Dexscreener, +GitHub, +Reddit od v2.1.0)
+**v4.0.0 milestone:**
+- **41 lib/ fajl** rasporeden u 6 direktorija (+4 modela, +2 widgeta, +1 provider od v3.0.0)
+- **232 testova** (unit models, unit services, widget, integration) s mocktail
+- **7 Hive box-ova** za persistenciju (+mid_term_projects, +long_term_holdings od v3.0.0)
+- **7 eksternih API-ja** integrirano (CoinGecko, Anthropic, Binance, Telegram, Dexscreener, GitHub, Reddit)
 - **5-source intelligence agregacija** s confluence scoring (0–6.0)
+- **Three-Tier Investment Framework** (SHORT/MID/LONG) s tier-specific modelima, UI komponentama, i Claude prompt prilagodama
 - **2 kriticna Binance buga** popravljena (LOT_SIZE, timestamp drift)
 - **MIT licenca** za open source distribuciju
 
 Trenutni blocker je **vanjski** (Binance account recovery), kod je verificiran `flutter analyze`/`test` na 0/clean. Kad developer dobije API kljuc, prvi live trade pokrece se iz Manage -> API u 2 minute.
 
-Projekt ima **solidan temelj za Session 7+** — svaka nova funkcionalnost sjeda u jasno definiran sloj (novi service / novi model / novi screen + provider extension), i postojeci pattern-i (skeleton loading, error bar, confirm dialog, status badge header, gated timers, reliability scoring, intelligence aggregation) su reusable za nove module.
+Projekt ima **solidan temelj za Session 8+** — svaka nova funkcionalnost sjeda u jasno definiran sloj (novi service / novi model / novi screen + provider extension), i postojeci pattern-i (skeleton loading, error bar, confirm dialog, status badge header, gated timers, reliability scoring, intelligence aggregation, tier-aware UI) su reusable za nove module.
 
 ---
 
 **Generirano:** 2026-04-16
-**Verzija:** 3.0.0
-**Pokriva sesije:** 1, 2, 3, 4, 5, 6
+**Verzija:** 4.0.0
+**Pokriva sesije:** 1, 2, 3, 4, 5, 6, 7

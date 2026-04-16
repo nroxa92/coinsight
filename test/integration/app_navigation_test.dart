@@ -14,6 +14,8 @@ void main() {
     if (!Hive.isBoxOpen('analysis_logs')) await Hive.openBox('analysis_logs');
     if (!Hive.isBoxOpen('positions')) await Hive.openBox('positions');
     if (!Hive.isBoxOpen('monitored_channels_detail')) await Hive.openBox('monitored_channels_detail');
+    if (!Hive.isBoxOpen('mid_term_projects')) await Hive.openBox('mid_term_projects');
+    if (!Hive.isBoxOpen('long_term_holdings')) await Hive.openBox('long_term_holdings');
   });
 
   group('App Navigation', () {
@@ -46,11 +48,33 @@ void main() {
       await tester.tap(find.text('Manage'));
       await tester.pumpAndSettle();
 
-      // Tabbed layout with 4 tabs
+      // Tabbed layout with 5 tabs
       expect(find.text('API'), findsWidgets);
+      expect(find.text('Tiers'), findsOneWidget);
       expect(find.text('Bot'), findsOneWidget);
       expect(find.text('Trade'), findsOneWidget);
       expect(find.text('App'), findsOneWidget);
+    });
+
+    testWidgets('TierModeSelector renders with 3 tier buttons',
+        (tester) async {
+      await tester.pumpWidget(const CoinSightApp());
+      await tester.pumpAndSettle();
+
+      expect(find.text('SHORT'), findsOneWidget);
+      expect(find.text('MID'), findsOneWidget);
+      expect(find.text('LONG'), findsOneWidget);
+    });
+
+    testWidgets('Manage tab now has 5 tabs including Tiers',
+        (tester) async {
+      await tester.pumpWidget(const CoinSightApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Manage'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Tiers'), findsOneWidget);
     });
 
     testWidgets('tapping Portfolio tab shows portfolio screen',

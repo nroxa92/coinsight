@@ -29,6 +29,16 @@ opcionalnom automatskom egzekucijom Binance Spot orderima.
 - **Cross-Channel Scoring** — confluence score 0-6.0 agregira sve izvore s težinskim faktorima
 - **Intelligence Dashboard** — vizualni score breakdown po izvoru u Portfolio screenu
 
+### Three-Tier Investment Framework (v4.0)
+
+CoinSight podržava tri investicijske strategije unutar jedne aplikacije:
+
+- **SHORT** — Early momentum trading (sati do dani). Auto-trade, stop-loss, DEX listinzi.
+- **MID** — Value discovery (tjedni do mjeseci). GitHub verifikacija, tokenomics analiza, projekt bilješke.
+- **LONG** — Fundamental hold (mjeseci do godina). Ultra rigorozna due diligence, DCA akumulacija, tim/investitori/partnerstva analiza.
+
+Persistent Tier Mode Selector omogućava brzo prebacivanje — svi screenovi se adaptiraju aktivnom tieru.
+
 ## Tehnički stack
 
 | Komponenta | Tehnologija |

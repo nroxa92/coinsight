@@ -1,10 +1,23 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:coinsight/services/github_intelligence.dart';
 import '../../helpers/mock_http_client.dart';
 
 void main() {
-  setUpAll(() => registerFallbacks());
+  setUpAll(() async {
+    registerFallbacks();
+    final dir = Directory.systemTemp.createTempSync('github_intel_test');
+    Hive.init(dir.path);
+    if (!Hive.isBoxOpen('settings')) await Hive.openBox('settings');
+    if (!Hive.isBoxOpen('watchlist')) await Hive.openBox('watchlist');
+    if (!Hive.isBoxOpen('analysis_logs')) await Hive.openBox('analysis_logs');
+    if (!Hive.isBoxOpen('positions')) await Hive.openBox('positions');
+    if (!Hive.isBoxOpen('monitored_channels_detail')) await Hive.openBox('monitored_channels_detail');
+    if (!Hive.isBoxOpen('mid_term_projects')) await Hive.openBox('mid_term_projects');
+    if (!Hive.isBoxOpen('long_term_holdings')) await Hive.openBox('long_term_holdings');
+  });
 
   Map<String, dynamic> makeRepoJson({
     String fullName = 'org/crypto-project',
@@ -113,8 +126,8 @@ void main() {
       });
     });
 
-    group('getRemainingRateLimit', () {
-      test('returns remaining count', () async {
+    group('getRateLimitStatus', () {
+      test('returns remaining and limit', () async {
         final client = HttpClientFactory.returning(
           json.encode({
             'resources': {
@@ -123,22 +136,25 @@ void main() {
           }),
         );
         final service = GitHubIntelligence(client: client);
-        final remaining = await service.getRemainingRateLimit();
-        expect(remaining, 42);
+        final status = await service.getRateLimitStatus();
+        expect(status['remaining'], 42);
+        expect(status['limit'], 60);
       });
 
-      test('returns 0 on error', () async {
+      test('returns 0 remaining on error', () async {
         final client = HttpClientFactory.returning('', statusCode: 500);
         final service = GitHubIntelligence(client: client);
-        final remaining = await service.getRemainingRateLimit();
-        expect(remaining, 0);
+        final status = await service.getRateLimitStatus();
+        expect(status['remaining'], 0);
+        expect(status['limit'], 60);
       });
 
-      test('returns 0 on timeout', () async {
+      test('returns 0 remaining on timeout', () async {
         final client = HttpClientFactory.throwingTimeout();
         final service = GitHubIntelligence(client: client);
-        final remaining = await service.getRemainingRateLimit();
-        expect(remaining, 0);
+        final status = await service.getRateLimitStatus();
+        expect(status['remaining'], 0);
+        expect(status['limit'], 60);
       });
     });
   });

@@ -1168,12 +1168,136 @@ Dodano na kraj system prompta: confluence analiza instrukcije (score 5-6 / 3-4.9
 
 ---
 
+## Session 7: 2026-04-16 — v4.0.0 Three-Tier Investment Framework
+
+**Kontekst:** Major version bump. Session 6 završila s Intelligence Layer (5-source scoring). Session 7 dodaje trodijelni investment sustav (SHORT/MID/LONG) s tier-specifičnim Claude promptima, adaptivnim UI-jem na svim screenima, i novim modelima za MID projekate i LONG holdinge.
+
+---
+
+### Faza 1 — Bugfix: Session 6 Identified Issues
+**Status:** Completed
+
+- `lib/services/github_intelligence.dart` — `_headers` getter sada uključuje `Authorization: token $token` ako je GitHub token konfiguriran. `getRemainingRateLimit()` → `getRateLimitStatus()` vraća Map s remaining+limit
+- `lib/services/reddit_monitor.dart` — exponential backoff retry (3 pokušaja, 300/600/1200ms) u `_getSubredditNew()` za 429. Inter-subreddit delay 300ms → 600ms
+- `lib/models/dexscreener_signal.dart` — `ageHours` validacija: pairCreatedAt=0 → 48h, future date → 0h, >30 dana → cap 720h
+- `lib/services/storage_service.dart` — dodane getGitHubToken/saveGitHubToken/deleteGitHubToken metode
+- `lib/widgets/settings/api_settings_tab.dart` — nova GitHub Token sekcija s obscured input, save/remove, status badge
+- `lib/screens/settings_screen.dart` — GitHub token state i callbacks
+
+### Faza 2 — Novi Modeli
+**Status:** Completed
+
+- `lib/models/investment_tier.dart` — InvestmentTier enum (short/mid/long) + InvestmentTierX extension (displayName, emoji, description, philosophy, riskLevel, suggestedPortfolioPercent, supportsAutoTrade, color, bgColor)
+- `lib/models/mid_term_project.dart` — MidTermProject (20+ polja: entry plan, actuals, thesis, notes, Claude analysis), MidTermStatus enum (researching/watching/entered/exited/abandoned), MidTermNote. Full toMap/fromMap/copyWith
+- `lib/models/long_term_holding.dart` — LongTermHolding (DCA purchases, targets, fundamentals, notes, confidence score), LongTermStatus enum, LongTermPurchase, LongTermFundamentals (7 polja), LongTermNote. Full toMap/fromMap/copyWith
+
+### Faza 3 — Storage Proširenje
+**Status:** Completed
+
+- Novi Hive boxovi: `mid_term_projects`, `long_term_holdings`
+- `_activeTierField` u settings box
+- CRUD: getActiveTier/saveActiveTier, getMidProjects/saveMidProject/deleteMidProject/addMidNote, getLongHoldings/saveLongHolding/deleteLongHolding/addLongPurchase/addLongNote, getTierRiskParameters/saveTierRiskParameters
+
+### Faza 4 — Tier Mode Selector + Navigation
+**Status:** Completed
+
+- `lib/models/tier_provider.dart` — TierProvider ChangeNotifier s activeTier, setTier
+- `lib/widgets/tier_mode_selector.dart` — persistent 40px banner ispod AppBara s 3 tier buttona (SHORT purple, MID teal, LONG gold), animated active state
+- `lib/main.dart` — TierProvider dodan u MultiProvider, TierModeSelector ugrađen u Column iznad IndexedStack
+
+### Faza 5 — Tier-Specifični Claude Prompti
+**Status:** Completed
+
+- `lib/models/analysis_provider.dart` — `_systemPrompt` → tri prompta: `_shortSystemPrompt` (existing), `_midSystemPrompt` (value discovery: tim, tokenomics, use case, competitive landscape, timing → RESEARCH_MORE/WATCHLIST/ENTER/AVOID), `_longSystemPrompt` (ultra rigorous: tim, investitori, adoption, infrastruktura, tokenomics, competitive moat → STRONG_HOLD/CONDITIONAL_HOLD/INVESTIGATE_MORE/AVOID_LONG + confidence 1-10). `_activeSystemPrompt` getter bira po tieru. `suggestionChips` getter vraća tier-specifične chipove.
+
+### Faza 6 — Analysis Screen Tier-Adaptive UI
+**Status:** Completed
+
+- Consumer2<AnalysisProvider, TierProvider> za pristup tieru
+- Suggestion chips koriste `provider.suggestionChips` (tier-specifični)
+- Trade Action Bar samo u SHORT tieru
+- MID Action Bar: pojavljuje se za **WATCHLIST**/**ENTER** — "DODAJ U ISTRAŽIVANJE" kreira MidTermProject
+- LONG Action Bar: pojavljuje se za **STRONG_HOLD**/**CONDITIONAL_HOLD** — "DODAJ U HOLDINGS" kreira LongTermHolding s confidence score parsiranjem
+
+### Faza 7 — Watchlist Screen Tier-Adaptive Layout
+**Status:** Completed
+
+- TickerProviderStateMixin za 3 TabControllera (short 4 taba, mid 3 taba, long 3 taba)
+- SHORT: DEX Early / New Listings / My Watchlist / Top Coins (nepromijenjeno)
+- MID: Projekti (MidTermProject cards) / Discovery (placeholder) / Watchlist (shared)
+- LONG: Holdings (LongTermHolding cards) / Research (top 100 coins) / Watchlist (shared)
+
+### Faza 8 — Portfolio Screen Tier-Adaptive Display
+**Status:** Completed
+
+- Consumer<TierProvider> switch za 3 portfolio prikaza
+- SHORT: existing (USDT balance, positions, intelligence, history)
+- MID: summary card (total/active/researching) + MidTermProject kartice
+- LONG: summary card (holdings/total invested) + LongTermHolding kartice s DCA info
+
+### Faza 9 — Manage Screen Tier Settings
+**Status:** Completed
+
+- `lib/widgets/settings/tier_settings_tab.dart` — novi widget s 3 ExpansionTile sekcije (SHORT/MID/LONG) za per-tier risk parametre
+- Settings TabController 4 → 5 tabova (API/Tiers/Bot/Trade/App)
+- StorageService: getTierRiskParameters/saveTierRiskParameters
+
+### Faza 10 — Testovi
+**Status:** Completed
+
+**Kreirani fajlovi (3):**
+- `test/unit/models/investment_tier_test.dart` (15 testova)
+- `test/unit/models/mid_term_project_test.dart` (12 testova)
+- `test/unit/models/long_term_holding_test.dart` (11 testova)
+
+**Ažurirani fajlovi (3):**
+- `test/integration/app_navigation_test.dart` — Hive boxovi, TierModeSelector test, Tiers tab test
+- `test/widget_test.dart` — Hive boxovi
+- `test/unit/services/github_intelligence_test.dart` — Hive init za StorageService dependency
+
+**Rezultat:** 232/232 testova prolazi
+
+### Faza 11 — Finalizacija
+**Status:** Completed
+
+- `pubspec.yaml` — version 3.0.0+4 → 4.0.0+5
+- `README.md` — Three-Tier Investment Framework sekcija
+- `flutter analyze` — **0 issues**
+- `flutter test` — **232/232 passed**
+- `flutter build apk --debug` — **uspješan**
+
+**Novi fajlovi (7):**
+- `lib/models/investment_tier.dart`, `mid_term_project.dart`, `long_term_holding.dart`, `tier_provider.dart`
+- `lib/widgets/tier_mode_selector.dart`, `settings/tier_settings_tab.dart`
+- `test/unit/models/investment_tier_test.dart`, `mid_term_project_test.dart`, `long_term_holding_test.dart`
+
+**Promijenjeni fajlovi (13):**
+- `lib/models/analysis_provider.dart` (3 prompta, suggestionChips, _activeSystemPrompt)
+- `lib/models/watchlist_provider.dart` (tier-aware)
+- `lib/models/dexscreener_signal.dart` (ageHours fix)
+- `lib/services/storage_service.dart` (tier CRUD, GitHub token, tier risk params)
+- `lib/services/github_intelligence.dart` (auth headers, getRateLimitStatus)
+- `lib/services/reddit_monitor.dart` (backoff retry)
+- `lib/screens/analysis_screen.dart` (tier action bars)
+- `lib/screens/watchlist_screen.dart` (3 layouts)
+- `lib/screens/portfolio_screen.dart` (3 portfolio views)
+- `lib/screens/settings_screen.dart` (5 tabs, GitHub token)
+- `lib/widgets/settings/api_settings_tab.dart` (GitHub section)
+- `lib/main.dart` (TierProvider, TierModeSelector)
+- `pubspec.yaml`, `README.md`
+
+---
+
+---
+
 ## Identified Issues
 
-- **Binance account lockout (developer):** SMS 2FA ne stiže, duplicate account na broju — blokira live testing. Status: developer planira live chat / Account Appeal.
-- **API Management only on desktop web:** Binance je uklonio API sekciju iz mobilne app-a, pa se ključevi mogu generirati samo preko desktop weba.
-- ~~**LOT_SIZE precision hardcoded**~~ — **FIXED u Session 5 Faza 1**
-- ~~**Timestamp drift**~~ — **FIXED u Session 5 Faza 2**
-- **GitHub API rate limit (60 req/h):** bez autentikacije, agregator troši ~15-20 req po full scan ciklusu. S 15min intervalom = ~80 req/h = blizu limita. Moguće rješenje: dodati optional GitHub token u Settings za veći limit (5000 req/h).
-- **Reddit rate limiting:** Reddit ponekad vraća 429 za prečeste requestove. Trenutno silent fail — ne crashira ali može propustiti signale. Moguće rješenje: duži delay između subreddita ili OAuth2 autentikacija.
-- **Dexscreener pair age accuracy:** `pairCreatedAt` timestamp ovisi o Dexscreeneru da ga pravilno postavi. Za neke chainove može biti netočan. Identified Issues — ne fix u Session 6.
+- **Binance account lockout (developer):** SMS 2FA ne stiže — blokira live testing.
+- **API Management only on desktop web:** Binance ograničenje.
+- ~~**LOT_SIZE precision hardcoded**~~ — FIXED Session 5
+- ~~**Timestamp drift**~~ — FIXED Session 5
+- ~~**GitHub API rate limit**~~ — **FIXED Session 7 Faza 1** — optional token u Settings
+- ~~**Reddit rate limiting**~~ — **FIXED Session 7 Faza 1** — exponential backoff retry
+- ~~**Dexscreener pair age accuracy**~~ — **FIXED Session 7 Faza 1** — timestamp validacija
+- **MID Discovery tab placeholder:** trenutno prikazuje samo basic tekst, trebalo bi integrirati GitHub trending filtriran za MID kriterije (rank 100-500, aktivan repo)
+- **LONG Research tab basic:** prikazuje top 100 coinove, trebalo bi dodati dublje filtriranje po fundamentalima

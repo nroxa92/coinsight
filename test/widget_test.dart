@@ -13,6 +13,8 @@ void main() {
     if (!Hive.isBoxOpen('analysis_logs')) await Hive.openBox('analysis_logs');
     if (!Hive.isBoxOpen('positions')) await Hive.openBox('positions');
     if (!Hive.isBoxOpen('monitored_channels_detail')) await Hive.openBox('monitored_channels_detail');
+    if (!Hive.isBoxOpen('mid_term_projects')) await Hive.openBox('mid_term_projects');
+    if (!Hive.isBoxOpen('long_term_holdings')) await Hive.openBox('long_term_holdings');
   });
 
   testWidgets('App renders with bottom navigation', (WidgetTester tester) async {

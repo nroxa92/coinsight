@@ -12,6 +12,7 @@ import 'package:coinsight/widgets/settings/api_settings_tab.dart';
 import 'package:coinsight/widgets/settings/bot_settings_tab.dart';
 import 'package:coinsight/widgets/settings/trade_settings_tab.dart';
 import 'package:coinsight/widgets/settings/app_settings_tab.dart';
+import 'package:coinsight/widgets/settings/tier_settings_tab.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -31,6 +32,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _binanceTestnet = true;
   bool _binanceConfigured = false;
   bool _testingBinance = false;
+  final _githubTokenController = TextEditingController();
+  bool _obscureGithubToken = true;
+  bool _githubConfigured = false;
 
   // Trade tab state
   late RiskParameters _risk;
@@ -58,6 +62,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _binanceSecretController.text = '••••••••••••••••';
     }
 
+    _githubConfigured = StorageService.getGitHubToken()?.isNotEmpty ?? false;
+    if (_githubConfigured) {
+      _githubTokenController.text = '••••••••••••••••';
+    }
+
     _risk = StorageService.getRiskParameters();
     _maxTradeController.text = _risk.maxTradeAmountUsdt.toStringAsFixed(2);
 
@@ -77,20 +86,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _maxTradeController.dispose();
     _monitorTokenController.dispose();
     _addChannelController.dispose();
+    _githubTokenController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Column(
         children: [
           const TabBar(
+            isScrollable: true,
             labelStyle: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
             unselectedLabelStyle: TextStyle(fontSize: 13),
             tabs: [
               Tab(text: 'API'),
+              Tab(text: 'Tiers'),
               Tab(text: 'Bot'),
               Tab(text: 'Trade'),
               Tab(text: 'App'),
@@ -124,7 +136,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onTestBinance: _testBinance,
                       onRemoveBinance: _removeBinance,
                       onToggleTestnet: _toggleTestnet,
+                      githubTokenController: _githubTokenController,
+                      obscureGithubToken: _obscureGithubToken,
+                      onToggleGithubToken: () => setState(
+                          () => _obscureGithubToken = !_obscureGithubToken),
+                      githubConfigured: _githubConfigured,
+                      onSaveGithubToken: _saveGithubToken,
+                      onRemoveGithubToken: _removeGithubToken,
                     ),
+                    const TierSettingsTab(),
                     BotSettingsTab(
                       monitorTokenController: _monitorTokenController,
                       addChannelController: _addChannelController,
@@ -319,6 +339,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
     return result ?? false;
+  }
+
+  // ───────── GitHub Token actions ─────────
+  Future<void> _saveGithubToken() async {
+    final token = _githubTokenController.text.trim();
+    if (token.isEmpty || token.startsWith('••')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unesi GitHub token')),
+      );
+      return;
+    }
+    await StorageService.saveGitHubToken(token);
+    if (!mounted) return;
+    setState(() {
+      _githubConfigured = true;
+      _githubTokenController.text = '••••••••••••••••';
+      _obscureGithubToken = true;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('GitHub token saved')),
+    );
+  }
+
+  Future<void> _removeGithubToken() async {
+    await StorageService.deleteGitHubToken();
+    if (!mounted) return;
+    setState(() {
+      _githubConfigured = false;
+      _githubTokenController.clear();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('GitHub token removed')),
+    );
   }
 
   // ───────── Risk actions ─────────

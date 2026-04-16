@@ -51,7 +51,7 @@ class RedditMonitor {
       try {
         final posts = await _getSubredditNew(sub);
         results.addAll(posts);
-        await Future.delayed(const Duration(milliseconds: 300));
+        await Future.delayed(const Duration(milliseconds: 600));
       } catch (_) {
         continue;
       }
@@ -88,13 +88,31 @@ class RedditMonitor {
   }
 
   Future<List<RedditSignal>> _getSubredditNew(String subreddit) async {
-    final uri = Uri.parse('$_baseUrl/r/$subreddit/new.json?limit=25');
+    // Exponential backoff: 300ms, 600ms, 1200ms
+    for (int attempt = 0; attempt < 3; attempt++) {
+      try {
+        final uri = Uri.parse('$_baseUrl/r/$subreddit/new.json?limit=25');
+        final res = await _client
+            .get(uri, headers: _headers)
+            .timeout(_timeout);
 
-    final res =
-        await _client.get(uri, headers: _headers).timeout(_timeout);
-    if (res.statusCode != 200) return [];
+        if (res.statusCode == 429) {
+          // Rate limited — čekaj i pokušaj opet
+          await Future.delayed(Duration(milliseconds: 300 * (attempt + 1) * 2));
+          continue;
+        }
 
-    return _parseResponse(res.body, subreddit);
+        if (res.statusCode != 200) return [];
+        return _parseResponse(res.body, subreddit);
+
+      } on TimeoutException {
+        if (attempt == 2) return [];
+        continue;
+      } catch (_) {
+        return [];
+      }
+    }
+    return [];
   }
 
   List<RedditSignal> _parseResponse(String body, String subreddit) {

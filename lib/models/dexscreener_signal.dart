@@ -35,9 +35,15 @@ class DexscreenerSignal {
   });
 
   int get ageHours {
+    // pairCreatedAt = 0 znači nepoznato — tretiramo kao svjež (48h)
+    if (pairCreatedAt == 0) return 48;
     final created =
         DateTime.fromMillisecondsSinceEpoch(pairCreatedAt * 1000);
-    return DateTime.now().difference(created).inHours;
+    // Sanity check: par ne može biti kreiran u budućnosti
+    if (created.isAfter(DateTime.now())) return 0;
+    // Sanity check: par stariji od 30 dana vjerojatno nije novi listing
+    final hours = DateTime.now().difference(created).inHours;
+    return hours > 720 ? 720 : hours;
   }
 
   double get volumeLiquidityRatio =>
@@ -45,6 +51,7 @@ class DexscreenerSignal {
 
   bool get hasMinimumLiquidity => liquidityUsd >= 10000;
 
+  // isFresh sada koristi validiran ageHours
   bool get isFresh => ageHours <= 24;
 
   String toClaudeContext() {

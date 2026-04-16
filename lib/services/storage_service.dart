@@ -3,6 +3,9 @@ import 'package:coinsight/models/analysis_log.dart';
 import 'package:coinsight/models/coin_position.dart';
 import 'package:coinsight/models/monitored_channel.dart';
 import 'package:coinsight/models/risk_parameters.dart';
+import 'package:coinsight/models/investment_tier.dart';
+import 'package:coinsight/models/mid_term_project.dart';
+import 'package:coinsight/models/long_term_holding.dart';
 
 class StorageService {
   static const _settingsBox = 'settings';
@@ -18,6 +21,10 @@ class StorageService {
   static const _monitoredChannelsField = 'monitored_channels';
   static const _monitoredChannelsDetailBox = 'monitored_channels_detail';
   static const _riskParamsField = 'risk_parameters';
+  static const _activeTierField = 'active_investment_tier';
+  static const _midProjectsBox = 'mid_term_projects';
+  static const _longHoldingsBox = 'long_term_holdings';
+  static const _githubTokenField = 'github_personal_token';
 
   static Future<void> init() async {
     await Hive.initFlutter();
@@ -26,6 +33,8 @@ class StorageService {
     await Hive.openBox(_analysisLogBox);
     await Hive.openBox(_positionsBox);
     await Hive.openBox(_monitoredChannelsDetailBox);
+    await Hive.openBox(_midProjectsBox);
+    await Hive.openBox(_longHoldingsBox);
   }
 
   // API Key
@@ -240,5 +249,123 @@ class StorageService {
     await Hive.box(_analysisLogBox).clear();
     await Hive.box(_positionsBox).clear();
     await Hive.box(_monitoredChannelsDetailBox).clear();
+    await Hive.box(_midProjectsBox).clear();
+    await Hive.box(_longHoldingsBox).clear();
+  }
+
+  // ─── Active Tier ─────────────────────────────────
+  static InvestmentTier getActiveTier() {
+    final box = Hive.box(_settingsBox);
+    final stored = box.get(_activeTierField) as String?;
+    switch (stored) {
+      case 'mid':  return InvestmentTier.mid;
+      case 'long': return InvestmentTier.long;
+      default:     return InvestmentTier.short;
+    }
+  }
+
+  static Future<void> saveActiveTier(InvestmentTier tier) async {
+    final box = Hive.box(_settingsBox);
+    await box.put(_activeTierField, tier.name);
+  }
+
+  // ─── GitHub Token ─────────────────────────────────
+  static String? getGitHubToken() {
+    final box = Hive.box(_settingsBox);
+    return box.get(_githubTokenField) as String?;
+  }
+
+  static Future<void> saveGitHubToken(String token) async {
+    await Hive.box(_settingsBox).put(_githubTokenField, token);
+  }
+
+  static Future<void> deleteGitHubToken() async {
+    await Hive.box(_settingsBox).delete(_githubTokenField);
+  }
+
+  // ─── MID Term Projects ────────────────────────────
+  static List<MidTermProject> getMidProjects() {
+    final box = Hive.box(_midProjectsBox);
+    return box.values
+        .map((v) => MidTermProject.fromMap(v as Map<dynamic, dynamic>))
+        .toList()
+      ..sort((a, b) => b.discoveredAt.compareTo(a.discoveredAt));
+  }
+
+  static Future<void> saveMidProject(MidTermProject project) async {
+    final box = Hive.box(_midProjectsBox);
+    await box.put(project.id, project.toMap());
+  }
+
+  static Future<void> deleteMidProject(String id) async {
+    await Hive.box(_midProjectsBox).delete(id);
+  }
+
+  static Future<void> addMidNote(String projectId, MidTermNote note) async {
+    final box = Hive.box(_midProjectsBox);
+    final existing = box.get(projectId);
+    if (existing == null) return;
+    final project = MidTermProject.fromMap(existing as Map<dynamic, dynamic>);
+    final updated = project.copyWith(
+      notes: [...project.notes, note],
+    );
+    await box.put(projectId, updated.toMap());
+  }
+
+  // ─── LONG Term Holdings ───────────────────────────
+  static List<LongTermHolding> getLongHoldings() {
+    final box = Hive.box(_longHoldingsBox);
+    return box.values
+        .map((v) => LongTermHolding.fromMap(v as Map<dynamic, dynamic>))
+        .toList()
+      ..sort((a, b) => b.firstResearchDate.compareTo(a.firstResearchDate));
+  }
+
+  static Future<void> saveLongHolding(LongTermHolding holding) async {
+    await Hive.box(_longHoldingsBox).put(holding.id, holding.toMap());
+  }
+
+  static Future<void> deleteLongHolding(String id) async {
+    await Hive.box(_longHoldingsBox).delete(id);
+  }
+
+  static Future<void> addLongPurchase(
+      String holdingId, LongTermPurchase purchase) async {
+    final box = Hive.box(_longHoldingsBox);
+    final existing = box.get(holdingId);
+    if (existing == null) return;
+    final holding = LongTermHolding.fromMap(existing as Map<dynamic, dynamic>);
+    final updated = holding.copyWith(
+      purchases: [...holding.purchases, purchase],
+    );
+    await box.put(holdingId, updated.toMap());
+  }
+
+  // ─── Tier Risk Parameters ──────────────────────────
+  static const _tierRiskParamsField = 'tier_risk_parameters';
+
+  static Map<String, dynamic> getTierRiskParameters() {
+    final box = Hive.box(_settingsBox);
+    final data = box.get(_tierRiskParamsField);
+    if (data == null) return {};
+    return Map<String, dynamic>.from(data as Map);
+  }
+
+  static Future<void> saveTierRiskParameters(
+      Map<String, dynamic> params) async {
+    final box = Hive.box(_settingsBox);
+    await box.put(_tierRiskParamsField, params);
+  }
+
+  static Future<void> addLongNote(
+      String holdingId, LongTermNote note) async {
+    final box = Hive.box(_longHoldingsBox);
+    final existing = box.get(holdingId);
+    if (existing == null) return;
+    final holding = LongTermHolding.fromMap(existing as Map<dynamic, dynamic>);
+    final updated = holding.copyWith(
+      notes: [...holding.notes, note],
+    );
+    await box.put(holdingId, updated.toMap());
   }
 }

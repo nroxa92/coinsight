@@ -22,6 +22,13 @@ class ApiSettingsTab extends StatelessWidget {
   final VoidCallback onRemoveBinance;
   final ValueChanged<bool> onToggleTestnet;
 
+  final TextEditingController githubTokenController;
+  final bool obscureGithubToken;
+  final VoidCallback onToggleGithubToken;
+  final bool githubConfigured;
+  final VoidCallback onSaveGithubToken;
+  final VoidCallback onRemoveGithubToken;
+
   const ApiSettingsTab({
     super.key,
     required this.apiKeyController,
@@ -43,6 +50,12 @@ class ApiSettingsTab extends StatelessWidget {
     required this.onTestBinance,
     required this.onRemoveBinance,
     required this.onToggleTestnet,
+    required this.githubTokenController,
+    required this.obscureGithubToken,
+    required this.onToggleGithubToken,
+    required this.githubConfigured,
+    required this.onSaveGithubToken,
+    required this.onRemoveGithubToken,
   });
 
   @override
@@ -55,6 +68,8 @@ class ApiSettingsTab extends StatelessWidget {
         _buildAnthropicSection(context),
         const SizedBox(height: 16),
         _buildBinanceSection(context),
+        const SizedBox(height: 16),
+        _buildGithubSection(context),
       ],
     );
   }
@@ -80,6 +95,12 @@ class ApiSettingsTab extends StatelessWidget {
                   ? (binanceTestnet ? 'Active (Testnet)' : 'Active (LIVE)')
                   : 'Not configured',
               binanceConfigured,
+            ),
+            const SizedBox(height: 8),
+            _statusRow(
+              'GitHub',
+              githubConfigured ? 'Authenticated' : 'Public (60 req/h)',
+              githubConfigured,
             ),
           ],
         ),
@@ -283,6 +304,66 @@ class ApiSettingsTab extends StatelessWidget {
                   const SizedBox(width: 8),
                   OutlinedButton(
                     onPressed: onRemoveBinance,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.error,
+                      side: BorderSide(
+                          color: Theme.of(context).colorScheme.error),
+                    ),
+                    child: const Text('Remove'),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGithubSection(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _sectionHeader(context, Icons.code, 'GitHub API (Opcionalno)',
+                statusLabel: githubConfigured ? 'Authenticated' : 'Public (60 req/h)',
+                statusActive: githubConfigured),
+            const SizedBox(height: 8),
+            Text(
+              'Personal Access Token pove\u0107ava rate limit sa 60 na 5000 req/h. '
+              'Generiraj na github.com/settings/tokens (scope: public_repo)',
+              style: TextStyle(color: Colors.grey[500], fontSize: 12),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: githubTokenController,
+              obscureText: obscureGithubToken,
+              decoration: InputDecoration(
+                labelText: 'GitHub Token (ghp_...)',
+                suffixIcon: IconButton(
+                  icon: Icon(
+                      obscureGithubToken ? Icons.visibility_off : Icons.visibility,
+                      size: 20,
+                      color: Colors.grey[600]),
+                  onPressed: onToggleGithubToken,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: onSaveGithubToken,
+                    child: const Text('Save'),
+                  ),
+                ),
+                if (githubConfigured) ...[
+                  const SizedBox(width: 8),
+                  OutlinedButton(
+                    onPressed: onRemoveGithubToken,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Theme.of(context).colorScheme.error,
                       side: BorderSide(

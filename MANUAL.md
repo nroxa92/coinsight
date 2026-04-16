@@ -2,7 +2,7 @@
 
 **Za koga je ovaj priručnik:** netko tko prvi put otvara CoinSight. Ne pretpostavljamo da znaš što je market cap, što je Spot trading, niti kako funkcionira API ključ. Sve se objašnjava u hodu.
 
-**Verzija aplikacije:** 3.0.0
+**Verzija aplikacije:** 4.0.0
 **Licenca:** MIT (open source)
 **Platforma:** Android (primarno) + Windows desktop
 **Datum priručnika:** 2026-04-16
@@ -23,6 +23,7 @@
 1. [Što je CoinSight i koji je cilj](#1-što-je-coinsight)
 2. [Osnovne crypto pojmove koje trebaš razumjeti](#2-osnovne-crypto-pojmove)
 3. [Što ti treba prije nego kreneš](#3-što-ti-treba-prije-nego-kreneš)
+3A. [Three-Tier Investment Framework (v4.0.0)](#3a-three-tier-investment-framework)
 4. [Prvo pokretanje aplikacije — što ćeš vidjeti](#4-prvo-pokretanje-aplikacije)
 5. [Turneja po aplikaciji — 4 taba + DEX Early](#5-turneja-po-aplikaciji)
 6. [Postavljanje API ključeva — korak po korak](#6-postavljanje-api-ključeva)
@@ -65,12 +66,14 @@ Zamisli uobičajeni proces kad netko želi uhvatiti crypto "pump":
 
 Traje 10-15 minuta po coinu. **CoinSight sve to radi u jednoj app-i u ~60 sekundi.**
 
-Verzija 3.0.0 dodaje **Intelligence Layer** — sustav koji prati DEX listinge, GitHub aktivnost, Reddit diskusije i Telegram kanale, te sve to objedinjuje u obavještajni izvještaj za Claude analizu. Više ne trebaš ručno provjeravati višestruke izvore.
+Verzija 3.0.0 dodala je **Intelligence Layer** — sustav koji prati DEX listinge, GitHub aktivnost, Reddit diskusije i Telegram kanale, te sve to objedinjuje u obavještajni izvještaj za Claude analizu.
+
+Verzija 4.0.0 uvodi **Three-Tier Investment Framework** — umjesto jednog pristupa za sve, sada imas tri razlicita investicijska moda: **SHORT** (kratkorocni momentum, do 48h), **MID** (srednjorocni projekti, tjedni do mjeseci) i **LONG** (dugorocna fundamentalna ulaganja, mjeseci do godine). Svaki tier ima vlastite alate, analizu i portfolio prikaz.
 
 ### 1.3 Što CoinSight NIJE
 
 - **Nije magija.** Ne zna budućnost. Njegova AI procjena je korisna u ~60-70% slučajeva, ne 100%.
-- **Nije za dugoročno investiranje.** Ne kupuješ Bitcoin preko njega da ga držiš 5 godina. App je fokusiran na **kratkoročne momentum prilike** (sati do dana).
+- **Nije za pasivno držanje bez strategije.** CoinSight podržava tri investicijska horizonta (SHORT/MID/LONG), ali svaki zahtijeva aktivno praćenje i disciplinu. LONG tier nije "kupi i zaboravi" — ukljucuje DCA kupnje i praćenje fundamentala.
 - **Nije financijski savjet.** Ti odlučuješ, ti snosiš gubitke.
 - **Nije vlasnik tvog novca.** Tvoj novac ostaje na Binanceu. CoinSight samo komunicira s Binance API-jem u tvoje ime.
 
@@ -78,7 +81,7 @@ Verzija 3.0.0 dodaje **Intelligence Layer** — sustav koji prati DEX listinge, 
 
 **Claude** od Anthropica — jedan od najnaprednijih AI asistenata. CoinSight ga koristi kroz službeni Anthropic API. AI dobija podatke o coinu (cijena, volumen, trendovi) i vraća procjenu: **WATCH / SKIP / INTERESTING**.
 
-U v3.0.0, Claude automatski prima strukturirani Intelligence Report iz višestrukih izvora — DEX listinzi, GitHub aktivnost, Reddit diskusije, Telegram signali — te ih koristi za precizniju analizu.
+U v3.0.0+, Claude automatski prima strukturirani Intelligence Report iz višestrukih izvora — DEX listinzi, GitHub aktivnost, Reddit diskusije, Telegram signali — te ih koristi za precizniju analizu. U v4.0.0, Claude dodatno prilagodava analizu ovisno o aktivnom tier-u (SHORT/MID/LONG) — svaki tier ima vlastite suggestion chipove i action bar akcije.
 
 ### 1.5 Open source
 
@@ -195,6 +198,85 @@ Za mjesečni budžet: **$10-30** za AI + fee.
 
 ---
 
+## 3A. Three-Tier Investment Framework (v4.0.0)
+
+### 3A.1 Što su tier-ovi
+
+Verzija 4.0.0 uvodi **tri investicijska tier-a** — tri potpuno razlicita nacina koristenja CoinSight-a, svaki s vlastitim alatima, analizom i portfolio prikazom:
+
+| Tier | Horizont | Fokus | Tipicni coinovi |
+|------|----------|-------|-----------------|
+| **SHORT** | Sati do 48h | Momentum trading, brzi ulaz/izlaz | Micro-cap, meme coinovi, DEX listinzi |
+| **MID** | Tjedni do mjeseci | Projekti s katalystom (launch, partnerstvo, upgrade) | Small-cap s jasnim roadmapom |
+| **LONG** | Mjeseci do godine+ | Fundamentalna ulaganja, DCA kupnje | Etablirani alt-coinovi, L1/L2, DeFi blue chip |
+
+### 3A.2 Kako prebaciti tier
+
+Na vrhu app-e, odmah ispod AppBara, vidjet ces **TierModeSelector** banner s tri buttona:
+
+```
++------------------------------------------+
+|   [SHORT]    [MID]    [LONG]             |
++------------------------------------------+
+```
+
+- **SHORT** je default (isto ponasanje kao u v3.0.0)
+- Tapni **MID** ili **LONG** za prebacivanje
+- Aktivni tier je istaknut bojom (SHORT = primary ljubicasta, MID = teal, LONG = amber)
+- Prebacivanje tier-a mijenja: suggestion chipove u Analysis tabu, akcije u Trade Action Baru, prikaz u Portfolio tabu
+
+### 3A.3 SHORT tier (default)
+
+Sve sto si dosad koristio u CoinSight-u. Brzi momentum, WATCH/SKIP/INTERESTING, Trade Action Bar s BUY NOW, SL/TP automatski. Nema promjena u odnosu na v3.0.0 za ovaj tier.
+
+### 3A.4 MID tier — srednjorocni projekti
+
+MID tier je za coinove koje ne kupujes na 2 sata, nego ih **pratis tjednima** s jasnim katalystom (npr. mainnet launch za 3 tjedna, partnerstvo, token unlock).
+
+**Kako koristiti:**
+
+1. Prebaci na **MID** tier u TierModeSelector-u
+2. U **Analysis tabu**, suggestion chipovi se mijenjaju u MID-specificne:
+   - "Procijeni MID-term potencijal"
+   - "Kreiraj MID projekt za [coin]"
+   - "Analiziraj katalyst timeline"
+3. Kad Claude identificira MID-term priliku, pojavljuje se **MID Action Bar** (umjesto standardnog Trade Action Bara):
+   - **CREATE PROJECT** — kreira MidTermProject zapis za taj coin
+   - **SKIP** — preskoci
+4. Kreirani projekti se vide u **Watchlist → Projekti** pod-tabu (novi pod-tab u v4.0.0)
+5. U **Portfolio tabu**, MID sekcija prikazuje tvoje aktivne MID projekte s progress barom do katalysta
+
+**MidTermProject** sadrzi: coin info, entry price, target price, katalyst opis, deadline, notes, status (ACTIVE/COMPLETED/ABANDONED).
+
+### 3A.5 LONG tier — dugorocna fundamentalna ulaganja
+
+LONG tier je za coinove u koje vjerujes dugorocno i kupujes ih postupno kroz **DCA (Dollar-Cost Averaging)** — redovite male kupnje neovisno o cijeni.
+
+**Kako koristiti:**
+
+1. Prebaci na **LONG** tier u TierModeSelector-u
+2. U **Analysis tabu**, suggestion chipovi se mijenjaju u LONG-specificne:
+   - "Fundamentalna analiza [coin]"
+   - "Kreiraj LONG holding za [coin]"
+   - "DCA strategija za [coin]"
+3. Kad Claude potvrdi fundamentalnu snagu, pojavljuje se **LONG Action Bar**:
+   - **CREATE HOLDING** — kreira LongTermHolding zapis
+   - **DCA BUY** — izvrsava DCA kupnju za postojeci holding
+   - **SKIP** — preskoci
+4. U **Portfolio tabu**, LONG sekcija prikazuje tvoje holdinge s prosjecnom kupovnom cijenom, ukupnom kolicinom, i fundamentals summary
+
+**LongTermHolding** sadrzi: coin info, DCA purchases lista (svaka s cijenom, kolicinom, datumom), prosjecna cijena, thesis (zasto drzis ovaj coin), fundamentals notes.
+
+### 3A.6 Tier-ovi i analiza
+
+Claude prilagodava analizu ovisno o aktivnom tier-u:
+
+- **SHORT**: fokus na momentum, volume spike, pump-and-dump rizik, 1h/24h konzistentnost → WATCH/SKIP/INTERESTING
+- **MID**: fokus na katalyst timeline, project legitimacy, community growth, token unlock schedule → CREATE PROJECT / SKIP
+- **LONG**: fokus na fundamentals (team, tech, adoption, tokenomics), competitive positioning, makro trendovi → CREATE HOLDING / SKIP
+
+---
+
 ## 4. Prvo pokretanje aplikacije
 
 ### 4.1 Instalacija
@@ -223,8 +305,10 @@ Kad prvi put otvoriš app vidjet ćeš:
 +------------------------------------------+
 |         Watchlist                         | <-- gornji naslov (AppBar)
 +------------------------------------------+
-| [DEX Early] [New Listings] [My Watchlist] | <-- 4 sub-taba (scrollable)
-|                           [Top Coins]     |
+|   [SHORT]    [MID]    [LONG]             | <-- TierModeSelector (v4.0.0)
++------------------------------------------+
+| [DEX Early] [New Listings] [My Watchlist] | <-- pod-tabi (scrollable)
+|              [Projekti] [Top Coins]       |     5 pod-tabova u MID modu
 +------------------------------------------+
 |  ░░░░░░░░░░░░░░░░░░░░                    |
 |  ░░░░░░░░░░░░░░░░░░░░                    | <-- skeleton (sivi loading)
@@ -236,6 +320,8 @@ Kad prvi put otvoriš app vidjet ćeš:
 ```
 
 Nakon 2-3 sekunde skeleton nestaje i pojavljuju se **stvarni coinovi** — lista 20-ak small-cap coinova koji trenutno rastu.
+
+**TierModeSelector banner (v4.0.0):** Ispod AppBara vidis tri buttona — SHORT, MID, LONG. Default je SHORT (ljubicasti). Ovo kontrolira koji investicijski tier je aktivan i utjece na suggestion chipove u Analysis tabu, akcije u Trade Action Baru, i prikaz u Portfolio tabu. Za pocetak ostavi na SHORT.
 
 ▶ **Napravi sad:** samo pogledaj listu. Ne moraš još ništa tapnuti.
 
@@ -282,7 +368,7 @@ Na dnu ekrana su **4 ikone**. Tapneš ikonu → mijenjaš tab.
 
 Kad tapneš tab, ikona se "puni" (outline verzija postaje solidna).
 
-**Napomena:** u v3.0.0, četvrti tab se zove **Manage** (ikona tune/equalizera), ne "Settings" kao u ranijim verzijama.
+**Napomena:** od v3.0.0 nadalje, četvrti tab se zove **Manage** (ikona tune/equalizera), ne "Settings" kao u ranijim verzijama.
 
 ---
 
@@ -393,10 +479,22 @@ Kad **dodaš ključ**, tab prelazi u chat sučelje:
 
 Ispod su 3 "suggestion chipa" — tapneš i pošalje tu poruku umjesto tebe. Dobro za prvi pokušaj.
 
-**Suggestion chipovi u v3.0.0:**
+**Suggestion chipovi ovise o aktivnom tier-u (v4.0.0):**
+
+**SHORT tier (default):**
 1. **"Analiziraj New Listings"** — Claude pregleda sve coinove iz New Listings taba
 2. **"Koji coin sada ima momentum?"** — traži momentum analizu svih coinova
 3. **"Procijeni rizik watchliste"** — Claude analizira risk profil tvog watchlista
+
+**MID tier:**
+1. **"Procijeni MID-term potencijal"** — Claude analizira srednjorocne prilike
+2. **"Kreiraj MID projekt za [coin]"** — priprema MidTermProject
+3. **"Analiziraj katalyst timeline"** — analiza predstojecih katalysta
+
+**LONG tier:**
+1. **"Fundamentalna analiza [coin]"** — duboka analiza fundamentala
+2. **"Kreiraj LONG holding za [coin]"** — priprema LongTermHolding
+3. **"DCA strategija za [coin]"** — preporuka DCA rasporeda
 
 **Intelligence Report kontekst (v3.0.0):**
 
@@ -464,6 +562,14 @@ S pozicijom:
 +----------------------------------+
 ```
 
+**MID Portfolio prikaz (v4.0.0):**
+
+Kad je aktivan MID tier, Portfolio tab prikazuje tvoje **MidTermProject** zapise umjesto kratkorocnih pozicija — svaki projekt s coin info, katalyst opisom, target cijenom, deadline-om, i progress barom do katalysta.
+
+**LONG Portfolio prikaz (v4.0.0):**
+
+Kad je aktivan LONG tier, Portfolio tab prikazuje tvoje **LongTermHolding** zapise — svaki holding s prosjecnom DCA cijenom, ukupnom kolicinom, thesis opisom, i listom svih DCA kupnji.
+
 **Intelligence Dashboard (v3.0.0):**
 
 Ispod pozicija, Portfolio tab sada prikazuje **Intelligence Dashboard** — zadnji Intelligence Report:
@@ -485,14 +591,14 @@ Ispod pozicija, Portfolio tab sada prikazuje **Intelligence Dashboard** — zadn
 
 ### 5.4 Tab [=] Manage — postavke i konfiguracija
 
-**Manage tab** je u v3.0.0 organiziran u **4 pod-taba** (umjesto ravnog settings ekrana):
+**Manage tab** je u v4.0.0 organiziran u **5 pod-tabova** (dodan Tiers tab):
 
 ```
-+----------------------------------+
-| Manage                           |
-+----------------------------------+
-| [API]  [Bot]  [Trade]  [App]    |
-+----------------------------------+
++------------------------------------------+
+| Manage                                   |
++------------------------------------------+
+| [API]  [Bot]  [Trade]  [Tiers]  [App]   |
++------------------------------------------+
 |                                  |
 |    (sadržaj aktivnog pod-taba)   |
 |                                  |
@@ -523,7 +629,15 @@ Risk parametri za trgovanje:
 - **Auto-trade** toggle — Faza 3 (auto kupnja)
 - **Quiet hours** — vremenski raspon kad auto-trade ne kupuje
 
-**Pod-tab 4: App**
+**Pod-tab 4: Tiers (NOVO v4.0.0)**
+
+Konfiguracija Three-Tier Investment Framework-a:
+- **Aktivni tier** prikaz — trenutno odabrani tier (SHORT/MID/LONG)
+- **MID tier postavke** — default target %, katalyst reminder interval
+- **LONG tier postavke** — DCA iznos, DCA interval (tjedno/mjesecno), fundamentals checklist
+- **Tier statistike** — broj aktivnih projekata/holdinga po tier-u
+
+**Pod-tab 5: App**
 
 Opće postavke i kontrole:
 - **About CoinSight** — verzija, MIT licenca, disclaimer
@@ -836,7 +950,9 @@ Vrati se na **[**] Analysis** tab. Ispod Claudeove INTERESTING poruke vidiš:
 - **Coin koji targetiraš**: prvi coin iz My Watchlist-a (u našem primjeru PEPR)
 - **Uloži iznos**: preuzeto iz tvojih Risk Parametera ($5). Možeš ovdje editirati za ovaj trade (ne mijenja default)
 - **SL/TP**: preuzeto iz Risk Parametera, samo info
-- **Dva buttona**: BUY NOW i SKIP (u v3.0.0 nema TELEGRAM buttona — Telegram je sada Monitor, ne notifikacijski bot)
+- **Dva buttona**: BUY NOW i SKIP (u v3.0.0+ nema TELEGRAM buttona — Telegram je sada Monitor, ne notifikacijski bot)
+
+**Napomena (v4.0.0):** Ovaj Trade Action Bar je za **SHORT tier**. Ako si na **MID tier-u**, umjesto toga vidis **MID Action Bar** s CREATE PROJECT / SKIP buttonima. Na **LONG tier-u** vidis **LONG Action Bar** s CREATE HOLDING / DCA BUY / SKIP buttonima. Vidi sekciju 3A za detalje.
 
 ### 9.4 Tap BUY NOW
 
@@ -1628,6 +1744,9 @@ A: TELEGRAM button je uklonjen iz Trade Action Bara. Telegram je u v3.0.0 prenam
 **Q: Što je LOT_SIZE greška?**
 A: U ranijim verzijama, sell orderi ponekad nisu poštivali Binance-ov zahtjev za preciznost količine. U v3.0.0, app dinamički dohvaća `stepSize` iz `/exchangeInfo` i pravilno zaokružuje količinu. Greška bi trebala biti riješena.
 
+**Q: Što su tri tier-a (SHORT/MID/LONG) i koji koristiti?**
+A: Three-Tier Investment Framework (v4.0.0) ti omogucava tri razlicita pristupa investiranju. **SHORT** je za brzi momentum trading (sati do 48h) — isto kao sto je CoinSight radio prije. **MID** je za srednjorocne projekte s jasnim katalystom (tjedni do mjeseci) — koristis ga kad vidis coin s predstojecim launchom ili partnerstvom. **LONG** je za dugorocna fundamentalna ulaganja s DCA kupnjama (mjeseci+) — koristis ga za coinove u koje dugorocno vjerujes. Pocni s SHORT, prebaci na MID/LONG kad ti bude trebalo.
+
 **Q: Što je Intelligence Layer i kako ga koristiti?**
 A: Intelligence Layer je sustav koji prikuplja podatke iz 5 izvora (Dexscreener, GitHub, Reddit, Telegram, Market Cap) i gradi obavještajni izvještaj s confluence score-om (0-6.0). Najlakše ga koristiš tapom na "Analiziraj" button na DEX Early kartici. Vidi sekciju 13A za detalje.
 
@@ -1638,7 +1757,7 @@ A: Mjera koliko nezavisnih izvora se slaže oko signala za coin. Score ide od 0 
 A: Koristi Manage → App → Export logs before reset. Za potpuni reset: Manage → App → Full reset. Binance pozicije ostaju na Binanceu neovisno o app-u.
 
 **Q: Koliko testova ima CoinSight?**
-A: Test suite sadrži **192 testa** koji pokrivaju servise, widgete i integracije.
+A: Test suite sadrži **232 testova** koji pokrivaju servise, widgete i integracije.
 
 **Q: Što znači "Timestamp out of sync" greška?**
 A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 automatski sinkronizira putem `/api/v3/time`. Ako se greška ponovi, provjeri da je automatsko vrijeme uključeno na uredjaju.
@@ -1657,6 +1776,7 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 | **CoinGecko** | Besplatan crypto market data servis. CoinSight ga koristi za Watchlist podatke |
 | **Confluence Score** | Mjera koliko nezavisnih izvora se slaže oko signala (0-6.0). Viši = jači signal |
 | **Confirm LIVE** | Warning dialog kad prebacuješ s testnet-a na pravi Binance |
+| **DCA (Dollar-Cost Averaging)** | Strategija kupnje fiksnog iznosa u redovitim intervalima, neovisno o cijeni — smanjuje utjecaj volatilnosti |
 | **DEX** | Decentralizirana burza (Decentralized Exchange) — trgovanje bez posrednika, direktno na blockchainu (npr. Uniswap, PancakeSwap) |
 | **DEX Early** | Prvi pod-tab Watchlist-a, prikazuje svježe DEX listinge detektirane putem Dexscreenera |
 | **Dexscreener** | Servis koji prati nove tokene na decentraliziranim burzama. Intelligence Layer ga koristi za DEX Early tab |
@@ -1665,18 +1785,22 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 | **exchangeInfo** | Binance endpoint koji vraća pravila za svaki trading par (stepSize, minNotional, itd.) |
 | **Faza 2** | Manualni mode — ti potvrduješ BUY kroz Trade Action Bar |
 | **Faza 3** | Automatski mode — app sama kupuje na INTERESTING |
+| **Fundamental Hold** | LONG tier pristup — kupnja coina na osnovu duboke fundamentalne analize (team, tech, adoption) |
 | **Full reset** | Opcija u Manage → App koja briše sve lokalne podatke i vraća app na tvorničko stanje |
 | **Hive** | Lokalna baza podataka unutar app-e (čuva ključeve, watchlist, pozicije) |
 | **Intelligence Layer** | Multi-source obavještajni sustav koji prikuplja podatke iz 5 izvora (DEX, GitHub, Reddit, Telegram, MCap) |
 | **Intelligence Report** | Obavještajni izvještaj koji Intelligence Layer generira, sadrži podatke iz svih izvora i confluence score |
 | **IntelligenceAggregator** | Komponenta koja objedinjuje podatke iz svih 5 izvora u IntelligenceReport |
+| **InvestmentTier** | Enum koji definira tri investicijska moda: SHORT, MID, LONG — kontrolira ponasanje Analysis i Portfolio tabova |
 | **INTERESTING** | Claude preporuka "razmatraj ulaz s malim iznosom" |
 | **Keyword filtering** | Filtriranje Telegram poruka po ključnim riječima (listing, whale, alert...) |
 | **KYC** | "Know Your Customer" — Binance verifikacija identiteta (osobna + selfie) |
 | **Liquidity** | Količina sredstava dostupnih u DEX pool-u za trgovanje. Veća likvidnost = manji slippage |
+| **LONG tier** | Dugorocni investicijski mod (mjeseci do godine+) — fokus na fundamentalnu analizu, DCA kupnje, i praćenje fundamentala |
 | **LOT_SIZE** | Binance filter koji definira minimalnu i maksimalnu količinu tokena te stepSize za trade |
 | **Manage tab** | Četvrti tab u navigaciji (ikona tune), sadrži 4 pod-taba: API, Bot, Trade, App |
 | **Market cap** | Ukupna vrijednost svih coinova u opticaju u USD |
+| **MID tier** | Srednjorocni investicijski mod (tjedni do mjeseci) — fokus na projekte s katalystom, target price, i deadline praćenje |
 | **Market order** | Kupnja/prodaja **po trenutnoj tržišnoj cijeni** (ne limit) |
 | **MIT licenca** | Open source licenca koja dozvoljava slobodno korištenje, modifikaciju i distribuciju |
 | **My Watchlist** | Tvoj izbor coinova (označeni zvjezdicom) |
@@ -1698,12 +1822,14 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 | **Telegram Intel** | Obavještajni podaci prikupljeni iz Telegram kanala putem Monitora |
 | **Telegram Monitor** | Pasivni sustav koji čita javne Telegram kanale i filtrira signale za AI analizu |
 | **Testnet** | Binance simulator s lažnim novcem (testnet.binance.vision) |
+| **TierModeSelector** | UI widget (banner ispod AppBara) s tri buttona (SHORT/MID/LONG) za prebacivanje aktivnog investicijskog tier-a |
 | **Tier-1 exchange** | Veliki, regulirani exchange (Binance, Coinbase, Kraken) |
 | **Timestamp sync** | Automatska sinkronizacija vremena s Binance serverom putem /api/v3/time |
 | **Top Coins** | Četvrti pod-tab Watchlist-a, top 25 coinova po market capu |
 | **Trade Action Bar** | Okvir u Analysis tabu koji se pojavljuje kod INTERESTING signala (BUY NOW / SKIP) |
 | **USDT** | Tether — stablecoin (1 USDT = ~$1). Koristi se kao "keš" u Binance Spot tradingu |
 | **V/L ratio** | Volume/Liquidity omjer — mjera aktivnosti tradinga u odnosu na likvidnost DEX pool-a |
+| **Value Discovery** | MID tier pristup — identifikacija coinova s neotkrivenom vrijednoscu i predstojecim katalystom |
 | **Volume** | 24h trading volumen u USD-u |
 | **WATCH** | Claude preporuka "ima potencijal, provjeri opet kasnije" |
 | **Withdrawal** | Povlačenje novca s Binance-a (CoinSight NE koristi; API ključ NE smije imati) |
@@ -1726,8 +1852,8 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 
 **Ako si ovo pročitao sve:** spreman si za prvi dan. Kreni s malim iznosima, bilježi rezultate, i **ne žuri povećavati rizik**. Konzistentnost kroz tjedne pobjeduje naglu agresivnost.
 
-**CoinSight v3.0.0** — Open Source, MIT License
-**Test suite:** 192 testa
+**CoinSight v4.0.0** — Open Source, MIT License
+**Test suite:** 232 testova
 **Izvorni kod:** javno dostupan
 
 Sretno!

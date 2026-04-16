@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:coinsight/models/github_signal.dart';
+import 'package:coinsight/services/storage_service.dart';
 
 /// GitHubIntelligence — prati crypto repozitorije na GitHubu
 ///
@@ -29,10 +30,15 @@ class GitHubIntelligence {
   GitHubIntelligence({http.Client? client})
       : _client = client ?? http.Client();
 
-  Map<String, String> get _headers => {
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'CoinSight-Intelligence/3.0',
-      };
+  Map<String, String> get _headers {
+    final token = StorageService.getGitHubToken();
+    return {
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'CoinSight-Intelligence/3.0',
+      if (token != null && token.isNotEmpty)
+        'Authorization': 'token $token',
+    };
+  }
 
   /// Traži nedavno kreirane crypto repozitorije (zadnja 24h)
   Future<List<GitHubSignal>> searchNewCryptoRepos() async {
@@ -145,18 +151,21 @@ class GitHubIntelligence {
   }
 
   /// Provjerava rate limit status
-  Future<int> getRemainingRateLimit() async {
+  Future<Map<String, int>> getRateLimitStatus() async {
     final uri = Uri.parse('$_baseUrl/rate_limit');
     try {
       final res =
           await _client.get(uri, headers: _headers).timeout(_timeout);
-      if (res.statusCode != 200) return 0;
+      if (res.statusCode != 200) return {'remaining': 0, 'limit': 60};
       final data = json.decode(res.body) as Map<String, dynamic>;
-      final resources = data['resources'] as Map<String, dynamic>?;
-      final core = resources?['core'] as Map<String, dynamic>?;
-      return (core?['remaining'] as num?)?.toInt() ?? 0;
+      final core = (data['resources'] as Map<String, dynamic>?)?['core']
+          as Map<String, dynamic>?;
+      return {
+        'remaining': (core?['remaining'] as num?)?.toInt() ?? 0,
+        'limit': (core?['limit'] as num?)?.toInt() ?? 60,
+      };
     } catch (_) {
-      return 0;
+      return {'remaining': 0, 'limit': 60};
     }
   }
 }

@@ -5,6 +5,10 @@ import 'package:coinsight/models/watchlist_provider.dart';
 import 'package:coinsight/models/coin.dart';
 import 'package:coinsight/models/analysis_log.dart';
 import 'package:coinsight/models/trade_proposal.dart';
+import 'package:coinsight/models/investment_tier.dart';
+import 'package:coinsight/models/tier_provider.dart';
+import 'package:coinsight/models/mid_term_project.dart';
+import 'package:coinsight/models/long_term_holding.dart';
 import 'package:coinsight/services/binance_service.dart';
 import 'package:coinsight/services/storage_service.dart';
 import 'package:coinsight/services/trade_service.dart';
@@ -24,6 +28,8 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   final _tradeService = TradeService();
   bool _disposed = false;
   int _dismissedActionBarIndex = -1;
+  int _dismissedMidBarIndex = -1;
+  int _dismissedLongBarIndex = -1;
   bool _executingTrade = false;
 
   @override
@@ -61,20 +67,23 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AnalysisProvider>(
-      builder: (context, provider, _) {
+    return Consumer2<AnalysisProvider, TierProvider>(
+      builder: (context, provider, tierProvider, _) {
         if (!provider.hasApiKey) {
           return _buildNoApiKeyState(context);
         }
+        final tier = tierProvider.activeTier;
         return Column(
           children: [
             _buildSignalBadge(provider),
             Expanded(
               child: provider.messages.isEmpty
-                  ? _buildEmptyState()
+                  ? _buildEmptyState(provider)
                   : _buildMessageList(provider),
             ),
-            _buildTradeActionBarIfEligible(provider),
+            _buildTradeActionBarIfEligible(provider, tier),
+            _buildMidActionBarIfEligible(provider, tier),
+            _buildLongActionBarIfEligible(provider, tier),
             if (provider.error != null) _buildErrorBar(provider),
             _buildInputBar(provider),
           ],
@@ -136,7 +145,8 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(AnalysisProvider provider) {
+    final chips = provider.suggestionChips;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -165,11 +175,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               spacing: 8,
               runSpacing: 8,
               alignment: WrapAlignment.center,
-              children: [
-                _buildSuggestionChip('Analiziraj New Listings'),
-                _buildSuggestionChip('Koji coin sada ima momentum?'),
-                _buildSuggestionChip('Procijeni rizik watchliste'),
-              ],
+              children: chips.map((c) => _buildSuggestionChip(c)).toList(),
             ),
           ],
         ),
@@ -250,8 +256,9 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     );
   }
 
-  // ───────── Trade Action Bar ─────────
-  Widget _buildTradeActionBarIfEligible(AnalysisProvider provider) {
+  // ───────── Trade Action Bar (SHORT tier only) ─────────
+  Widget _buildTradeActionBarIfEligible(AnalysisProvider provider, InvestmentTier tier) {
+    if (tier != InvestmentTier.short) return const SizedBox.shrink();
     if (provider.messages.isEmpty) return const SizedBox.shrink();
     final lastIndex = provider.messages.length - 1;
     if (lastIndex == _dismissedActionBarIndex) {
@@ -480,6 +487,235 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     setState(() => _dismissedActionBarIndex = idx);
   }
 
+  // ───────── MID Action Bar ─────────
+  Widget _buildMidActionBarIfEligible(AnalysisProvider provider, InvestmentTier tier) {
+    if (tier != InvestmentTier.mid) return const SizedBox.shrink();
+    if (provider.messages.isEmpty) return const SizedBox.shrink();
+    final lastIndex = provider.messages.length - 1;
+    if (lastIndex == _dismissedMidBarIndex) return const SizedBox.shrink();
+    final last = provider.messages[lastIndex];
+    if (last.role != 'assistant') return const SizedBox.shrink();
+    if (!last.content.contains('**WATCHLIST**') &&
+        !last.content.contains('**ENTER**')) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF03DAC6).withValues(alpha: 0.08),
+        border: Border.all(color: const Color(0xFF03DAC6).withValues(alpha: 0.4)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('\uD83D\uDCC8 ', style: TextStyle(fontSize: 14)),
+              Expanded(
+                child: Text(
+                  'MID tier signal \u2014 dodaj u istra\u017Eivanje?',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF03DAC6),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () => setState(() => _dismissedMidBarIndex = lastIndex),
+                child: Icon(Icons.close, size: 16, color: Colors.grey[500]),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF03DAC6),
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  onPressed: () => _addMidProject(last.content, lastIndex),
+                  child: const Text('DODAJ U ISTRA\u017DIVANJE',
+                      style: TextStyle(fontWeight: FontWeight.w600)),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => setState(() => _dismissedMidBarIndex = lastIndex),
+                  child: const Text('PRESKO\u010CI'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addMidProject(String claudeResponse, int lastIndex) {
+    // Try to extract symbol from the response
+    final symbolMatch = RegExp(r'\b([A-Z]{2,10})\b').firstMatch(claudeResponse);
+    final symbol = symbolMatch?.group(1) ?? 'UNKNOWN';
+    final project = MidTermProject(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      symbol: symbol,
+      name: symbol,
+      discoveredAt: DateTime.now(),
+      status: MidTermStatus.researching,
+      thesis: claudeResponse.length > 300
+          ? '${claudeResponse.substring(0, 300)}...'
+          : claudeResponse,
+      lastClaudeAnalysis: claudeResponse,
+      lastAnalysisDate: DateTime.now(),
+    );
+    StorageService.saveMidProject(project);
+    setState(() => _dismissedMidBarIndex = lastIndex);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$symbol dodan u MID istra\u017Eivanje')),
+    );
+  }
+
+  // ───────── LONG Action Bar ─────────
+  Widget _buildLongActionBarIfEligible(AnalysisProvider provider, InvestmentTier tier) {
+    if (tier != InvestmentTier.long) return const SizedBox.shrink();
+    if (provider.messages.isEmpty) return const SizedBox.shrink();
+    final lastIndex = provider.messages.length - 1;
+    if (lastIndex == _dismissedLongBarIndex) return const SizedBox.shrink();
+    final last = provider.messages[lastIndex];
+    if (last.role != 'assistant') return const SizedBox.shrink();
+    if (!last.content.contains('**STRONG_HOLD**') &&
+        !last.content.contains('**CONDITIONAL_HOLD**')) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFD700).withValues(alpha: 0.08),
+        border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.4)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('\uD83C\uDFDB\uFE0F ', style: TextStyle(fontSize: 14)),
+              Expanded(
+                child: Text(
+                  'LONG tier signal',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFFFFD700),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () => setState(() => _dismissedLongBarIndex = lastIndex),
+                child: Icon(Icons.close, size: 16, color: Colors.grey[500]),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFD700),
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  onPressed: () => _addLongHolding(last.content, lastIndex),
+                  child: const Text('DODAJ U HOLDINGS',
+                      style: TextStyle(fontWeight: FontWeight.w600)),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => _addLongNote(last.content, lastIndex),
+                  child: const Text('ZAPI\u0160I BILJE\u0160KU'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addLongHolding(String claudeResponse, int lastIndex) {
+    final symbolMatch = RegExp(r'\b([A-Z]{2,10})\b').firstMatch(claudeResponse);
+    final symbol = symbolMatch?.group(1) ?? 'UNKNOWN';
+    final holding = LongTermHolding(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      symbol: symbol,
+      name: symbol,
+      firstResearchDate: DateTime.now(),
+      status: LongTermStatus.researching,
+      targetPriceMin: 0,
+      targetPriceMax: 0,
+      investmentThesis: claudeResponse.length > 300
+          ? '${claudeResponse.substring(0, 300)}...'
+          : claudeResponse,
+      claudeConfidenceScore: _extractConfidence(claudeResponse),
+    );
+    StorageService.saveLongHolding(holding);
+    setState(() => _dismissedLongBarIndex = lastIndex);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$symbol dodan u LONG holdings')),
+    );
+  }
+
+  void _addLongNote(String claudeResponse, int lastIndex) {
+    // Save as a note — user can later assign to a holding
+    final note = LongTermNote(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      timestamp: DateTime.now(),
+      content: claudeResponse.length > 500
+          ? '${claudeResponse.substring(0, 500)}...'
+          : claudeResponse,
+      noteType: 'claude_analysis',
+    );
+    // For now, save as a standalone holding with note
+    final symbolMatch = RegExp(r'\b([A-Z]{2,10})\b').firstMatch(claudeResponse);
+    final symbol = symbolMatch?.group(1) ?? 'UNKNOWN';
+    final holding = LongTermHolding(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      symbol: symbol,
+      name: symbol,
+      firstResearchDate: DateTime.now(),
+      status: LongTermStatus.researching,
+      targetPriceMin: 0,
+      targetPriceMax: 0,
+      notes: [note],
+    );
+    StorageService.saveLongHolding(holding);
+    setState(() => _dismissedLongBarIndex = lastIndex);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Bilje\u0161ka zapisana za $symbol')),
+    );
+  }
+
+  int? _extractConfidence(String text) {
+    final match = RegExp(r'Confidence:\s*(\d+)/10').firstMatch(text);
+    if (match != null) return int.tryParse(match.group(1)!);
+    return null;
+  }
+
   Widget _buildErrorBar(AnalysisProvider provider) {
     return Dismissible(
       key: ValueKey(provider.error),
@@ -583,7 +819,11 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
             onPressed: () {
               provider.clearChat();
               Navigator.of(ctx).pop();
-              setState(() => _dismissedActionBarIndex = -1);
+              setState(() {
+                _dismissedActionBarIndex = -1;
+                _dismissedMidBarIndex = -1;
+                _dismissedLongBarIndex = -1;
+              });
             },
             child: Text(
               'Clear',

@@ -6,6 +6,10 @@ import 'package:coinsight/models/analysis_provider.dart';
 import 'package:coinsight/models/coin_position.dart';
 import 'package:coinsight/models/analysis_log.dart';
 import 'package:coinsight/models/intelligence_report.dart';
+import 'package:coinsight/models/investment_tier.dart';
+import 'package:coinsight/models/tier_provider.dart';
+import 'package:coinsight/models/mid_term_project.dart';
+import 'package:coinsight/models/long_term_holding.dart';
 import 'package:coinsight/services/storage_service.dart';
 
 class PortfolioScreen extends StatefulWidget {
@@ -44,6 +48,24 @@ class _PortfolioScreenState extends State<PortfolioScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    return Consumer<TierProvider>(
+      builder: (context, tierProvider, _) {
+        switch (tierProvider.activeTier) {
+          case InvestmentTier.short:
+            return _buildShortPortfolio();
+          case InvestmentTier.mid:
+            return _buildMidPortfolio();
+          case InvestmentTier.long:
+            return _buildLongPortfolio();
+        }
+      },
+    );
+  }
+
+  // ═══════════════════════════════════════════
+  // SHORT tier portfolio — existing layout
+  // ═══════════════════════════════════════════
+  Widget _buildShortPortfolio() {
     return Consumer<PortfolioProvider>(
       builder: (context, provider, _) {
         if (!provider.hasCredentials) {
@@ -68,6 +90,254 @@ class _PortfolioScreenState extends State<PortfolioScreen>
     );
   }
 
+  // ═══════════════════════════════════════════
+  // MID tier portfolio
+  // ═══════════════════════════════════════════
+  Widget _buildMidPortfolio() {
+    final projects = StorageService.getMidProjects();
+    final active = projects.where(
+        (p) => p.status == MidTermStatus.entered ||
+               p.status == MidTermStatus.watching).toList();
+    final researching = projects.where(
+        (p) => p.status == MidTermStatus.researching).toList();
+
+    return RefreshIndicator(
+      onRefresh: () async => setState(() {}),
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Summary card
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.science_outlined, size: 20,
+                          color: Color(0xFF03DAC6)),
+                      const SizedBox(width: 8),
+                      const Text('MID Portfolio',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _row('Ukupno projekata', '${projects.length}'),
+                  _row('Aktivni (entered/watching)', '${active.length}'),
+                  _row('U istra\u017Eivanju', '${researching.length}'),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (projects.isEmpty)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(Icons.inbox_outlined,
+                          size: 40, color: Colors.grey[600]),
+                      const SizedBox(height: 8),
+                      Text('Nema MID projekata',
+                          style: TextStyle(
+                              color: Colors.grey[500], fontSize: 14)),
+                    ],
+                  ),
+                ),
+              ),
+            )
+          else
+            ...projects.map(_buildMidPortfolioCard),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMidPortfolioCard(MidTermProject project) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(project.symbol.toUpperCase(),
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w700)),
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: project.status.color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(project.status.label,
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: project.status.color)),
+                ),
+                const Spacer(),
+                Text('${project.daysWatching}d',
+                    style: TextStyle(
+                        color: Colors.grey[500], fontSize: 12)),
+              ],
+            ),
+            if (project.thesis.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Text(
+                project.thesis.length > 100
+                    ? '${project.thesis.substring(0, 100)}...'
+                    : project.thesis,
+                style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+            if (project.potentialReturnPercent != 0) ...[
+              const SizedBox(height: 4),
+              Text(
+                'Potencijalni return: +${project.potentialReturnPercent.toStringAsFixed(0)}%',
+                style: const TextStyle(color: Colors.green, fontSize: 12),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════
+  // LONG tier portfolio
+  // ═══════════════════════════════════════════
+  Widget _buildLongPortfolio() {
+    final holdings = StorageService.getLongHoldings();
+    final totalInvested = holdings.fold<double>(
+        0, (sum, h) => sum + h.totalInvested);
+
+    return RefreshIndicator(
+      onRefresh: () async => setState(() {}),
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // Summary card
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.account_balance_outlined, size: 20,
+                          color: Color(0xFFFFD700)),
+                      const SizedBox(width: 8),
+                      const Text('LONG Portfolio',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _row('Ukupno holdinga', '${holdings.length}'),
+                  _row('Ukupno investirano',
+                      '\$${totalInvested.toStringAsFixed(2)}'),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          if (holdings.isEmpty)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(Icons.inbox_outlined,
+                          size: 40, color: Colors.grey[600]),
+                      const SizedBox(height: 8),
+                      Text('Nema LONG holdinga',
+                          style: TextStyle(
+                              color: Colors.grey[500], fontSize: 14)),
+                    ],
+                  ),
+                ),
+              ),
+            )
+          else
+            ...holdings.map(_buildLongPortfolioCard),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLongPortfolioCard(LongTermHolding holding) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(holding.symbol.toUpperCase(),
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w700)),
+                const SizedBox(width: 8),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: holding.status.color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(holding.status.label,
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: holding.status.color)),
+                ),
+                const Spacer(),
+                if (holding.claudeConfidenceScore != null)
+                  Text('${holding.claudeConfidenceScore}/10',
+                      style: TextStyle(
+                          color: Colors.grey[500], fontSize: 12)),
+              ],
+            ),
+            if (holding.purchases.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Text(
+                'DCA: ${holding.purchases.length} kupnja | '
+                'Avg: \$${holding.averageEntryPrice.toStringAsFixed(holding.averageEntryPrice >= 1 ? 2 : 6)} | '
+                'Invested: \$${holding.totalInvested.toStringAsFixed(2)}',
+                style: TextStyle(color: Colors.grey[400], fontSize: 12),
+              ),
+            ],
+            if (holding.potentialReturnMinPercent != 0 ||
+                holding.potentialReturnMaxPercent != 0) ...[
+              const SizedBox(height: 4),
+              Text(
+                'Potencijalni return: +${holding.potentialReturnMinPercent.toStringAsFixed(0)}% ~ +${holding.potentialReturnMaxPercent.toStringAsFixed(0)}%',
+                style: const TextStyle(color: Colors.green, fontSize: 12),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════
+  // Shared widgets (used by SHORT tier)
+  // ═══════════════════════════════════════════
   Widget _buildNoCredentialsState() {
     return Center(
       child: Padding(
@@ -84,7 +354,7 @@ class _PortfolioScreenState extends State<PortfolioScreen>
             ),
             const SizedBox(height: 8),
             Text(
-              'Dodaj Binance API ključeve u Settings da započneš trading.',
+              'Dodaj Binance API klju\u010Deve u Settings da zapo\u010Dne\u0161 trading.',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey[500], fontSize: 14),
             ),
@@ -218,7 +488,7 @@ class _PortfolioScreenState extends State<PortfolioScreen>
               ],
             ),
             Text(
-              'Entry: \$${pos.entryPrice.toStringAsFixed(6)} → Now: \$${(pos.currentPrice ?? pos.entryPrice).toStringAsFixed(6)}',
+              'Entry: \$${pos.entryPrice.toStringAsFixed(6)} \u2192 Now: \$${(pos.currentPrice ?? pos.entryPrice).toStringAsFixed(6)}',
               style: TextStyle(color: Colors.grey[400], fontSize: 13),
             ),
             const SizedBox(height: 2),
@@ -253,7 +523,7 @@ class _PortfolioScreenState extends State<PortfolioScreen>
         backgroundColor: const Color(0xFF252525),
         title: const Text('Zatvori poziciju?'),
         content: Text(
-          'Prodaješ ${pos.quantity.toStringAsFixed(6)} ${pos.symbol} po tržišnoj cijeni.',
+          'Prodaje\u0161 ${pos.quantity.toStringAsFixed(6)} ${pos.symbol} po tr\u017Ei\u0161noj cijeni.',
         ),
         actions: [
           TextButton(

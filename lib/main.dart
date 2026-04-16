@@ -8,6 +8,8 @@ import 'package:coinsight/services/binance_service.dart';
 import 'package:coinsight/models/watchlist_provider.dart';
 import 'package:coinsight/models/analysis_provider.dart';
 import 'package:coinsight/models/portfolio_provider.dart';
+import 'package:coinsight/models/tier_provider.dart';
+import 'package:coinsight/widgets/tier_mode_selector.dart';
 import 'package:coinsight/screens/watchlist_screen.dart';
 import 'package:coinsight/screens/analysis_screen.dart';
 import 'package:coinsight/screens/settings_screen.dart';
@@ -33,6 +35,7 @@ class CoinSightApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => WatchlistProvider()),
         ChangeNotifierProvider(create: (_) => AnalysisProvider()),
         ChangeNotifierProvider(create: (_) => PortfolioProvider()),
+        ChangeNotifierProvider(create: (_) => TierProvider()),
       ],
       child: MaterialApp(
         title: 'CoinSight',
@@ -90,13 +93,20 @@ class _MainNavigationState extends State<MainNavigation> {
       appBar: AppBar(
         title: Text(_titles[_currentIndex]),
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: const [
-          WatchlistScreen(),
-          AnalysisScreen(),
-          PortfolioScreen(),
-          SettingsScreen(),
+      body: Column(
+        children: [
+          const TierModeSelector(),
+          Expanded(
+            child: IndexedStack(
+              index: _currentIndex,
+              children: const [
+                WatchlistScreen(),
+                AnalysisScreen(),
+                PortfolioScreen(),
+                SettingsScreen(),
+              ],
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
