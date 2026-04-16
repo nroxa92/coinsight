@@ -4,7 +4,7 @@ class RiskParameters {
   final double stopLossPercent;
   final double takeProfitPercent;
   final bool autoTradeEnabled;
-  final bool telegramNotifications;
+  final bool telegramMonitorEnabled;
   final int quietHoursStart;
   final int quietHoursEnd;
 
@@ -14,7 +14,7 @@ class RiskParameters {
     this.stopLossPercent = 15.0,
     this.takeProfitPercent = 30.0,
     this.autoTradeEnabled = false,
-    this.telegramNotifications = false,
+    this.telegramMonitorEnabled = false,
     this.quietHoursStart = 23,
     this.quietHoursEnd = 7,
   });
@@ -33,7 +33,7 @@ class RiskParameters {
     double? stopLossPercent,
     double? takeProfitPercent,
     bool? autoTradeEnabled,
-    bool? telegramNotifications,
+    bool? telegramMonitorEnabled,
     int? quietHoursStart,
     int? quietHoursEnd,
   }) =>
@@ -43,8 +43,8 @@ class RiskParameters {
         stopLossPercent: stopLossPercent ?? this.stopLossPercent,
         takeProfitPercent: takeProfitPercent ?? this.takeProfitPercent,
         autoTradeEnabled: autoTradeEnabled ?? this.autoTradeEnabled,
-        telegramNotifications:
-            telegramNotifications ?? this.telegramNotifications,
+        telegramMonitorEnabled:
+            telegramMonitorEnabled ?? this.telegramMonitorEnabled,
         quietHoursStart: quietHoursStart ?? this.quietHoursStart,
         quietHoursEnd: quietHoursEnd ?? this.quietHoursEnd,
       );
@@ -55,7 +55,7 @@ class RiskParameters {
         'stop_loss_percent': stopLossPercent,
         'take_profit_percent': takeProfitPercent,
         'auto_trade_enabled': autoTradeEnabled,
-        'telegram_notifications': telegramNotifications,
+        'telegram_monitor_enabled': telegramMonitorEnabled,
         'quiet_hours_start': quietHoursStart,
         'quiet_hours_end': quietHoursEnd,
       };
@@ -69,8 +69,8 @@ class RiskParameters {
         takeProfitPercent:
             (map['take_profit_percent'] as num?)?.toDouble() ?? 30.0,
         autoTradeEnabled: (map['auto_trade_enabled'] as bool?) ?? false,
-        telegramNotifications:
-            (map['telegram_notifications'] as bool?) ?? false,
+        telegramMonitorEnabled:
+            (map['telegram_monitor_enabled'] as bool?) ?? false,
         quietHoursStart: (map['quiet_hours_start'] as int?) ?? 23,
         quietHoursEnd: (map['quiet_hours_end'] as int?) ?? 7,
       );

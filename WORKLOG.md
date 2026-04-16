@@ -769,6 +769,177 @@ Ključni dodani insight-i (nisu bili eksplicitni u WORKLOG-u):
 
 ---
 
+## Session 4: 2026-04-16 — v2.0.0 Final Release
+
+**Kontekst:** Session 3 završila s Binance/Telegram/Portfolio implementacijom. Session 4 cilj: dovesti projekt do production-ready stanja za javni open source release. Nema novih featurea — samo refactoring, testovi, cleanup, dokumentacija.
+
+---
+
+### Faza 1 — Telegram Refactoring
+**Status:** Completed
+
+**Opis:** Zamjena TelegramService (notification bot) s TelegramMonitor (public channel intelligence reader).
+
+**Obrisani fajlovi:**
+- `lib/services/telegram_service.dart` (185 linija) — kompletno uklonjen
+
+**Kreirani fajlovi:**
+- `lib/services/telegram_monitor.dart` (~135 linija) — pasivni čitač javnih Telegram kanala, `getUpdates` polling sa 10s intervalom, keyword filter (listing, whale, alert...), `onSignalReceived` callback, `testConnection()` za getMe provjeru
+- `lib/models/telegram_signal.dart` (24 linije) — model za primljeni signal: text, channelTitle, channelUsername, timestamp, messageId. `preview` getter (truncate 150), `toClaudeContext()` formatter
+
+**Ažurirani fajlovi:**
+- `lib/models/risk_parameters.dart` — `telegramNotifications` → `telegramMonitorEnabled`, ažurirani constructor/copyWith/toMap/fromMap
+- `lib/services/storage_service.dart` — uklonjene `_telegramTokenField`/`_telegramChatIdField` konstante i metode (getTelegramToken, getTelegramChatId, saveTelegramCredentials, deleteTelegramCredentials). Dodane: `_telegramMonitorTokenField`, `_monitoredChannelsField`, getTelegramMonitorToken, saveTelegramMonitorToken, deleteTelegramMonitorToken, getMonitoredChannels, saveMonitoredChannels
+- `lib/models/analysis_provider.dart` — dodan TelegramMonitor + `_pendingSignals` lista. `onSignalReceived` callback dodaje signale (max 10). `_buildUserMessage()` uključuje pending signale kao `[TELEGRAM INTELLIGENCE]` kontekst. Dodane metode: `startTelegramMonitor()`, `stopTelegramMonitor()`, `testTelegramMonitor()`, getter `pendingSignalsCount`
+- `lib/main.dart` — uklonjen TelegramService import/instanca/handler/polling. Dodano `context.read<AnalysisProvider>().startTelegramMonitor()` u initState
+- `lib/screens/analysis_screen.dart` — uklonjen TelegramService import i TELEGRAM button iz Trade Action Bar. Dodani: signal badge widget iznad chat liste, ažurirani suggestion chipovi (HR)
+- `lib/screens/settings_screen.dart` — uklonjena kompletna stara Telegram Bot sekcija. Dodana nova "Intelligence — Telegram Monitor" sekcija s: bot token (obscured), Save/Test/Remove, default kanali (chips), custom kanali (add/remove), monitoring toggle
+
+**Verifikacija:** `flutter analyze` 0 issues, 0 referenci na stari TelegramService
+
+---
+
+### Faza 2 — Analysis Screen Signal Badge
+**Status:** Completed (implementirano u sklopu Faze 1)
+
+**Opis:** Signal badge i suggestion chips dodani u Fazi 1.
+
+---
+
+### Faza 3 — Kompletni Test Suite
+**Status:** Completed
+
+**Opis:** Kompletna test infrastruktura od nule. Prethodno je postojao samo 1 test fajl (widget_test.dart, 2 testa).
+
+**Dodana dependency:** `mocktail: ^1.0.4` u dev_dependencies
+
+**Kreirani fajlovi (17 test fajlova):**
+
+`test/helpers/test_fixtures.dart` — centralizirani test podaci: btcCoin(), newListingCoin(), openPosition(), defaultRisk(), aggressiveRisk(), coinJson() factory, Binance mock responses (price, order, account, error), Telegram mock responses
+
+`test/helpers/mock_http_client.dart` — MockHttpClient (mocktail), HttpClientFactory s metodama: returning(body, statusCode), throwingTimeout(), returningBinanceError(), returningSequence()
+
+`test/unit/models/coin_test.dart` (6 testova) — fromJson kompletni/nullable, 1h change present/absent, sparkline present/absent
+
+`test/unit/models/coin_position_test.dart` (7 testova) — pnl profit/loss/breakeven, currentValue null fallback, pnlPercent zero entryTotal, toMap/fromMap roundtrip
+
+`test/unit/models/risk_parameters_test.dart` (4 testa) — defaults, copyWith, toMap/fromMap roundtrip, fromMap missing fields
+
+`test/unit/models/analysis_log_test.dart` (7 testova) — parseRecommendationType za INTERESTING/WATCH/SKIP/NONE, prioritet INTERESTING>WATCH>SKIP, toMap/fromMap roundtrip
+
+`test/unit/models/trade_proposal_test.dart` (3 testa) — isExpired false/true/boundary
+
+`test/unit/models/trade_result_test.dart` (2 testa) — failure factory, success fields
+
+`test/unit/models/telegram_signal_test.dart` (3 testa) — preview truncate/short, toClaudeContext format
+
+`test/unit/services/coingecko_service_test.dart` (7 testova) — getMarketData 200/429/timeout/malformed, getNewListings filter/sort, non-200 status
+
+`test/unit/services/claude_service_test.dart` (11 testova) — sendMessage success/no-key/401/429/timeout/empty/malformed, hasApiKey true/false/null, setApiKey, ChatMessage toJson/timestamp
+
+`test/unit/services/binance_service_test.dart` (12 testova) — ping success/error, hasCredentials true/false, isTestnet, getUsdtBalance success/no-creds, getCurrentPrice, placeBuyOrder success/insufficient/-1121, placeSellOrder, BinanceOrder avgPrice/zero
+
+`test/unit/services/trade_service_test.dart` (8 testova) — prepareTradeProposal price/SL/TP, executeTrade expired/max-positions/duplicate, autoExecuteIfEligible disabled/no-creds
+
+`test/unit/services/telegram_monitor_test.dart` (6 testova) — isConfigured false/true, startMonitoring unconfigured, testConnection success/invalid/unconfigured
+
+`test/widget/coin_card_test.dart` (5 testova) — name/symbol, star filled/unfilled, toggle callback, skeleton
+
+`test/widget/chat_bubble_test.dart` (3 testa) — user align right, assistant align left, selectable text
+
+`test/widget/sparkline_chart_test.dart` (3 testa) — valid/empty/single data
+
+`test/integration/app_navigation_test.dart` (4 testa) — 4 nav tabs render, Analysis API key required, Settings sections, Portfolio tab
+
+**Ažurirani fajlovi:**
+- `test/widget_test.dart` — uklonjen `Hive.close()` iz tearDownAll (conflict s paralelnim testovima), dodani `isBoxOpen` čekovi
+- `pubspec.yaml` — dodano `mocktail: ^1.0.4`
+
+**Verifikacija:** `flutter test` 97/97 passed, 0 failures
+
+---
+
+### Faza 4 — Projekt Cleanup i Arhiviranje
+**Status:** Completed
+
+**Kreirani fajlovi:**
+- `archive/README.md` — objašnjenje arhive
+
+**Premješteni fajlovi u archive/:**
+- SESSION_2.md, SESSION_3.md, SESSION_4.md
+- CLAUDE_CODE_PROMPT.md, PROJECT_OVERVIEW.md, USER_MANUAL.md
+- chat_log.md, work_log.md
+
+**Ažurirani fajlovi:**
+- `.gitignore` — dodano: `*.hive`, `*.lock.hive`, `/archive/*.md`, `*.secret`
+- `pubspec.yaml` — version `1.0.0+1` → `2.0.0+2`, description ažuriran
+
+---
+
+### Faza 5 — MIT Licenca
+**Status:** Completed
+
+**Ažurirani fajlovi:**
+- `LICENSE` — Proprietary → MIT (Copyright (c) 2026 Neven Roksandić)
+
+**Provjere:**
+- 0 proprietary/confidential referenci u lib/
+- 0 hardkodiranih API ključeva (samo `sk-ant-...` hint text u TextField)
+
+---
+
+### Faza 6 — Dokumentacija
+**Status:** Completed
+
+**Kreirani fajlovi:**
+- `MANUAL.md` (~120 linija) — korisnički priručnik: setup (Anthropic, Binance, Telegram), korištenje svih tabova, risk management, česte greške
+- `OVERVIEW.md` (~80 linija) — tehnički pregled: arhitekturalni principi, podatkovni tok dijagram, sigurnosni model, poznata ograničenja, verzijska historija
+
+**Ažurirani fajlovi:**
+- `README.md` — kompletno prepisan za public audience: features, stack tablica, preduvjeti, instalacija, arhitektura tree, sigurnost, upozorenje, MIT licenca
+- `CLAUDE.md` — kompletno prepisan: identitet, pravila rada, arhitektura, API integracije, Hive boxovi, WORKLOG format
+
+---
+
+### Faza 7 — Finalna Verifikacija
+**Status:** Completed
+
+- `flutter analyze` — **0 issues**
+- `flutter test` — **97/97 passed**
+- `flutter build apk --debug` — **uspješan** (app-debug.apk)
+- `LICENSE` — **MIT**
+- Stari TelegramService reference — **0**
+- Hardkodirani secreti — **0**
+
+**Android build fix:** dodano `isCoreLibraryDesugaringEnabled = true` i `coreLibraryDesugaring` dependency u `android/app/build.gradle.kts` (flutter_local_notifications zahtijeva)
+
+---
+
+**Obrisani fajlovi:** `lib/services/telegram_service.dart`
+
+**Novi fajlovi (21):**
+- `lib/services/telegram_monitor.dart`
+- `lib/models/telegram_signal.dart`
+- `MANUAL.md`, `OVERVIEW.md`
+- `archive/README.md`
+- `test/helpers/test_fixtures.dart`, `test/helpers/mock_http_client.dart`
+- `test/unit/models/coin_test.dart`, `coin_position_test.dart`, `risk_parameters_test.dart`, `analysis_log_test.dart`, `trade_proposal_test.dart`, `trade_result_test.dart`, `telegram_signal_test.dart`
+- `test/unit/services/coingecko_service_test.dart`, `claude_service_test.dart`, `binance_service_test.dart`, `trade_service_test.dart`, `telegram_monitor_test.dart`
+- `test/widget/coin_card_test.dart`, `chat_bubble_test.dart`, `sparkline_chart_test.dart`
+- `test/integration/app_navigation_test.dart`
+
+**Promijenjeni fajlovi (12):**
+- `lib/main.dart`, `lib/models/analysis_provider.dart`, `lib/models/risk_parameters.dart`
+- `lib/services/storage_service.dart`
+- `lib/screens/analysis_screen.dart`, `lib/screens/settings_screen.dart`
+- `test/widget_test.dart`
+- `pubspec.yaml`, `.gitignore`, `LICENSE`, `README.md`, `CLAUDE.md`
+- `android/app/build.gradle.kts`
+
+---
+
+---
+
 ## Identified Issues
 
 - **Binance account lockout (developer):** SMS 2FA ne stiže, duplicate account na broju — blokira live testing. Nije bug u appu, ali blocker za verifikaciju Session 3 rada. Status: developer planira live chat / Account Appeal.

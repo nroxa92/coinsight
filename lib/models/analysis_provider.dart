@@ -1,11 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:coinsight/services/claude_service.dart';
 import 'package:coinsight/services/storage_service.dart';
+import 'package:coinsight/services/telegram_monitor.dart';
 import 'package:coinsight/models/coin.dart';
 import 'package:coinsight/models/analysis_log.dart';
+import 'package:coinsight/models/telegram_signal.dart';
 
 class AnalysisProvider extends ChangeNotifier {
   final ClaudeService _claudeService;
+  final TelegramMonitor _telegramMonitor;
+  final List<TelegramSignal> _pendingSignals = [];
 
   List<ChatMessage> _messages = [];
   bool _isLoading = false;
@@ -29,18 +33,25 @@ class AnalysisProvider extends ChangeNotifier {
       'Nikad ne garantiraš profit. Ovo je analiza obrazaca, ne financijski savjet.\n\n'
       'Jezik: ako korisnik piše na hrvatskom, odgovaraj na hrvatskom. Ako na engleskom, na engleskom.';
 
-  AnalysisProvider({ClaudeService? claudeService})
-      : _claudeService = claudeService ?? ClaudeService() {
+  AnalysisProvider({ClaudeService? claudeService, TelegramMonitor? telegramMonitor})
+      : _claudeService = claudeService ?? ClaudeService(),
+        _telegramMonitor = telegramMonitor ?? TelegramMonitor() {
     final savedKey = StorageService.getApiKey();
     if (savedKey != null && savedKey.isNotEmpty) {
       _claudeService.setApiKey(savedKey);
     }
+    _telegramMonitor.onSignalReceived = (signal) {
+      _pendingSignals.add(signal);
+      if (_pendingSignals.length > 10) _pendingSignals.removeAt(0);
+      notifyListeners();
+    };
   }
 
   List<ChatMessage> get messages => _messages;
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get hasApiKey => _claudeService.hasApiKey;
+  int get pendingSignalsCount => _pendingSignals.length;
 
   void setApiKey(String key) {
     _claudeService.setApiKey(key);
@@ -88,17 +99,32 @@ class AnalysisProvider extends ChangeNotifier {
   }
 
   String _buildUserMessage(String text, List<Coin>? coins) {
-    if (coins == null || coins.isEmpty) return text;
+    final buffer = StringBuffer();
 
-    final coinData = coins.map((c) {
-      final change = c.priceChangePercentage24h >= 0 ? '+' : '';
-      return '${c.name} (${c.symbol.toUpperCase()}): '
-          '\$${c.currentPrice.toStringAsFixed(2)}, '
-          '$change${c.priceChangePercentage24h.toStringAsFixed(2)}% 24h, '
-          'MCap rank #${c.marketCapRank}';
-    }).join('\n');
+    if (coins != null && coins.isNotEmpty) {
+      final coinData = coins.map((c) {
+        final change = c.priceChangePercentage24h >= 0 ? '+' : '';
+        return '${c.name} (${c.symbol.toUpperCase()}): '
+            '\$${c.currentPrice.toStringAsFixed(2)}, '
+            '$change${c.priceChangePercentage24h.toStringAsFixed(2)}% 24h, '
+            'MCap rank #${c.marketCapRank}';
+      }).join('\n');
+      buffer.writeln('My watchlist:\n$coinData\n');
+    }
 
-    return 'My watchlist:\n$coinData\n\nQuestion: $text';
+    if (_pendingSignals.isNotEmpty) {
+      final signalContext =
+          _pendingSignals.map((s) => s.toClaudeContext()).join('\n\n');
+      buffer.writeln(
+          '[TELEGRAM INTELLIGENCE - zadnjih ${_pendingSignals.length} signala]:\n$signalContext\n');
+      _pendingSignals.clear();
+    }
+
+    if (buffer.isNotEmpty) {
+      buffer.write('Question: $text');
+      return buffer.toString();
+    }
+    return text;
   }
 
   void _tryLogAnalysis(String response, List<Coin>? coins) {
@@ -128,4 +154,16 @@ class AnalysisProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
   }
+
+  // Telegram Monitor lifecycle
+  void startTelegramMonitor() {
+    _telegramMonitor.reloadCredentials();
+    if (_telegramMonitor.isConfigured) {
+      _telegramMonitor.startMonitoring();
+    }
+  }
+
+  void stopTelegramMonitor() => _telegramMonitor.stopMonitoring();
+
+  Future<String?> testTelegramMonitor() => _telegramMonitor.testConnection();
 }

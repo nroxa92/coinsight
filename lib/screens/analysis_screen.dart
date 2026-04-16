@@ -8,7 +8,6 @@ import 'package:coinsight/models/trade_proposal.dart';
 import 'package:coinsight/services/binance_service.dart';
 import 'package:coinsight/services/storage_service.dart';
 import 'package:coinsight/services/trade_service.dart';
-import 'package:coinsight/services/telegram_service.dart';
 import 'package:coinsight/widgets/chat_bubble.dart';
 
 class AnalysisScreen extends StatefulWidget {
@@ -69,6 +68,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         }
         return Column(
           children: [
+            _buildSignalBadge(provider),
             Expanded(
               child: provider.messages.isEmpty
                   ? _buildEmptyState()
@@ -80,6 +80,30 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildSignalBadge(AnalysisProvider provider) {
+    if (provider.pendingSignalsCount == 0) return const SizedBox.shrink();
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 4, 12, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.orange.withValues(alpha: 0.1),
+        border: Border.all(color: Colors.orange.withValues(alpha: 0.4)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          const Text('📡 ', style: TextStyle(fontSize: 12)),
+          Expanded(
+            child: Text(
+              '${provider.pendingSignalsCount} Telegram signal(a) čeka — bit će uključen u sljedeću analizu',
+              style: const TextStyle(fontSize: 11, color: Colors.orange),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -142,9 +166,9 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               runSpacing: 8,
               alignment: WrapAlignment.center,
               children: [
-                _buildSuggestionChip('Analyze my watchlist'),
-                _buildSuggestionChip('Bitcoin outlook?'),
-                _buildSuggestionChip('Explain DeFi'),
+                _buildSuggestionChip('Analiziraj New Listings'),
+                _buildSuggestionChip('Koji coin sada ima momentum?'),
+                _buildSuggestionChip('Procijeni rizik watchliste'),
               ],
             ),
           ],
@@ -268,14 +292,15 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
             children: [
               const Text('🚨 ',
                   style: TextStyle(fontSize: 14)),
-              Text(
-                'INTERESTING signal — ${coin.symbol.toUpperCase()}/USDT',
-                style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.green),
+              Expanded(
+                child: Text(
+                  'INTERESTING signal — ${coin.symbol.toUpperCase()}/USDT',
+                  style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.green),
+                ),
               ),
-              const Spacer(),
               GestureDetector(
                 onTap: () =>
                     setState(() => _dismissedActionBarIndex = lastIndex),
@@ -343,14 +368,6 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                 child: OutlinedButton(
                   onPressed: () => _skip(coin, last.content, lastIndex),
                   child: const Text('SKIP'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => _sendToTelegram(coin, last.content),
-                  child: const Text('TELEGRAM',
-                      style: TextStyle(fontSize: 11)),
                 ),
               ),
             ],
@@ -461,25 +478,6 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     ));
     if (!mounted) return;
     setState(() => _dismissedActionBarIndex = idx);
-  }
-
-  Future<void> _sendToTelegram(Coin coin, String recommendation) async {
-    final tg = TelegramService();
-    if (!tg.isConfigured) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Telegram nije konfiguriran')),
-      );
-      return;
-    }
-    await tg.sendInterestingSignal(
-      coin: coin,
-      claudeRecommendation: recommendation,
-      riskParams: StorageService.getRiskParameters(),
-    );
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Sent to Telegram')),
-    );
   }
 
   Widget _buildErrorBar(AnalysisProvider provider) {

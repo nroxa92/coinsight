@@ -13,8 +13,8 @@ class StorageService {
   static const _binanceApiKeyField = 'binance_api_key';
   static const _binanceSecretField = 'binance_secret';
   static const _binanceTestnetField = 'binance_testnet';
-  static const _telegramTokenField = 'telegram_bot_token';
-  static const _telegramChatIdField = 'telegram_chat_id';
+  static const _telegramMonitorTokenField = 'telegram_monitor_token';
+  static const _monitoredChannelsField = 'monitored_channels';
   static const _riskParamsField = 'risk_parameters';
 
   static Future<void> init() async {
@@ -102,28 +102,32 @@ class StorageService {
     await box.put(_binanceTestnetField, value);
   }
 
-  // Telegram credentials
-  static String? getTelegramToken() {
+  // Telegram Monitor
+  static String? getTelegramMonitorToken() {
     final box = Hive.box(_settingsBox);
-    return box.get(_telegramTokenField) as String?;
+    return box.get(_telegramMonitorTokenField) as String?;
   }
 
-  static String? getTelegramChatId() {
+  static Future<void> saveTelegramMonitorToken(String token) async {
     final box = Hive.box(_settingsBox);
-    return box.get(_telegramChatIdField) as String?;
+    await box.put(_telegramMonitorTokenField, token);
   }
 
-  static Future<void> saveTelegramCredentials(
-      String token, String chatId) async {
+  static Future<void> deleteTelegramMonitorToken() async {
     final box = Hive.box(_settingsBox);
-    await box.put(_telegramTokenField, token);
-    await box.put(_telegramChatIdField, chatId);
+    await box.delete(_telegramMonitorTokenField);
   }
 
-  static Future<void> deleteTelegramCredentials() async {
+  static List<String> getMonitoredChannels() {
     final box = Hive.box(_settingsBox);
-    await box.delete(_telegramTokenField);
-    await box.delete(_telegramChatIdField);
+    final channels = box.get(_monitoredChannelsField);
+    if (channels == null) return [];
+    return List<String>.from(channels as List);
+  }
+
+  static Future<void> saveMonitoredChannels(List<String> channels) async {
+    final box = Hive.box(_settingsBox);
+    await box.put(_monitoredChannelsField, channels);
   }
 
   // Risk Parameters

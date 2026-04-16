@@ -1,145 +1,122 @@
 # CoinSight
 
-AI-powered cryptocurrency insights combining real-time market data from CoinGecko with intelligent analysis powered by Claude (Anthropic).
+> AI-powered cryptocurrency signal detector with automated trading
 
-> **Proprietary Software** — See [LICENSE](LICENSE) for terms.
+CoinSight je open source Flutter Android aplikacija koja kombinira
+real-time tržišne podatke, Telegram intelligence monitoring i Claude AI
+analizu za detekciju ranih momentum signala na crypto tržištu — s
+opcionalnom automatskom egzekucijom Binance Spot orderima.
 
----
+## Što radi
 
-## Features
+- **New Listings detekcija** — prati coinove s malim market cap rankom
+  i visokim hourly volumenom koji su potencijalni early momentum kandidati
+- **Telegram Intelligence** — čita javne crypto kanale (@binance,
+  @whale_alert, @coingecko) i uključuje signale kao kontekst u AI analizu
+- **Claude AI analiza** — svaki coin prolazi kroz tri analitička objektiva
+  (profil listinga, rizik profil, preporuka) i dobiva WATCH/SKIP/INTERESTING oznaku
+- **Trade execution** — INTERESTING signal → jednim tapom Binance Spot
+  order s automatskim stop-lossom i take-profitom
+- **Auto-trade** — opcionalni autonomni mod koji izvršava ordere bez
+  korisnikove potvrde unutar definiranih risk parametara
+- **Portfolio tracking** — live P&L praćenje otvorenih pozicija i
+  history svih analiza
 
-### Watchlist
-- Real-time cryptocurrency prices from CoinGecko API
-- Top 25 coins by market cap with 7-day sparkline charts
-- Personal watchlist with star toggle (persisted locally)
-- Pull-to-refresh with skeleton loading states
-- 24h price change with color-coded indicators
+## Tehnički stack
 
-### AI Analysis
-- Chat interface powered by Claude (Anthropic API)
-- Automatic watchlist context injection for relevant analysis
-- Suggestion chips for quick prompts
-- Conversation history within session
-- System prompt tuned for crypto analysis with DYOR disclaimer
-
-### Settings
-- Secure API key management (stored locally via Hive)
-- Key validation and visibility toggle
-- Confirmation dialogs for destructive actions
-- App information and version display
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
+| Komponenta | Tehnologija |
+|---|---|
 | Framework | Flutter 3.41+ / Dart 3.11+ |
-| State Management | Provider (ChangeNotifier) |
-| Market Data | CoinGecko API v3 (free tier) |
-| AI Analysis | Anthropic Claude API (claude-sonnet-4-20250514) |
-| Local Storage | Hive (Flutter) |
-| UI | Material Design 3 — Custom dark theme |
+| State management | Provider |
+| Tržišni podaci | CoinGecko API v3 (besplatno) |
+| AI analiza | Anthropic Claude API |
+| Trading | Binance Spot REST API |
+| Intelligence | Telegram Bot API (channel monitoring) |
+| Storage | Hive (lokalno, na uređaju) |
 
----
+## Preduvjeti
 
-## Architecture
+- Android uređaj (API 21+) ili emulator
+- Flutter SDK 3.41+
+- Anthropic API ključ — [console.anthropic.com](https://console.anthropic.com)
+- Binance account s API ključem (Spot Trading, bez Withdrawal dozvole)
+- Telegram bot token (opcionalno, za channel monitoring)
+
+## Instalacija
+
+```bash
+git clone https://github.com/nroxa92/claude_coinsight.git
+cd claude_coinsight
+flutter pub get
+flutter build apk --release
+```
+
+APK se nalazi u `build/app/outputs/flutter-apk/app-release.apk`
+
+## Konfiguracija
+
+1. Instaliraj APK na Android uređaj
+2. Otvori **Settings** tab
+3. Unesi Anthropic API ključ
+4. Unesi Binance API ključeve (preporučeno: počni s Testnetom)
+5. Opcionalno: konfiguriraj Telegram bot za channel monitoring
+
+Detaljne upute: [MANUAL.md](MANUAL.md)
+
+## Arhitektura
 
 ```
 lib/
-├── main.dart                    # App entry point, provider setup, navigation
+├── main.dart                    # Entry point, navigation, background services
 ├── models/
-│   ├── coin.dart                # Coin data model (CoinGecko JSON mapping)
-│   ├── watchlist_provider.dart  # Watchlist state management
-│   └── analysis_provider.dart   # Chat/AI state management
+│   ├── coin.dart                # CoinGecko data model
+│   ├── coin_position.dart       # Otvorena trading pozicija
+│   ├── risk_parameters.dart     # Risk management konfiguracija
+│   ├── analysis_log.dart        # Log Claude analiza
+│   ├── trade_proposal.dart      # Pripremljeni order (pre-execution)
+│   ├── trade_result.dart        # Rezultat izvršenog ordera
+│   ├── telegram_signal.dart     # Signal iz Telegram kanala
+│   ├── watchlist_provider.dart  # Watchlist state
+│   ├── analysis_provider.dart   # Chat/AI state + Telegram integration
+│   └── portfolio_provider.dart  # Portfolio state + live prices
 ├── services/
-│   ├── coingecko_service.dart   # CoinGecko API client
-│   ├── claude_service.dart      # Anthropic Claude API client
+│   ├── coingecko_service.dart   # CoinGecko HTTP client
+│   ├── claude_service.dart      # Anthropic Claude HTTP client
+│   ├── binance_service.dart     # Binance REST API + HMAC signing
+│   ├── trade_service.dart       # Trade execution logic
+│   ├── telegram_monitor.dart    # Telegram public channel monitor
 │   └── storage_service.dart     # Hive local storage wrapper
 ├── screens/
-│   ├── watchlist_screen.dart    # Watchlist + Top Coins tabs
-│   ├── analysis_screen.dart     # AI chat interface
-│   └── settings_screen.dart     # API key management + about
+│   ├── watchlist_screen.dart    # New Listings, Watchlist, Top Coins
+│   ├── analysis_screen.dart     # Claude AI chat + Trade Action Bar
+│   ├── portfolio_screen.dart    # Pozicije, P&L, History
+│   └── settings_screen.dart     # API keys, Risk params, Telegram monitor
 ├── widgets/
-│   ├── coin_card.dart           # Coin display card + skeleton loader
-│   ├── chat_bubble.dart         # Chat message bubble
-│   └── sparkline_chart.dart     # 7-day price sparkline (CustomPainter)
+│   ├── coin_card.dart           # Coin display + skeleton loader
+│   ├── chat_bubble.dart         # Chat poruka
+│   └── sparkline_chart.dart     # 7-day sparkline
 └── theme/
-    └── app_theme.dart           # Dark theme configuration
+    └── app_theme.dart           # Dark tema
 ```
 
----
+## Sigurnost
 
-## Setup
+- API ključevi se čuvaju **isključivo lokalno** na uređaju (Hive)
+- Nema servera, nema telemetrije, nema cloud pohrane
+- Binance API ključ NIKAD ne smije imati Withdrawal dozvolu
+- Testnet mode za sigurno testiranje bez pravog novca
 
-### Prerequisites
-- Flutter SDK 3.41+ ([install](https://docs.flutter.dev/get-started/install))
-- Anthropic API key ([console.anthropic.com](https://console.anthropic.com))
+## Upozorenje
 
-### Run
+Ovo je eksperimentalni alat za osobnu upotrebu. Nije financijski savjet.
+Crypto trading nosi visok rizik gubitka kapitala. Koristi isključivo iznose
+koje možeš priuštiti izgubiti. DYOR (Do Your Own Research).
 
-```bash
-# Install dependencies
-flutter pub get
+## Licenca
 
-# Run on Windows
-flutter run -d windows
+MIT — vidi [LICENSE](LICENSE)
 
-# Run on Chrome (web)
-flutter run -d chrome
+## Razvoj
 
-# Build release
-flutter build windows
-```
-
-### Configuration
-1. Launch the app
-2. Go to **Settings** tab
-3. Enter your Anthropic API key (`sk-ant-...`)
-4. Return to **Analysis** tab to start chatting
-
----
-
-## API Usage
-
-### CoinGecko (Free Tier)
-- Endpoint: `GET /coins/markets`
-- Rate limit: ~10-30 req/min (free tier)
-- No API key required
-- Data: prices, market cap, 24h change, 7d sparkline
-
-### Anthropic Claude
-- Endpoint: `POST /v1/messages`
-- Model: `claude-sonnet-4-20250514`
-- Requires API key (user-provided, stored locally)
-- Max tokens: 1024 per response
-
----
-
-## Error Handling
-
-| Scenario | Behavior |
-|----------|----------|
-| No internet | Error message + Retry button |
-| CoinGecko rate limit (429) | User-friendly message |
-| Claude API invalid key (401) | Redirect to Settings |
-| Claude rate limit (429) | User-friendly message |
-| Request timeout | 15s (CoinGecko) / 30s (Claude) with message |
-| Malformed API response | Graceful fallback with error message |
-
----
-
-## Security
-
-- API keys are stored locally on-device via Hive (never transmitted except to Anthropic API)
-- No analytics, tracking, or telemetry
-- No server-side component — all communication is client-to-API
-- Obscured key display in Settings with confirmation for deletion
-
----
-
-## License
-
-This software is proprietary and confidential. Unauthorized copying, modification, distribution, or use of this software is strictly prohibited. See [LICENSE](LICENSE) for full terms.
-
-Copyright (c) 2026 CoinSight. All Rights Reserved.
+Projekt je razvijen kao eksperiment u AI-assisted development koristeći
+Claude Code kroz strukturirane sesije s CLAUDE.md workflow-om.

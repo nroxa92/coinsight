@@ -5,7 +5,7 @@ import 'package:coinsight/models/portfolio_provider.dart';
 import 'package:coinsight/models/risk_parameters.dart';
 import 'package:coinsight/services/binance_service.dart';
 import 'package:coinsight/services/storage_service.dart';
-import 'package:coinsight/services/telegram_service.dart';
+import 'package:coinsight/services/telegram_monitor.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -29,9 +29,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late RiskParameters _risk;
   final _maxTradeController = TextEditingController();
 
-  final _telegramTokenController = TextEditingController();
-  final _telegramChatIdController = TextEditingController();
-  bool _telegramConfigured = false;
+  final _monitorTokenController = TextEditingController();
+  final _addChannelController = TextEditingController();
+  bool _monitorConfigured = false;
+  bool _testingMonitor = false;
+  List<String> _customChannels = [];
 
   @override
   void initState() {
@@ -51,13 +53,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _risk = StorageService.getRiskParameters();
     _maxTradeController.text = _risk.maxTradeAmountUsdt.toStringAsFixed(2);
 
-    _telegramConfigured =
-        StorageService.getTelegramToken()?.isNotEmpty ?? false;
-    if (_telegramConfigured) {
-      _telegramTokenController.text = '••••••••••••••••';
-      _telegramChatIdController.text =
-          StorageService.getTelegramChatId() ?? '';
+    _monitorConfigured =
+        StorageService.getTelegramMonitorToken()?.isNotEmpty ?? false;
+    if (_monitorConfigured) {
+      _monitorTokenController.text = '••••••••••••••••';
     }
+    _customChannels = StorageService.getMonitoredChannels();
   }
 
   @override
@@ -66,8 +67,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _binanceKeyController.dispose();
     _binanceSecretController.dispose();
     _maxTradeController.dispose();
-    _telegramTokenController.dispose();
-    _telegramChatIdController.dispose();
+    _monitorTokenController.dispose();
+    _addChannelController.dispose();
     super.dispose();
   }
 
@@ -84,7 +85,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 16),
             _buildRiskSection(),
             const SizedBox(height: 16),
-            _buildTelegramSection(),
+            _buildTelegramMonitorSection(),
             const SizedBox(height: 16),
             _buildAboutSection(),
           ],
@@ -541,58 +542,160 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await StorageService.saveRiskParameters(_risk);
   }
 
-  // ───────── Telegram ─────────
-  Widget _buildTelegramSection() {
+  // ───────── Intelligence — Telegram Monitor ─────────
+  Widget _buildTelegramMonitorSection() {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _sectionHeader(Icons.send, 'Telegram Bot',
+            _sectionHeader(Icons.satellite_alt, 'Intelligence — Telegram Monitor',
                 statusLabel:
-                    _telegramConfigured ? 'Configured' : 'Not set',
-                statusActive: _telegramConfigured),
+                    _monitorConfigured ? 'Configured' : 'Not set',
+                statusActive: _monitorConfigured),
             const SizedBox(height: 8),
             Text(
-              'Pošalji /start svom botu da dobiješ Chat ID.',
+              'Kreiraj bota kod @BotFather, dodaj ga u željene javne kanale kao administratora.',
               style: TextStyle(color: Colors.grey[500], fontSize: 12),
             ),
             const SizedBox(height: 12),
             TextField(
-              controller: _telegramTokenController,
+              controller: _monitorTokenController,
               obscureText: true,
               onTap: () {
-                if (_telegramTokenController.text.startsWith('••')) {
-                  _telegramTokenController.clear();
+                if (_monitorTokenController.text.startsWith('••')) {
+                  _monitorTokenController.clear();
                 }
               },
               decoration:
                   const InputDecoration(labelText: 'Bot Token'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _telegramChatIdController,
-              decoration:
-                  const InputDecoration(labelText: 'Chat ID'),
             ),
             const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: _saveTelegram,
+                    onPressed: _saveMonitorToken,
                     child: const Text('Save'),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: _testTelegram,
-                    child: const Text('Test'),
+                    onPressed: _testingMonitor ? null : _testMonitor,
+                    child: _testingMonitor
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Text('Test'),
                   ),
                 ),
+                if (_monitorConfigured) ...[
+                  const SizedBox(width: 8),
+                  OutlinedButton(
+                    onPressed: _removeMonitorToken,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.error,
+                      side: BorderSide(
+                          color: Theme.of(context).colorScheme.error),
+                    ),
+                    child: const Text('Remove'),
+                  ),
+                ],
               ],
+            ),
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 8),
+            Text('Default kanali:',
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[400])),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: TelegramMonitor.defaultChannels
+                  .map((ch) => Chip(
+                        label: Text(ch, style: const TextStyle(fontSize: 12)),
+                        avatar: const Icon(Icons.check_circle,
+                            size: 16, color: Colors.green),
+                        backgroundColor: const Color(0xFF252525),
+                      ))
+                  .toList(),
+            ),
+            const SizedBox(height: 16),
+            Text('Dodatni kanali:',
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey[400])),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _addChannelController,
+                    decoration: const InputDecoration(
+                      hintText: '@channel_username',
+                      isDense: true,
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    ),
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: _addChannel,
+                  child: const Text('Dodaj'),
+                ),
+              ],
+            ),
+            if (_customChannels.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                children: _customChannels
+                    .map((ch) => Chip(
+                          label:
+                              Text(ch, style: const TextStyle(fontSize: 12)),
+                          backgroundColor: const Color(0xFF252525),
+                          deleteIcon:
+                              const Icon(Icons.close, size: 14),
+                          onDeleted: () => _removeChannel(ch),
+                        ))
+                    .toList(),
+              ),
+            ],
+            const SizedBox(height: 16),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Aktiviraj monitoring'),
+              subtitle: Text(
+                _monitorConfigured
+                    ? 'Bot čita poruke iz praćenih kanala'
+                    : 'Konfiguriraj bot token za aktiviranje',
+                style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+              ),
+              value: _risk.telegramMonitorEnabled,
+              onChanged: _monitorConfigured
+                  ? (v) {
+                      setState(() => _risk =
+                          _risk.copyWith(telegramMonitorEnabled: v));
+                      _saveRisk();
+                      final provider = context.read<AnalysisProvider>();
+                      if (v) {
+                        provider.startTelegramMonitor();
+                      } else {
+                        provider.stopTelegramMonitor();
+                      }
+                    }
+                  : null,
             ),
           ],
         ),
@@ -600,42 +703,75 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Future<void> _saveTelegram() async {
-    final tokenInput = _telegramTokenController.text.trim();
-    final chatId = _telegramChatIdController.text.trim();
-    if (chatId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unesi Chat ID')),
-      );
-      return;
-    }
-    final token = tokenInput.startsWith('••')
-        ? StorageService.getTelegramToken() ?? ''
-        : tokenInput;
-    if (token.isEmpty) {
+  Future<void> _saveMonitorToken() async {
+    final tokenInput = _monitorTokenController.text.trim();
+    if (tokenInput.isEmpty || tokenInput.startsWith('••')) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Unesi Bot Token')),
       );
       return;
     }
-    await StorageService.saveTelegramCredentials(token, chatId);
+    await StorageService.saveTelegramMonitorToken(tokenInput);
     if (!mounted) return;
     setState(() {
-      _telegramConfigured = true;
-      _telegramTokenController.text = '••••••••••••••••';
+      _monitorConfigured = true;
+      _monitorTokenController.text = '••••••••••••••••';
     });
+    context.read<AnalysisProvider>().startTelegramMonitor();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Telegram saved')),
+      const SnackBar(content: Text('Telegram Monitor token saved')),
     );
   }
 
-  Future<void> _testTelegram() async {
-    final tg = TelegramService();
-    final ok = await tg.sendMessage('✅ CoinSight test poruka');
+  Future<void> _testMonitor() async {
+    setState(() => _testingMonitor = true);
+    try {
+      final provider = context.read<AnalysisProvider>();
+      final username = await provider.testTelegramMonitor();
+      if (!mounted) return;
+      if (username != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('OK — bot: @$username')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed — invalid token')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _testingMonitor = false);
+    }
+  }
+
+  Future<void> _removeMonitorToken() async {
+    await StorageService.deleteTelegramMonitorToken();
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(ok ? 'Sent!' : 'Failed to send')),
-    );
+    setState(() {
+      _monitorConfigured = false;
+      _monitorTokenController.clear();
+    });
+    context.read<AnalysisProvider>().stopTelegramMonitor();
+  }
+
+  void _addChannel() {
+    var channel = _addChannelController.text.trim();
+    if (channel.isEmpty) return;
+    if (!channel.startsWith('@')) channel = '@$channel';
+    if (_customChannels.contains(channel) ||
+        TelegramMonitor.defaultChannels.contains(channel)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Kanal već postoji')),
+      );
+      return;
+    }
+    setState(() => _customChannels.add(channel));
+    _addChannelController.clear();
+    StorageService.saveMonitoredChannels(_customChannels);
+  }
+
+  void _removeChannel(String channel) {
+    setState(() => _customChannels.remove(channel));
+    StorageService.saveMonitoredChannels(_customChannels);
   }
 
   // ───────── Shared widgets ─────────
@@ -645,11 +781,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       children: [
         Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
         const SizedBox(width: 8),
-        Text(title,
-            style:
-                const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-        if (statusLabel != null) ...[
-          const Spacer(),
+        Expanded(
+          child: Text(title,
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+        ),
+        if (statusLabel != null)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
@@ -667,7 +804,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ),
-        ],
       ],
     );
   }
@@ -685,6 +821,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _buildInfoRow('Market Data', 'CoinGecko API'),
             _buildInfoRow('AI Analysis', 'Claude by Anthropic'),
             _buildInfoRow('Trading', 'Binance Spot'),
+            _buildInfoRow('Intelligence', 'Telegram Monitor'),
             const Divider(height: 24),
             Text(
               'CoinSight provides cryptocurrency market data and AI-powered analysis. '

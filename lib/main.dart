@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:coinsight/theme/app_theme.dart';
 import 'package:coinsight/services/storage_service.dart';
 import 'package:coinsight/services/trade_service.dart';
-import 'package:coinsight/services/telegram_service.dart';
 import 'package:coinsight/services/binance_service.dart';
 import 'package:coinsight/models/watchlist_provider.dart';
 import 'package:coinsight/models/analysis_provider.dart';
@@ -57,7 +56,6 @@ class _MainNavigationState extends State<MainNavigation> {
   final _titles = const ['Watchlist', 'Analysis', 'Portfolio', 'Settings'];
 
   final TradeService _tradeService = TradeService();
-  final TelegramService _telegramService = TelegramService();
   Timer? _stopLossTimer;
 
   @override
@@ -67,10 +65,10 @@ class _MainNavigationState extends State<MainNavigation> {
   }
 
   void _startBackgroundServices() {
-    if (_telegramService.isConfigured) {
-      _telegramService.setCommandHandler(_handleTelegramCommand);
-      _telegramService.startPolling();
-    }
+    // Start Telegram Monitor via AnalysisProvider
+    context.read<AnalysisProvider>().startTelegramMonitor();
+
+    // Start stop-loss checker if Binance is configured
     _stopLossTimer?.cancel();
     if (BinanceService().hasCredentials) {
       _stopLossTimer = Timer.periodic(
@@ -80,39 +78,9 @@ class _MainNavigationState extends State<MainNavigation> {
     }
   }
 
-  Future<void> _handleTelegramCommand(String command, String argument) async {
-    // Minimal handler — proširi u budućim sesijama za /buy_/skip_/status/balance
-    switch (command) {
-      case 'status':
-        final positions = StorageService.getPositions();
-        final totalInv =
-            positions.fold<double>(0, (s, p) => s + p.entryTotal);
-        await _telegramService.sendMessage(
-          '📊 Open positions: ${positions.length}\nInvested: \$${totalInv.toStringAsFixed(2)}',
-        );
-        break;
-      case 'stop':
-        final rp = StorageService.getRiskParameters();
-        await StorageService.saveRiskParameters(
-            rp.copyWith(autoTradeEnabled: false));
-        await _telegramService.sendMessage('⏸  Auto-trade paused');
-        break;
-      case 'start':
-        final rp = StorageService.getRiskParameters();
-        await StorageService.saveRiskParameters(
-            rp.copyWith(autoTradeEnabled: true));
-        await _telegramService.sendMessage('▶  Auto-trade enabled');
-        break;
-      default:
-        await _telegramService.sendMessage(
-            'ℹ  Commands: /status /stop /start');
-    }
-  }
-
   @override
   void dispose() {
     _stopLossTimer?.cancel();
-    _telegramService.stopPolling();
     super.dispose();
   }
 

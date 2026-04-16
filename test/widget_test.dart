@@ -8,14 +8,10 @@ void main() {
     TestWidgetsFlutterBinding.ensureInitialized();
     final tempDir = Directory.systemTemp.createTempSync('coinsight_test');
     Hive.init(tempDir.path);
-    await Hive.openBox('settings');
-    await Hive.openBox('watchlist');
-    await Hive.openBox('analysis_logs');
-    await Hive.openBox('positions');
-  });
-
-  tearDownAll(() async {
-    await Hive.close();
+    if (!Hive.isBoxOpen('settings')) await Hive.openBox('settings');
+    if (!Hive.isBoxOpen('watchlist')) await Hive.openBox('watchlist');
+    if (!Hive.isBoxOpen('analysis_logs')) await Hive.openBox('analysis_logs');
+    if (!Hive.isBoxOpen('positions')) await Hive.openBox('positions');
   });
 
   testWidgets('App renders with bottom navigation', (WidgetTester tester) async {

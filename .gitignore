@@ -55,3 +55,9 @@ app.*.map.json
 # Dev logs
 chat_log.md
 work_log.md
+
+# CoinSight specific
+*.hive
+*.lock.hive
+/archive/*.md
+*.secret
