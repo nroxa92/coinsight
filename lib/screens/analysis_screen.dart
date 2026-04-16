@@ -13,6 +13,7 @@ import 'package:coinsight/services/binance_service.dart';
 import 'package:coinsight/services/storage_service.dart';
 import 'package:coinsight/services/trade_service.dart';
 import 'package:coinsight/widgets/chat_bubble.dart';
+import 'package:coinsight/screens/chart_screen.dart';
 
 class AnalysisScreen extends StatefulWidget {
   const AnalysisScreen({super.key});
@@ -81,6 +82,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                   ? _buildEmptyState(provider)
                   : _buildMessageList(provider),
             ),
+            _buildChartButton(provider, tierProvider),
             _buildTradeActionBarIfEligible(provider, tier),
             _buildMidActionBarIfEligible(provider, tier),
             _buildLongActionBarIfEligible(provider, tier),
@@ -251,6 +253,48 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               style: TextStyle(color: Colors.grey[500], fontSize: 13),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  // ───────── Chart Button ─────────
+  Widget _buildChartButton(AnalysisProvider provider, TierProvider tierProvider) {
+    if (provider.messages.isEmpty) return const SizedBox.shrink();
+    final last = provider.messages.last;
+    if (last.role != 'assistant') return const SizedBox.shrink();
+
+    // Pronađi simbol iz analize (regex)
+    final symbolMatch = RegExp(r'\b([A-Z]{2,10})\b').firstMatch(last.content);
+    if (symbolMatch == null) return const SizedBox.shrink();
+    final symbol = symbolMatch.group(1)!;
+
+    // Ne prikazuj za poznate ne-coin uppercase riječi
+    const ignore = {'WATCH', 'SKIP', 'INTERESTING', 'ENTER', 'AVOID',
+        'DEX', 'CEX', 'TVL', 'DCA', 'SL', 'TP', 'ATH', 'ATL'};
+    if (ignore.contains(symbol)) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: SizedBox(
+        width: double.infinity,
+        child: OutlinedButton.icon(
+          icon: const Icon(Icons.show_chart, size: 16),
+          label: Text('Prikaži $symbol chart'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: tierProvider.activeTier.color,
+            side: BorderSide(
+                color: tierProvider.activeTier.color.withValues(alpha: 0.5)),
+          ),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => ChartScreen(
+                symbol: symbol,
+                tier: tierProvider.activeTier,
+                claudeAnalysis: last.content,
+              ),
+            ),
+          ),
         ),
       ),
     );

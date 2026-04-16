@@ -8,6 +8,9 @@ import 'package:coinsight/models/analysis_log.dart';
 import 'package:coinsight/models/telegram_signal.dart';
 import 'package:coinsight/models/intelligence_report.dart';
 import 'package:coinsight/models/investment_tier.dart';
+import 'package:coinsight/models/mid_term_project.dart';
+import 'package:coinsight/models/long_term_holding.dart';
+import 'package:coinsight/services/notification_service.dart';
 
 class AnalysisProvider extends ChangeNotifier {
   final ClaudeService _claudeService;
@@ -53,7 +56,18 @@ class AnalysisProvider extends ChangeNotifier {
       'Scoring hint koji dobiješ (STRONG_INTERESTING, POSSIBLE_WATCH, itd.) je matematička kalkulacija — nije tvoja obveza složiti se. Tvoja analiza kroz tri objektiva ima prioritet.\n\n'
       'Ako dobiješ report s activeSources < 2 — jasno napiši da nema dovoljno podataka za pouzdanu analizu.\n'
       'Ako dobiješ report bez DEX signala ali s visokim Telegram/Reddit score-om — to može biti CEX listing koji dolazi — WATCH, prati.\n'
-      'Ako dobiješ report s DEX signalom ali bez GitHub-a — povećani rizik scama, naglasi u analizi.';
+      'Ako dobiješ report s DEX signalom ali bez GitHub-a — povećani rizik scama, naglasi u analizi.'
+      '\n\nDEX vs CEX KONTEKST (SHORT tier):\n'
+      'CoinSight prati coinove na DEX-u (Uniswap, PancakeSwap, Raydium) i CEX-u (Binance).\n'
+      'DEX listing prethodi CEX listingu za 1-14 dana — to je naš primary edge.\n'
+      'Kad coin dođe na Binance — možda je pravi trenutak za izlaz, ne ulaz.\n'
+      'Korisnik može imati Binance Spot pozicije (CEX) i DEX pozicije — obje prikazane u kontekstu.\n\n'
+      'CHART PREDIKCIJA:\n'
+      'Ako korisnik traži price predikciju, vrati strukturirani blok na kraju odgovora:\n'
+      'PREDICTION_DATA: {"direction": true/false, "target": CIJENA_USD, "confidence": 0.0-1.0}\n'
+      'direction: true = bullish, false = bearish\n'
+      'confidence: koliko si siguran u predikciju (0.5 = nesiguran, 0.9 = vrlo siguran)\n'
+      'Daj predikciju samo ako imaš dovoljno podataka. Bez podataka — izostavi PREDICTION_DATA blok.';
 
   static const _midSystemPrompt =
       'Ti si CoinSight MID-TERM analiti\u010Dar. Specijaliziran si za value discovery \u2014 '
@@ -92,7 +106,14 @@ class AnalysisProvider extends ChangeNotifier {
       'Uz oznaku: 2-3 re\u010Denice razloga i jedan konkretan sljede\u0107i korak '
       '(\u0161to provjeriti, \u0161to \u010Dekati, ili koji podatak nedostaje).\n\n'
       'Nikad ne garantira\u0161 profit. Ovo je analiza obrazaca i fundamentala. '
-      'Jezik: prilagodi korisniku.';
+      'Jezik: prilagodi korisniku.'
+      '\n\nMID PORTFOLIO KONTEKST:\n'
+      'Korisnik možda već prati ovaj ili sličan projekt. '
+      'Ako vidiš da je projekt već u MID portfelju — fokusiraj se na UPDATE analize, '
+      'ne na inicijalnu procjenu. Prati li se projekt dovoljno dugo? Je li status ispravan?\n\n'
+      'CHART PREDIKCIJA (MID horizon — tjedni do mjeseci):\n'
+      'PREDICTION_DATA: {"direction": true/false, "target": CIJENA_USD, "confidence": 0.0-1.0}\n'
+      'Budi konzervativan s MID predikcijama — horizon je duži, nesigurnost veća.';
 
   static const _longSystemPrompt =
       'Ti si CoinSight LONG-TERM analiti\u010Dar. Specijaliziran si za identifikaciju '
@@ -141,7 +162,15 @@ class AnalysisProvider extends ChangeNotifier {
       '- Target exit price range\n'
       '- Key metric koji treba pratiti\n\n'
       'Nikad ne garantira\u0161 profit. Ovo je analiza obrazaca i fundamentala. '
-      'Jezik: prilagodi korisniku.';
+      'Jezik: prilagodi korisniku.'
+      '\n\nLONG PORTFOLIO KONTEKST:\n'
+      'Korisnik može imati DCA historiju za ovaj holding. '
+      'Ako vidiš DCA podatke u kontekstu — uključi ih u analizu: '
+      'je li prosječna ulazna cijena dobra? Ima li smisla DCA-ati dalje?\n\n'
+      'CHART PREDIKCIJA (LONG horizon — 6 mjeseci):\n'
+      'PREDICTION_DATA: {"direction": true/false, "target": CIJENA_USD, "confidence": 0.0-1.0}\n'
+      'LONG predikcija mora biti bazirana isključivo na fundamentalima, '
+      'ne na kratkoročnoj volatilnosti. Confidence rijetko prelazi 0.7 za LONG.';
 
   String get _activeSystemPrompt {
     final tier = StorageService.getActiveTier();
@@ -196,6 +225,10 @@ class AnalysisProvider extends ChangeNotifier {
     };
     _intelligence.onHighScoreSignal = (report) {
       _lastReport = report;
+      NotificationService.showInterestingSignal(
+        symbol: report.symbol,
+        score: report.confluenceScore,
+      );
       notifyListeners();
     };
   }
@@ -255,31 +288,48 @@ class AnalysisProvider extends ChangeNotifier {
 
   String _buildUserMessage(String text, List<Coin>? coins) {
     final buffer = StringBuffer();
+    final tier = StorageService.getActiveTier();
 
-    // 1. Intelligence Report (najvažniji kontekst)
+    // 0. Aktivan tier (uvijek prvi)
+    buffer.writeln('[AKTIVAN TIER: ${tier.displayName} — '
+        '${tier.description}]');
+    buffer.writeln();
+
+    // 1. Portfolio kontekst (novi — prije intelligence)
+    final portfolioContext = _buildPortfolioContext(tier);
+    if (portfolioContext.isNotEmpty) {
+      buffer.writeln(portfolioContext);
+      buffer.writeln();
+    }
+
+    // 2. Intelligence Report (ako postoji)
     if (_lastReport != null) {
       buffer.writeln(_lastReport!.toClaudeContext());
       buffer.writeln();
       _lastReport = null;
     } else {
-      // 2. Watchlist kontekst
+      // 3. Watchlist kontekst
       if (coins != null && coins.isNotEmpty) {
         final coinData = coins.map((c) {
           final change = c.priceChangePercentage24h >= 0 ? '+' : '';
           return '${c.name} (${c.symbol.toUpperCase()}): '
-              '\$${c.currentPrice.toStringAsFixed(2)}, '
+              '\$${c.currentPrice.toStringAsFixed(6)}, '
               '$change${c.priceChangePercentage24h.toStringAsFixed(2)}% 24h, '
               'MCap rank #${c.marketCapRank}';
         }).join('\n');
-        buffer.writeln('Watchlist kontekst:\n$coinData\n');
+        buffer.writeln('Watchlist:\n$coinData');
+        buffer.writeln();
       }
 
-      // 3. Telegram signali
+      // 4. Telegram signali
       if (_pendingSignals.isNotEmpty) {
-        final signalContext =
-            _pendingSignals.map((s) => s.toClaudeContext()).join('\n\n');
+        final signalContext = _pendingSignals
+            .map((s) => s.toClaudeContext())
+            .join('\n\n');
         buffer.writeln(
-            '[TELEGRAM INTELLIGENCE — ${_pendingSignals.length} signala]:\n$signalContext\n');
+            '[TELEGRAM INTELLIGENCE — ${_pendingSignals.length} signala]:\n'
+            '$signalContext');
+        buffer.writeln();
         _pendingSignals.clear();
       }
     }
@@ -289,6 +339,77 @@ class AnalysisProvider extends ChangeNotifier {
       return buffer.toString();
     }
     return text;
+  }
+
+  /// Gradi portfolio kontekst ovisno o aktivnom tieru
+  String _buildPortfolioContext(InvestmentTier tier) {
+    final buffer = StringBuffer();
+
+    switch (tier) {
+      case InvestmentTier.short:
+        // Binance pozicije
+        final positions = StorageService.getPositions();
+        if (positions.isNotEmpty) {
+          buffer.writeln('[OTVORENE SHORT POZICIJE (Binance):');
+          for (final p in positions) {
+            final pnl = p.pnlAbsolute;
+            final sign = pnl >= 0 ? '+' : '';
+            buffer.writeln('  ${p.symbol}: entry \$${p.entryPrice.toStringAsFixed(6)}, '
+                'P&L: $sign\$${pnl.toStringAsFixed(2)} (${p.pnlPercent.toStringAsFixed(1)}%)');
+          }
+          buffer.write(']');
+        }
+        // DEX pozicije
+        final dexPositions = StorageService.getDexPositions();
+        if (dexPositions.isNotEmpty) {
+          buffer.writeln('[OTVORENE SHORT POZICIJE (DEX):');
+          for (final p in dexPositions) {
+            final pnl = p.pnlAbsolute;
+            final sign = pnl >= 0 ? '+' : '';
+            buffer.writeln('  ${p.tokenSymbol} (${p.dexName}/${p.chainId}): '
+                'entry \$${p.entryPrice.toStringAsFixed(6)}, '
+                'P&L: $sign\$${pnl.toStringAsFixed(2)}');
+          }
+          buffer.write(']');
+        }
+        break;
+
+      case InvestmentTier.mid:
+        final projects = StorageService.getMidProjects()
+            .where((p) => p.status != MidTermStatus.exited &&
+                          p.status != MidTermStatus.abandoned)
+            .toList();
+        if (projects.isNotEmpty) {
+          buffer.writeln('[AKTIVNI MID PROJEKTI:');
+          for (final p in projects) {
+            buffer.writeln('  ${p.symbol.isEmpty ? "?" : p.symbol}: '
+                '${p.status.label}, '
+                '${p.daysWatching}d praćenja'
+                '${p.thesis.isNotEmpty ? ", teza: ${p.thesis.substring(0, p.thesis.length.clamp(0, 80))}..." : ""}');
+          }
+          buffer.write(']');
+        }
+        break;
+
+      case InvestmentTier.long:
+        final holdings = StorageService.getLongHoldings()
+            .where((h) => h.status != LongTermStatus.closed)
+            .toList();
+        if (holdings.isNotEmpty) {
+          buffer.writeln('[AKTIVNI LONG HOLDINGS:');
+          for (final h in holdings) {
+            buffer.writeln('  ${h.symbol.isEmpty ? "?" : h.symbol}: '
+                '${h.status.label}, '
+                '${h.purchases.length} kupnji, '
+                'avg \$${h.averageEntryPrice.toStringAsFixed(h.averageEntryPrice >= 1 ? 4 : 8)}, '
+                'target \$${h.targetPriceMin.toStringAsFixed(2)}-\$${h.targetPriceMax.toStringAsFixed(2)}');
+          }
+          buffer.write(']');
+        }
+        break;
+    }
+
+    return buffer.toString();
   }
 
   void _tryLogAnalysis(String response, List<Coin>? coins) {

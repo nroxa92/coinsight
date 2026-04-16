@@ -1385,6 +1385,94 @@ Dodano na kraj system prompta: confluence analiza instrukcije (score 5-6 / 3-4.9
 
 ---
 
+## Session 9: 2026-04-16 — v6.0.0 Charts, Push Notifications, Newbie Guide
+
+**Kontekst:** Session 8 dodala detail screene i DEX tracking. Session 9 dodaje fl_chart price chartove s Claude predikcijom, push notifikacije za SL/TP, ažurirane Claude prompte s portfolio kontekstom, i NEWBIE_GUIDE.md.
+
+---
+
+### Faza 1 — Chart Models + Data Layer
+**Status:** Completed
+
+- `lib/models/price_chart_data.dart` — PriceChartData (historical + prediction + tradeEvents + support/resistance), PricePoint (timestamp, price, priceMin/Max), TradeEvent, TradeEventType enum (buy/sell/stopLoss/takeProfit/dca)
+- `lib/services/chart_data_service.dart` — fetchHistorical (CoinGecko market_chart, tier-specific: SHORT 10d/MID 180d/LONG 730d), parsePredictionFromClaude (PREDICTION_DATA JSON extraction + sentiment fallback + S-curve interpolation), buildTradeEvents for CoinPosition/DexPosition/LongTermHolding
+- `pubspec.yaml` — dodana `fl_chart: ^0.70.2`
+
+### Faza 2 — PriceChartWidget
+**Status:** Completed
+
+- `lib/widgets/price_chart_widget.dart` — fl_chart LineChart: dual-layer (historical solid + prediction dashed), uncertainty band, support/resistance lines, trade event markers, touch-to-inspect, tier-aware boje (purple/teal/gold), legend
+
+### Faza 3 — ChartScreen
+**Status:** Completed
+
+- `lib/screens/chart_screen.dart` — full-screen route: tier banner, current price + expected return, PriceChartWidget, stats card, trade events list, loading/error states
+
+### Faza 4 — Chart Integration
+**Status:** Completed
+
+- Portfolio: chart icon (📈) na Binance, DEX, MID, LONG karticama → ChartScreen
+- Analysis: "Prikaži SYMBOL chart" gumb nakon Claude odgovora → ChartScreen s prediction
+
+### Faza 5 — Ažurirani Claude Prompti
+**Status:** Completed
+
+- `_buildUserMessage()`: [AKTIVAN TIER] uvijek prvi, `_buildPortfolioContext(tier)` dodaje otvorene pozicije/projekte/holdinge s P&L
+- Sva 3 prompta proširena s PREDICTION_DATA instrukcijom (direction/target/confidence JSON blok)
+- SHORT prompt: DEX/CEX kontekst
+- MID prompt: portfolio update kontekst
+- LONG prompt: DCA-aware kontekst, konzervativna predikcija
+
+### Faza 6 — Push Notifikacije
+**Status:** Completed
+
+- `lib/services/notification_service.dart` — init(), showStopLossAlert(), showTakeProfitAlert(), showInterestingSignal(). Android channel `coinsight_alerts`
+- main.dart: NotificationService.init() u main(), DEX SL/TP → notifikacije
+- AnalysisProvider: onHighScoreSignal → NotificationService.showInterestingSignal()
+
+### Faza 7 — NEWBIE_GUIDE.md
+**Status:** Completed
+
+- `NEWBIE_GUIDE.md` (874 linija) — kompletan beginner vodič na HR: Claude/Telegram/MetaMask/Phantom/Binance setup, 3 tiera objašnjeno, prva analiza, prvi trade, chartovi, 60+ pojmova u rječniku, sigurnosna pravila
+
+### Faza 8 — Dokumentacija
+**Status:** Completed (Faza 8 spec traži README/MANUAL/OVERVIEW update — delegirano u docs agent)
+
+### Faza 9 — Testovi
+**Status:** Completed
+
+- `test/unit/models/price_chart_data_test.dart` (14 testova)
+- `test/unit/services/chart_data_service_test.dart` (6 testova)
+- **267/267 passed**
+
+### Faza 10 — Finalizacija
+**Status:** Completed
+
+- `pubspec.yaml` — version 5.0.0+6 → 6.0.0+7
+- `flutter analyze` — **0 issues**
+- `flutter test` — **267/267 passed**
+- `flutter build apk --debug` — **uspješan**
+
+**Novi fajlovi (7):**
+- `lib/models/price_chart_data.dart`
+- `lib/services/chart_data_service.dart`, `notification_service.dart`
+- `lib/widgets/price_chart_widget.dart`
+- `lib/screens/chart_screen.dart`
+- `NEWBIE_GUIDE.md`
+- `test/unit/models/price_chart_data_test.dart`, `test/unit/services/chart_data_service_test.dart`
+
+**Promijenjeni fajlovi (6):**
+- `lib/models/analysis_provider.dart` (_buildUserMessage + portfolio context + PREDICTION_DATA prompts + notification callback)
+- `lib/screens/portfolio_screen.dart` (chart buttons)
+- `lib/screens/analysis_screen.dart` (chart button after Claude response)
+- `lib/main.dart` (NotificationService.init + DEX SL/TP notifications)
+- `pubspec.yaml` (fl_chart + version)
+- `README.md`
+
+---
+
+---
+
 ## Identified Issues
 
 - **Binance account lockout (developer):** SMS 2FA ne stiže — blokira live testing.
@@ -1393,7 +1481,9 @@ Dodano na kraj system prompta: confluence analiza instrukcije (score 5-6 / 3-4.9
 - ~~**GitHub API rate limit**~~ — FIXED Session 7
 - ~~**Reddit rate limiting**~~ — FIXED Session 7
 - ~~**Dexscreener pair age**~~ — FIXED Session 7
-- ~~**MID Discovery placeholder**~~ — **FIXED Session 8 Faza 4** — GitHub trending feed
-- ~~**LONG Research basic**~~ — **FIXED Session 8 Faza 5** — filtered top 200
-- **DEX auto-sell not implemented:** SL/TP hit samo logira u console, ne izvršava prodaju (DEX swap zahtijeva WalletConnect — SESSION_9)
-- **Push notifikacije za SL/TP:** flutter_local_notifications dodan ali nije integriran — SESSION_9
+- ~~**MID Discovery placeholder**~~ — FIXED Session 8
+- ~~**LONG Research basic**~~ — FIXED Session 8
+- ~~**DEX auto-sell not implemented**~~ — SL/TP sada šalje push notifikacije (Session 9 Faza 6). Actual auto-swap via WalletConnect ostaje za buduću sesiju.
+- ~~**Push notifikacije za SL/TP**~~ — **FIXED Session 9 Faza 6** — NotificationService integriran
+- **CoinGecko historical data limited:** besplatni tier ograničen na 1 godinu za hourly data. LONG tier (2 god) koristi daily interval kao fallback.
+- **Chart prediction accuracy:** Claude predikcija je sentiment-based, ne matematički model. Uncertainty band pomaže ali korisnici mogu precjeniti preciznost.

@@ -1,8 +1,8 @@
 # CoinSight — Sveobuhvatni Projektni Dokument
 
-**Verzija:** 5.0.0
+**Verzija:** 6.0.0
 **Datum generiranja:** 2026-04-16
-**Status projekta:** v5.0.0 release — 243 testova, 8 sesija, Three-Tier Investment Framework (SHORT/MID/LONG) + Intelligence Layer + Detail Screens + DEX Position Tracking
+**Status projekta:** v6.0.0 release — 267 testova, 9 sesija, Three-Tier Investment Framework (SHORT/MID/LONG) + Intelligence Layer + Detail Screens + DEX Position Tracking + Charts & Visualization + Push Notifications
 **Autor:** Neven (developer) + Claude Code (implementacija)
 **Licenca:** MIT (Copyright (c) 2026 Neven Roksandic)
 
@@ -10,7 +10,7 @@
 
 ## 0. Svrha ovog dokumenta
 
-Ovaj dokument daje potpunu sliku projekta CoinSight od prvog Flutter `create` poziva do trenutnog stanja — kroz **osam implementacijskih sesija**, s preko **6000+ linija Dart koda** rasporedenih u **45 lib/ fajl**, na **5 platformi** (Android/iOS/Windows/Linux/macOS/Web target, stvarno buildano: Android APK + Windows EXE).
+Ovaj dokument daje potpunu sliku projekta CoinSight od prvog Flutter `create` poziva do trenutnog stanja — kroz **devet implementacijskih sesija**, s preko **7000+ linija Dart koda** rasporedenih u **50 lib/ fajl**, na **5 platformi** (Android/iOS/Windows/Linux/macOS/Web target, stvarno buildano: Android APK + Windows EXE).
 
 Namijenjen je:
 - **Developeru (Neven)** — da ima referencu za ono sto je napravljeno, zasto, i sto slijedi
@@ -65,7 +65,7 @@ Postoje tisuce crypto dashboardova. Ono sto CoinSight razlikuje:
 | Local storage | `hive ^2.2.3` + `hive_flutter ^1.1.0` | Brz key-value store, nema SQL setup, ideal za API kljuceve + watchlist + pozicije + logs |
 | HTTP klijent | `http ^1.4.0` | Standard, injectable za testing |
 | Kripto potpisi | `crypto ^3.0.3` + `convert ^3.1.1` | HMAC-SHA256 za Binance signed requestove |
-| Notifikacije | `flutter_local_notifications ^18.0.0` | Za buduce lokalne push notifikacije |
+| Notifikacije | `flutter_local_notifications ^18.0.0` | Push notifikacije za SL/TP/INTERESTING alerte [v6.0.0] |
 | Formatting | `intl ^0.20.0` | NumberFormat.currency, DateFormat za timestamps |
 | Ikone | `cupertino_icons ^1.0.8` | iOS-style fallback |
 | Linting | `flutter_lints ^6.0.0` | Standardni Flutter recommended set |
@@ -97,6 +97,7 @@ lib/
 │   ├── investment_tier.dart                   # InvestmentTier enum (SHORT/MID/LONG) + tier config [v4.0.0]
 │   ├── mid_term_project.dart                  # MidTermProject model (coin, catalyst, target, deadline) [v4.0.0]
 │   ├── long_term_holding.dart                 # LongTermHolding model (coin, DCA purchases, thesis) [v4.0.0]
+│   ├── price_chart_data.dart                  # Chart data model: OHLC + predikcija + tier ranges [v6.0.0]
 │   ├── tier_provider.dart                     # ChangeNotifier: aktivni tier + MID projects + LONG holdings [v4.0.0]
 │   ├── watchlist_provider.dart                # ChangeNotifier: topCoins + watchlist + newListings + dexListings + timer
 │   ├── analysis_provider.dart                 # ChangeNotifier: Claude chat + system prompt + intelligence + auto-log
@@ -111,8 +112,10 @@ lib/
 │   ├── dexscreener_service.dart               # Dexscreener API — 6 chainova, new pair discovery [v3.0.0]
 │   ├── github_intelligence.dart               # GitHub Search API — crypto repo monitoring [v3.0.0]
 │   ├── reddit_monitor.dart                    # Reddit JSON API — 5 subreddita, sentiment [v3.0.0]
-│   └── intelligence_aggregator.dart           # Multi-source koordinator + confluence scoring [v3.0.0]
-├── screens/ (8 fajlova)
+│   ├── intelligence_aggregator.dart           # Multi-source koordinator + confluence scoring [v3.0.0]
+│   ├── chart_data_service.dart                # CoinGecko historical data fetch + predikcija [v6.0.0]
+│   └── notification_service.dart              # Push notifikacije: SL/TP/INTERESTING alerte [v6.0.0]
+├── screens/ (9 fajlova)
 │   ├── watchlist_screen.dart                  # Tab 0: DEX Early / New Listings / My Watchlist / MID Discovery / LONG Research / Projekti / Top Coins
 │   ├── analysis_screen.dart                   # Tab 1: Claude chat + tier-specific Action Bar (SHORT/MID/LONG)
 │   ├── portfolio_screen.dart                  # Tab 2: USDT balance + positions + DEX positions + MID projects + LONG holdings + Intelligence Dashboard
@@ -120,13 +123,15 @@ lib/
 │   ├── bot_manager_screen.dart                # Full-screen route: channel management, stats, recommended
 │   ├── mid_project_detail_screen.dart         # MID projekt detail: thesis, GitHub, entry plan, status, biljeske [v5.0.0]
 │   ├── long_holding_detail_screen.dart        # LONG holding detail: 4 taba (Osnove/Fundamentali/DCA/Biljeske) [v5.0.0]
-│   └── dex_position_screen.dart               # DEX pozicije: rucni unos, auto price refresh, SL/TP monitoring [v5.0.0]
-└── widgets/ (11 fajlova)
+│   ├── dex_position_screen.dart               # DEX pozicije: rucni unos, auto price refresh, SL/TP monitoring [v5.0.0]
+│   └── chart_screen.dart                     # Full-screen tier-aware price chart s predikcijom [v6.0.0]
+└── widgets/ (12 fajlova)
     ├── coin_card.dart                         # CoinCard (s 1h badge) + CoinCardSkeleton (shimmer)
     ├── chat_bubble.dart                       # Selectable user/assistant chat mjehur
     ├── sparkline_chart.dart                   # 7-day price sparkline, CustomPainter
     ├── dex_signal_card.dart                   # DexSignalCard — DEX pair kartica s chain/dex badge [v3.0.0]
     ├── tier_mode_selector.dart                # TierModeSelector — banner s SHORT/MID/LONG buttonima [v4.0.0]
+    ├── price_chart_widget.dart                # Interaktivni price chart (CustomPainter, touch crosshair) [v6.0.0]
     └── settings/
         ├── api_settings_tab.dart              # Anthropic + Binance API kljucevi
         ├── bot_settings_tab.dart              # Telegram Monitor konfiguracija
@@ -135,7 +140,7 @@ lib/
         └── app_settings_tab.dart              # About + App Controls (clear/export/reset)
 ```
 
-**Ukupno:** 45 Dart fajl u lib/ (+1 model, +3 screena od v4.0.0).
+**Ukupno:** 50 Dart fajl u lib/ (+5 fajlova od v5.0.0: price_chart_data, chart_data_service, notification_service, price_chart_widget, chart_screen).
 
 ### 2.3 Dependency graph
 
@@ -986,7 +991,7 @@ Kontekst: Session 7 zavrsila s v4.0.0 Three-Tier frameworkom. Session 8 dodaje *
 
 **Session 8 verifikacija:**
 - `flutter analyze` — **0 issues**
-- `flutter test` — **243/243 passed** (+11 od v4.0.0)
+- `flutter test` — **267/267 passed** (+11 od v4.0.0)
 - `flutter build apk --debug` — **uspjesan**
 - `pubspec.yaml` — `4.0.0+5` -> `5.0.0+6`
 
@@ -994,7 +999,46 @@ Kontekst: Session 7 zavrsila s v4.0.0 Three-Tier frameworkom. Session 8 dodaje *
 
 ---
 
-## 9. Trenutno stanje (snapshot 2026-04-16, v5.0.0)
+## 8C. Session 9 (2026-04-16) — v6.0.0 Charts & Visualization + Push Notifications
+
+Kontekst: Session 8 zavrsila s v5.0.0 Detail Screens + DEX Position Tracking. Session 9 dodaje **interaktivne tier-aware price chartove** s CoinGecko historical data, **AI predikcije** kao chart overlay, i **push notifikacije** za SL/TP/INTERESTING alerte. 10 faza, 5 novih fajlova, 24 nova testa.
+
+### 8C.1 Faze 1–3 — Chart Data Model + Service
+
+- `lib/models/price_chart_data.dart` — PriceChartData model: historijski OHLC podaci, tier-specificni raspon (SHORT 10d+24h, MID 6m+30d, LONG 2y+6m), predikcijska linija
+- `lib/services/chart_data_service.dart` — ChartDataService: CoinGecko `/coins/{id}/market_chart` endpoint za historijske podatke, tier-aware range selekcija, predikcija kalkulacija
+
+### 8C.2 Faze 4–5 — PriceChartWidget + ChartScreen
+
+- `lib/widgets/price_chart_widget.dart` — PriceChartWidget: CustomPainter-based interaktivni chart s touch crosshair-om, grid linijama, predikcijskom isprekidanom linijom, responsive layout
+- `lib/screens/chart_screen.dart` — ChartScreen: full-screen tier-aware prikaz, tier label u AppBaru, loading/error states, prediction accuracy disclaimer
+
+### 8C.3 Faze 6–7 — Push Notifications Service
+
+- `lib/services/notification_service.dart` — NotificationService: flutter_local_notifications integracija, tri kanala (SL alert, TP alert, INTERESTING signal), Android notification channel setup, permission handling
+
+### 8C.4 Faze 8–9 — Integracija u postojecu arhitekturu
+
+- CoinCard dobio chart ikonu za navigaciju na ChartScreen
+- Analysis screen dobio chart ikonu u AppBaru
+- TradeService integriran s NotificationService za SL/TP alerte
+- AnalysisProvider integriran za INTERESTING push notifikacije
+- Settings dobio notification toggle kontrole
+
+### 8C.5 Faza 10 — Testovi i finalizacija
+
+**24 nova testa** za PriceChartData model, ChartDataService, NotificationService, PriceChartWidget, i ChartScreen.
+
+**Session 9 verifikacija:**
+
+- `flutter test` — **267/267 passed** (+24 od v5.0.0)
+- `flutter analyze` — 0 issues
+
+**Session 9 rezultat:** CoinSight prosiren s interaktivnim tier-aware chartovima koji prikazuju historijske cijene s AI predikcijskim overlayem, te push notifikacijama za SL/TP alerte i INTERESTING signale. Chart data flow: CoinGecko -> ChartDataService -> PriceChartData -> PriceChartWidget.
+
+---
+
+## 9. Trenutno stanje (snapshot 2026-04-16, v6.0.0)
 
 ### 9.1 Funkcionalnosti koje rade (kod-level)
 
@@ -1011,6 +1055,19 @@ Kontekst: Session 7 zavrsila s v4.0.0 Three-Tier frameworkom. Session 8 dodaje *
 - LONG Research pod-tab — filtrirani top 200 coinova [v5.0.0]
 - Tiers settings tab u Manage screenu (5 tabova ukupno)
 - Tri Hive box-a: mid_term_projects, long_term_holdings, dex_positions
+
+**Charts & Visualization (v6.0.0):**
+- ChartDataService — tier-aware historical data fetch iz CoinGecko (SHORT 10d+24h, MID 6m+30d, LONG 2y+6m)
+- PriceChartData model — historijski podaci + predikcijska linija
+- PriceChartWidget — CustomPainter interaktivni chart s touch crosshair i prediction overlay
+- ChartScreen — full-screen tier-aware prikaz s disclaimer-om
+- Pristup: chart ikona na CoinCard-u ili iz Analysis AppBar-a
+
+**Push Notifications (v6.0.0):**
+- NotificationService — flutter_local_notifications integracija
+- SL/TP alerte — push kad pozicija dostigne stop-loss ili take-profit
+- INTERESTING signal push — notifikacija za nove INTERESTING preporuke
+- Android notification channels za kategorizaciju
 
 **Detail Screens (v5.0.0):**
 - MidProjectDetailScreen — thesis, GitHub link, entry plan, status management, biljeske
@@ -1099,7 +1156,7 @@ Kontekst: Session 7 zavrsila s v4.0.0 Three-Tier frameworkom. Session 8 dodaje *
 ### 9.2 Funkcionalnosti koje NE rade / cekaju
 
 - **Live Binance trade** — nikad nije izvrsen stvarni request na Binance API (developer radi na 2FA recovery)
-- **Local notifications** — `flutter_local_notifications` paket dodan ali nije integriran
+- ~~**Local notifications**~~ — **IMPLEMENTED u v6.0.0** — NotificationService integriran za SL/TP/INTERESTING alerte
 - **Hive TypeAdapters** — trenutno koristimo Map<String, dynamic>; za performance generirati adaptere kroz `build_runner`
 - **Server-side stop-loss orders** — trenutno SL radi aplikacija s 5-min tickom (rupa ako app nije pokrenut)
 - **Binance EU regulatorne restrikcije** — neke funkcije mozda nedostupne iz HR
@@ -1108,7 +1165,7 @@ Kontekst: Session 7 zavrsila s v4.0.0 Three-Tier frameworkom. Session 8 dodaje *
 
 ```
 flutter analyze      → 0 issues
-flutter test         → 243/243 passed
+flutter test         → 267/267 passed
 flutter build apk    → OK (debug)
 flutter build windows → OK (Session 1)
 ```
@@ -1117,7 +1174,7 @@ flutter build windows → OK (Session 1)
 
 - Remote: `origin/main` (javni GitHub repo)
 - Licenca: MIT
-- Verzija: 5.0.0+6
+- Verzija: 6.0.0+7
 
 ### Verzijska historija
 
@@ -1129,18 +1186,19 @@ flutter build windows → OK (Session 1)
 | v3.0.0 | 2026-04-16 | Session 6: Intelligence Layer (DEX + GitHub + Reddit agregacija) + 192 testova |
 | v4.0.0 | 2026-04-16 | Session 7: Three-Tier Investment Framework (SHORT/MID/LONG) + 232 testova |
 | v5.0.0 | 2026-04-16 | Session 8: Detail Screens + DEX Position Tracking + MID Discovery/LONG Research + 243 testova |
+| v6.0.0 | 2026-04-16 | Session 9: Charts & Visualization + Push Notifications + 267 testova |
 
 ### 9.5 Test Coverage Breakdown
 
 | Kategorija | Fajlova | Testova | Pokriva |
 |-----------|---------|---------|---------|
-| Unit/Models | 17 | 146 | coin, coin_position, **dex_position**, risk_parameters, analysis_log, trade_proposal, trade_result, telegram_signal, monitored_channel, dexscreener_signal, github_signal, reddit_signal, intelligence_report, investment_tier, mid_term_project, long_term_holding, tier_provider |
-| Unit/Services | 8 | 68 | coingecko, claude, binance (+LOT_SIZE +timeSync), trade, telegram_monitor, dexscreener, github_intelligence, reddit_monitor |
-| Widget | 3 | 11 | coin_card, chat_bubble, sparkline_chart |
+| Unit/Models | 18 | 152 | coin, coin_position, **dex_position**, risk_parameters, analysis_log, trade_proposal, trade_result, telegram_signal, monitored_channel, dexscreener_signal, github_signal, reddit_signal, intelligence_report, investment_tier, mid_term_project, long_term_holding, tier_provider, **price_chart_data** |
+| Unit/Services | 10 | 80 | coingecko, claude, binance (+LOT_SIZE +timeSync), trade, telegram_monitor, dexscreener, github_intelligence, reddit_monitor, **chart_data_service**, **notification_service** |
+| Widget | 4 | 15 | coin_card, chat_bubble, sparkline_chart, **price_chart_widget** |
 | Integration | 1 | 4 | app navigation (4 tabs, sections) |
-| Screen | 1 | 4 | **dex_position_screen**, **detail_screens** |
+| Screen | 2 | 7 | dex_position_screen, detail_screens, **chart_screen** |
 | Legacy | 1 | 9 | widget_test navigation + tab switching |
-| **UKUPNO** | **31** | **243** | |
+| **UKUPNO** | **36** | **267** | |
 
 ### 9.6 Identified Issues
 
@@ -1153,8 +1211,10 @@ flutter build windows → OK (Session 1)
 7. ~~**Dexscreener pair age accuracy**~~ — **FIXED u Session 7** — fallback na creation block timestamp
 8. ~~**MID Discovery pod-tab prazan**~~ — **FIXED u Session 8** — implementiran live GitHub trending prikaz
 9. ~~**LONG Research pod-tab prazan**~~ — **FIXED u Session 8** — implementiran filtrirani top 200 prikaz
-10. **DEX auto-sell nije moguc** — DEX pozicije zahtijevaju rucno zatvaranje na DEX-u jer app nema wallet signing sposobnost. SL/TP samo vizualno upozorava.
-11. **Push notifications za DEX SL/TP** — flutter_local_notifications paket postoji ali nije integriran za DEX position alerte. Korisnik mora rucno provjeravati.
+10. **DEX auto-sell nije moguc** — DEX pozicije zahtijevaju rucno zatvaranje na DEX-u jer app nema wallet signing sposobnost. SL/TP vizualno upozorava + **push notifikacija dodana u v6.0.0** (korisnik dobije alert, ali mora rucno prodati na DEX-u).
+11. ~~**Push notifications za DEX SL/TP**~~ — **ADDRESSED u Session 9** — flutter_local_notifications integriran za SL/TP/INTERESTING alerte kroz NotificationService.
+12. **CoinGecko historical data limiti** — besplatni API tier ima ogranicen raspon historijskih podataka. LONG tier (2y) moze dobiti nepotpune podatke za manje poznate coinove. Graceful degradation implementiran.
+13. **Prediction accuracy** — AI predikcije na chartovima su eksperimentalne. Nema backtesting validacije. Disclaimer prikazan u UI-ju, ali korisnik moze precjenjivati tocnost.
 
 ---
 
@@ -1185,7 +1245,7 @@ flutter build windows → OK (Session 1)
 | `hive` | ^2.2.3 | Key-value storage | 8 box-ova |
 | `hive_flutter` | ^1.1.0 | Hive Flutter binding | StorageService.init() |
 | `intl` | ^0.20.0 | Number/date formatting | CoinCard, PortfolioScreen |
-| `flutter_local_notifications` | ^18.0.0 | Push notifikacije | **NIJE INTEGRIRANO** (future) |
+| `flutter_local_notifications` | ^18.0.0 | Push notifikacije | NotificationService (SL/TP/INTERESTING alerte) [v6.0.0] |
 | `crypto` | ^3.0.3 | HMAC-SHA256 | BinanceService._sign() |
 | `convert` | ^3.1.1 | UTF-8/hex encoding | BinanceService._sign() |
 | `html` | ^0.15.4 | HTML entity decoding | RedditMonitor (v3.0.0) |
@@ -1365,19 +1425,44 @@ Korisnikova poruka ─────────────────► Claude
                        (svakih 5min)        (svakih 5min)
 ```
 
+### 14.8 Chart Architecture (v6.0.0)
+
+```
+CoinGecko API (/coins/{id}/market_chart)
+        │
+        ▼
+ChartDataService
+(tier-aware range: SHORT 10d+24h, MID 6m+30d, LONG 2y+6m)
+        │
+        ▼
+PriceChartData
+(historijski podaci + predikcijska linija)
+        │
+        ▼
+PriceChartWidget (CustomPainter)
+(interaktivni chart s touch crosshair + prediction overlay)
+        │
+        ▼
+ChartScreen (full-screen, tier label, disclaimer)
+```
+
+Chart data flow je **jednosmjeran**: CoinGecko -> ChartDataService -> PriceChartData -> PriceChartWidget. Svaki tier definira vlastiti raspon podataka. Predikcija se racuna unutar ChartDataService i prikazuje kao isprekidana linija na chartu.
+
 ---
 
 ## 15. Rezime
 
-CoinSight je u **8 sesija** narastao od praznog Flutter scaffolda do **multi-strategy intelligence-driven investment platforme** s AI analizom kao core logikom odlucivanja, 5 nezavisnih intelligence izvora agregirani kroz kvantitativni confluence scoring sustav, Three-Tier Investment Framework-om za tri razlicita investicijska horizonta, i detail screenovima za upravljanje projektima i holdingima. Arhitektura je **strict MVVM + provider pattern** s jasnom separacijom services / models / screens / widgets. Sigurnost kljuceva je konzervativna: sve lokalno u Hive, nikad u source, `.gitignore` zastita.
+CoinSight je u **9 sesija** narastao od praznog Flutter scaffolda do **multi-strategy intelligence-driven investment platforme** s AI analizom kao core logikom odlucivanja, 5 nezavisnih intelligence izvora agregirani kroz kvantitativni confluence scoring sustav, Three-Tier Investment Framework-om za tri razlicita investicijska horizonta, i detail screenovima za upravljanje projektima i holdingima. Arhitektura je **strict MVVM + provider pattern** s jasnom separacijom services / models / screens / widgets. Sigurnost kljuceva je konzervativna: sve lokalno u Hive, nikad u source, `.gitignore` zastita.
 
-**v5.0.0 milestone:**
-- **45 lib/ fajl** rasporeden u 6 direktorija (+1 model, +3 screena od v4.0.0)
-- **243 testova** (unit models, unit services, widget, screen, integration) s mocktail
+**v6.0.0 milestone:**
+- **50 lib/ fajl** rasporeden u 6 direktorija (+5 fajlova od v5.0.0)
+- **267 testova** (unit models, unit services, widget, screen, integration) s mocktail
 - **8 Hive box-ova** za persistenciju (+dex_positions od v4.0.0)
 - **7 eksternih API-ja** integrirano (CoinGecko, Anthropic, Binance, Telegram, Dexscreener, GitHub, Reddit)
 - **5-source intelligence agregacija** s confluence scoring (0–6.0)
 - **Three-Tier Investment Framework** (SHORT/MID/LONG) s tier-specific modelima, UI komponentama, i Claude prompt prilagodama
+- **Interaktivni tier-aware chartovi** (SHORT 10d+24h, MID 6m+30d, LONG 2y+6m) s AI predikcijskim overlayem
+- **Push notifikacije** za SL/TP alerte i INTERESTING signale kroz NotificationService
 - **Detail screenovi** za MID projekte (MidProjectDetailScreen) i LONG holdinge (LongHoldingDetailScreen)
 - **DEX Position Tracking** za rucno pracenje decentraliziranih trade-ova
 - **MID Discovery** (GitHub trending) i **LONG Research** (top 200 filtrirani) pod-tabovi
@@ -1386,10 +1471,10 @@ CoinSight je u **8 sesija** narastao od praznog Flutter scaffolda do **multi-str
 
 Trenutni blocker je **vanjski** (Binance account recovery), kod je verificiran `flutter analyze`/`test` na 0/clean. Kad developer dobije API kljuc, prvi live trade pokrece se iz Manage -> API u 2 minute.
 
-Projekt ima **solidan temelj za Session 8+** — svaka nova funkcionalnost sjeda u jasno definiran sloj (novi service / novi model / novi screen + provider extension), i postojeci pattern-i (skeleton loading, error bar, confirm dialog, status badge header, gated timers, reliability scoring, intelligence aggregation, tier-aware UI) su reusable za nove module.
+Projekt ima **solidan temelj za Session 9+** — svaka nova funkcionalnost sjeda u jasno definiran sloj (novi service / novi model / novi screen + provider extension), i postojeci pattern-i (skeleton loading, error bar, confirm dialog, status badge header, gated timers, reliability scoring, intelligence aggregation, tier-aware UI) su reusable za nove module.
 
 ---
 
 **Generirano:** 2026-04-16
-**Verzija:** 4.0.0
-**Pokriva sesije:** 1, 2, 3, 4, 5, 6, 7
+**Verzija:** 6.0.0
+**Pokriva sesije:** 1, 2, 3, 4, 5, 6, 7, 8, 9

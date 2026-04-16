@@ -15,6 +15,7 @@ import 'package:coinsight/services/storage_service.dart';
 import 'package:coinsight/screens/dex_position_screen.dart';
 import 'package:coinsight/screens/mid_project_detail_screen.dart';
 import 'package:coinsight/screens/long_holding_detail_screen.dart';
+import 'package:coinsight/screens/chart_screen.dart';
 
 class PortfolioScreen extends StatefulWidget {
   const PortfolioScreen({super.key});
@@ -221,6 +222,25 @@ class _PortfolioScreenState extends State<PortfolioScreen>
                             color: project.status.color)),
                   ),
                   const Spacer(),
+                  IconButton(
+                    icon: Icon(Icons.show_chart,
+                        color: InvestmentTier.mid.color, size: 18),
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ChartScreen(
+                          symbol: project.symbol,
+                          coinGeckoId: project.coinGeckoId.isEmpty
+                              ? null : project.coinGeckoId,
+                          tier: InvestmentTier.mid,
+                          midProject: project,
+                        ),
+                      ),
+                    ),
+                    tooltip: 'Prikaži chart',
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                  const SizedBox(width: 8),
                   Text('${project.daysWatching}d',
                       style: TextStyle(
                           color: Colors.grey[500], fontSize: 12)),
@@ -373,6 +393,25 @@ class _PortfolioScreenState extends State<PortfolioScreen>
                             color: holding.status.color)),
                   ),
                   const Spacer(),
+                  IconButton(
+                    icon: Icon(Icons.show_chart,
+                        color: InvestmentTier.long.color, size: 18),
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => ChartScreen(
+                          symbol: holding.symbol,
+                          coinGeckoId: holding.coinGeckoId.isEmpty
+                              ? null : holding.coinGeckoId,
+                          tier: InvestmentTier.long,
+                          longHolding: holding,
+                        ),
+                      ),
+                    ),
+                    tooltip: 'Prikaži chart',
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                  const SizedBox(width: 8),
                   if (holding.claudeConfidenceScore != null)
                     Text('${holding.claudeConfidenceScore}/10',
                         style: TextStyle(
@@ -545,6 +584,22 @@ class _PortfolioScreenState extends State<PortfolioScreen>
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.w600)),
                 const Spacer(),
+                IconButton(
+                  icon: Icon(Icons.show_chart, color: InvestmentTier.short.color, size: 20),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ChartScreen(
+                        symbol: pos.symbol,
+                        coinGeckoId: pos.coinId,
+                        tier: InvestmentTier.short,
+                        binancePosition: pos,
+                      ),
+                    ),
+                  ),
+                  tooltip: 'Prikaži chart',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
                 TextButton(
                   onPressed: () => _confirmClose(provider, pos),
                   style: TextButton.styleFrom(
@@ -882,6 +937,22 @@ class _PortfolioScreenState extends State<PortfolioScreen>
                           TextStyle(fontSize: 11, color: Colors.grey[500])),
                 ],
                 const Spacer(),
+                IconButton(
+                  icon: Icon(Icons.show_chart, color: InvestmentTier.short.color, size: 16),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ChartScreen(
+                        symbol: pos.tokenSymbol,
+                        tier: InvestmentTier.short,
+                        dexPosition: pos,
+                      ),
+                    ),
+                  ),
+                  tooltip: 'Prikaži chart',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                const SizedBox(width: 8),
                 IconButton(
                   icon: const Icon(Icons.delete_outline,
                       size: 16, color: Color(0xFFEF5350)),

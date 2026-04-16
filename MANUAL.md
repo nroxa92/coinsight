@@ -2,7 +2,7 @@
 
 **Za koga je ovaj priručnik:** netko tko prvi put otvara CoinSight. Ne pretpostavljamo da znaš što je market cap, što je Spot trading, niti kako funkcionira API ključ. Sve se objašnjava u hodu.
 
-**Verzija aplikacije:** 5.0.0
+**Verzija aplikacije:** 6.0.0
 **Licenca:** MIT (open source)
 **Platforma:** Android (primarno) + Windows desktop
 **Datum priručnika:** 2026-04-16
@@ -27,6 +27,8 @@
 3B. [MidProjectDetailScreen (v5.0.0)](#3b-midprojectdetailscreen)
 3C. [LongHoldingDetailScreen (v5.0.0)](#3c-longholdingdetailscreen)
 3D. [DEX Position Tracking (v5.0.0)](#3d-dex-position-tracking)
+3E. [Charts & Visualization (v6.0.0)](#3e-charts--visualization)
+3F. [Push Notifications (v6.0.0)](#3f-push-notifications)
 4. [Prvo pokretanje aplikacije — što ćeš vidjeti](#4-prvo-pokretanje-aplikacije)
 5. [Turneja po aplikaciji — 4 taba + DEX Early](#5-turneja-po-aplikaciji)
 6. [Postavljanje API ključeva — korak po korak](#6-postavljanje-api-ključeva)
@@ -74,6 +76,10 @@ Verzija 3.0.0 dodala je **Intelligence Layer** — sustav koji prati DEX listing
 Verzija 4.0.0 uvodi **Three-Tier Investment Framework** — umjesto jednog pristupa za sve, sada imas tri razlicita investicijska moda: **SHORT** (kratkorocni momentum, do 48h), **MID** (srednjorocni projekti, tjedni do mjeseci) i **LONG** (dugorocna fundamentalna ulaganja, mjeseci do godine). Svaki tier ima vlastite alate, analizu i portfolio prikaz.
 
 Verzija 5.0.0 dodaje **detail screenove** za MID projekte i LONG holdinge, **DEX Position Tracking** za rucno pracenje trade-ova s decentraliziranih burzi, te **MID Discovery** (GitHub trending) i **LONG Research** (filtrirani top 200) pod-tabove u Watchlistu.
+
+Verzija 6.0.0 dodaje **interaktivne tier-aware chartove** (SHORT 10d+24h, MID 6m+30d, LONG 2y+6m), **push notifikacije** (SL/TP/INTERESTING alerte), i znacajno prosiren test suite.
+
+> Ako si potpuni pocetnik u crypto svijetu, pogledaj [NEWBIE_GUIDE.md](NEWBIE_GUIDE.md) za pojednostavljen uvod.
 
 ### 1.3 Što CoinSight NIJE
 
@@ -377,6 +383,62 @@ DEX Position Tracking omogucava **rucno pracenje trade-ova s decentraliziranih b
 | App automatski kupuje/prodaje | Rucni unos trade-ova |
 | SL/TP automatski izvrsava sell | SL/TP samo upozorava (vizualno) |
 | Podaci iz Binance API-ja | Podaci iz Dexscreener-a + rucni unos |
+
+---
+
+## 3E. Charts & Visualization (v6.0.0)
+
+### 3E.1 Sto su chartovi
+
+CoinSight v6.0.0 dodaje **interaktivne price chartove** za svaki coin. Chartovi prikazuju historijske cijene i (opcionalno) AI-generirane predikcije.
+
+### 3E.2 Kako otvoriti chart
+
+Na bilo kojem **CoinCard-u** (Watchlist, DEX Early, Top Coins) tapni ikonu **chart** (ikona trenda). Alternativno, iz **Analysis screena** tapni ikonu charta u AppBaru nakon sto odaberes coin.
+
+### 3E.3 Sto svaki tier prikazuje
+
+| Tier | Duzi period | Kraci period |
+|------|------------|-------------|
+| **SHORT** | 10 dana | 24 sata |
+| **MID** | 6 mjeseci | 30 dana |
+| **LONG** | 2 godine | 6 mjeseci |
+
+Chartovi se automatski prilagodavaju aktivnom tieru. Mozes prebaciti tier kroz TierModeSelector i chart ce se osvjeziti.
+
+### 3E.4 Interakcija
+
+- **Dodir i drzanje** na chartu prikazuje crosshair s tocnom cijenom i datumom
+- **Pomicanje** po chartu mijenja tocku crosshair-a
+- Predikcijska linija (ako postoji) prikazana je isprekidano
+
+### 3E.5 Tocnost predikcije
+
+**Vazno:** AI predikcije su **eksperimentalne** i sluze kao vizualna pomoc, ne kao financijski savjet. Historijska tocnost varira. Nikad ne donosite investicijske odluke iskljucivo na osnovu predikcije.
+
+---
+
+## 3F. Push Notifications (v6.0.0)
+
+### 3F.1 Sto su push notifikacije
+
+CoinSight v6.0.0 integrira `flutter_local_notifications` za slanje lokalnih push obavijesti cak i kad app nije u prvom planu.
+
+### 3F.2 Tipovi notifikacija
+
+| Tip | Opis |
+|-----|------|
+| **SL alert** | Pozicija je dostigla stop-loss razinu — potrebna akcija |
+| **TP alert** | Pozicija je dostigla take-profit razinu — razmotri prodaju |
+| **INTERESTING signal** | Claude je oznacio coin kao INTERESTING — nova prilika |
+
+### 3F.3 Kako konfigurirati
+
+1. Otvori **Manage** tab (ikona tune)
+2. Idi na **Trade** pod-tab
+3. Toggle za svaki tip notifikacije (SL/TP/INTERESTING)
+
+Notifikacije rade lokalno — nema servera, nema cloud messaginga.
 
 ---
 
@@ -1873,7 +1935,7 @@ A: Mjera koliko nezavisnih izvora se slaže oko signala za coin. Score ide od 0 
 A: Koristi Manage → App → Export logs before reset. Za potpuni reset: Manage → App → Full reset. Binance pozicije ostaju na Binanceu neovisno o app-u.
 
 **Q: Koliko testova ima CoinSight?**
-A: Test suite sadrži **243 testova** koji pokrivaju servise, widgete i integracije.
+A: Test suite sadrži **267 testova** koji pokrivaju servise, widgete i integracije.
 
 **Q: Što znači "Timestamp out of sync" greška?**
 A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 automatski sinkronizira putem `/api/v3/time`. Ako se greška ponovi, provjeri da je automatsko vrijeme uključeno na uredjaju.
@@ -1974,7 +2036,7 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 
 **Ako si ovo pročitao sve:** spreman si za prvi dan. Kreni s malim iznosima, bilježi rezultate, i **ne žuri povećavati rizik**. Konzistentnost kroz tjedne pobjeduje naglu agresivnost.
 
-**CoinSight v5.0.0** — Open Source, MIT License
+**CoinSight v6.0.0** — Open Source, MIT License
 **Test suite:** 243 testova
 **Izvorni kod:** javno dostupan
 

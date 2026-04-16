@@ -16,6 +16,7 @@ import 'package:coinsight/screens/settings_screen.dart';
 import 'package:coinsight/screens/portfolio_screen.dart';
 import 'package:coinsight/services/dexscreener_service.dart';
 import 'package:coinsight/models/dex_position.dart';
+import 'package:coinsight/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +25,7 @@ void main() async {
   } catch (e) {
     debugPrint('Storage init failed: $e');
   }
+  await NotificationService.init();
   runApp(const CoinSightApp());
 }
 
@@ -103,21 +105,28 @@ class _MainNavigationState extends State<MainNavigation> {
     for (final pos in positions) {
       try {
         final price = await _dexService.getPriceByContract(
-          pos.contractAddress,
-          pos.chainId,
-        );
+            pos.contractAddress, pos.chainId);
         if (price == null) continue;
 
-        var updated = pos.copyWith(currentPrice: price);
-
-        // Check SL/TP
-        if (updated.isStopLossHit) {
-          updated = updated.copyWith(status: DexPositionStatus.closedSL);
-        } else if (updated.isTakeProfitHit) {
-          updated = updated.copyWith(status: DexPositionStatus.closedTP);
-        }
-
+        final updated = pos.copyWith(currentPrice: price);
         await StorageService.saveDexPosition(updated);
+
+        // SL alert
+        if (updated.isStopLossHit) {
+          await NotificationService.showStopLossAlert(
+            symbol: pos.tokenSymbol,
+            price: price,
+            pnlPercent: updated.pnlPercent,
+          );
+        }
+        // TP alert
+        if (updated.isTakeProfitHit) {
+          await NotificationService.showTakeProfitAlert(
+            symbol: pos.tokenSymbol,
+            price: price,
+            pnlPercent: updated.pnlPercent,
+          );
+        }
       } catch (_) {
         continue;
       }
