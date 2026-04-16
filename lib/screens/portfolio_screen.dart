@@ -11,11 +11,15 @@ import 'package:coinsight/models/tier_provider.dart';
 import 'package:coinsight/models/mid_term_project.dart';
 import 'package:coinsight/models/long_term_holding.dart';
 import 'package:coinsight/models/dex_position.dart';
+import 'package:coinsight/models/closed_trade.dart';
+import 'package:coinsight/models/pnl_analytics.dart';
 import 'package:coinsight/services/storage_service.dart';
 import 'package:coinsight/screens/dex_position_screen.dart';
 import 'package:coinsight/screens/mid_project_detail_screen.dart';
 import 'package:coinsight/screens/long_holding_detail_screen.dart';
 import 'package:coinsight/screens/chart_screen.dart';
+import 'package:coinsight/widgets/wallet_connect_button.dart';
+import 'package:coinsight/screens/pnl_dashboard_screen.dart';
 
 class PortfolioScreen extends StatefulWidget {
   const PortfolioScreen({super.key});
@@ -81,6 +85,7 @@ class _PortfolioScreenState extends State<PortfolioScreen>
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              _buildDashboardBanner(),
               _buildHeader(provider),
               const SizedBox(height: 16),
               _buildIntelligenceSection(),
@@ -115,6 +120,7 @@ class _PortfolioScreenState extends State<PortfolioScreen>
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              _buildDashboardBanner(),
               // Summary card
               Card(
                 child: Padding(
@@ -286,6 +292,7 @@ class _PortfolioScreenState extends State<PortfolioScreen>
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              _buildDashboardBanner(),
               // Summary card
               Card(
                 child: Padding(
@@ -513,6 +520,8 @@ class _PortfolioScreenState extends State<PortfolioScreen>
               Text(p.error!,
                   style: const TextStyle(color: Color(0xFFEF5350), fontSize: 12)),
             ],
+            const SizedBox(height: 8),
+            const WalletConnectButton(),
           ],
         ),
       ),
@@ -954,9 +963,9 @@ class _PortfolioScreenState extends State<PortfolioScreen>
                 ),
                 const SizedBox(width: 8),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline,
+                  icon: const Icon(Icons.close,
                       size: 16, color: Color(0xFFEF5350)),
-                  onPressed: () => _confirmDeleteDexPosition(pos),
+                  onPressed: () => _confirmCloseDexPosition(pos),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -1002,31 +1011,101 @@ class _PortfolioScreenState extends State<PortfolioScreen>
     );
   }
 
-  void _confirmDeleteDexPosition(DexPosition pos) {
-    showDialog(
+  Future<void> _closeDexPosition(DexPosition pos, {
+    required double exitPrice,
+    required DexPositionStatus closeReason,
+  }) async {
+    // Odredi result
+    final pnl = (exitPrice * pos.quantity) - pos.entryAmountUsdt;
+    ClosedTradeResult result;
+    if (pnl > 0.01) {
+      result = ClosedTradeResult.profit;
+    } else if (pnl < -0.01) {
+      result = ClosedTradeResult.loss;
+    } else {
+      result = ClosedTradeResult.breakeven;
+    }
+
+    // Spremi u closed_trades
+    final closed = ClosedTrade.fromDexPosition(
+      pos, exitPrice, result);
+    await StorageService.saveClosedTrade(closed);
+
+    // Azuriraj DEX poziciju na closed status
+    final updated = pos.copyWith(
+      currentPrice: exitPrice,
+      status: closeReason,
+    );
+    await StorageService.saveDexPosition(updated);
+
+    if (!mounted) return;
+    setState(() {});
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '${pos.tokenSymbol} zatvoren | '
+          '${pnl >= 0 ? "+" : ""}\$${pnl.toStringAsFixed(2)} USDT',
+        ),
+        backgroundColor: pnl >= 0 ? Colors.green : const Color(0xFFEF5350),
+      ),
+    );
+  }
+
+  Future<void> _confirmCloseDexPosition(DexPosition pos) async {
+    final exitPriceController = TextEditingController(
+      text: (pos.currentPrice ?? pos.entryPrice).toStringAsFixed(8),
+    );
+
+    final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF252525),
-        title: const Text('Obriši DEX poziciju?'),
-        content: Text('${pos.tokenSymbol} na ${pos.chainId}'),
+        title: Text('Zatvori ${pos.tokenSymbol}?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Entry: \$${pos.entryPrice.toStringAsFixed(8)}\n'
+              'P&L: ${pos.pnlAbsolute >= 0 ? "+" : ""}'
+              '\$${pos.pnlAbsolute.toStringAsFixed(2)}',
+              style: TextStyle(color: Colors.grey[400], fontSize: 12),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: exitPriceController,
+              keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true),
+              decoration: const InputDecoration(
+                labelText: 'Izlazna cijena (\$)',
+                isDense: true,
+              ),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Odustani'),
           ),
-          TextButton(
-            onPressed: () async {
-              await StorageService.deleteDexPosition(pos.id);
-              if (!ctx.mounted) return;
-              Navigator.of(ctx).pop();
-              if (!mounted) return;
-              setState(() {});
-            },
-            child: const Text('Obriši',
-                style: TextStyle(color: Color(0xFFEF5350))),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Zatvori'),
           ),
         ],
       ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    final exitPrice = double.tryParse(exitPriceController.text) ??
+        (pos.currentPrice ?? pos.entryPrice);
+
+    await _closeDexPosition(
+      pos,
+      exitPrice: exitPrice,
+      closeReason: DexPositionStatus.closedManual,
     );
   }
 
@@ -1061,6 +1140,48 @@ class _PortfolioScreenState extends State<PortfolioScreen>
       ),
     );
   }
+
+  Widget _buildDashboardBanner() => GestureDetector(
+    onTap: () => Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (_) => const PnlDashboardScreen()),
+    ),
+    child: Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF6C63FF).withValues(alpha: 0.15),
+            const Color(0xFF03DAC6).withValues(alpha: 0.15),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.analytics_outlined, size: 18),
+          const SizedBox(width: 10),
+          const Text('P&L Dashboard',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+          const Spacer(),
+          Builder(
+            builder: (_) {
+              final analytics = PnlAnalyticsBuilder.build();
+              final pnl = analytics.totalRealizedPnl;
+              return Text(
+                '${pnl >= 0 ? "+" : ""}\$${pnl.toStringAsFixed(2)}',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              );
+            },
+          ),
+          const SizedBox(width: 6),
+          const Icon(Icons.chevron_right, size: 16),
+        ],
+      ),
+    ),
+  );
 
   Widget _buildLogRow(AnalysisLog log) {
     final chipColor = switch (log.recommendationType) {

@@ -16,7 +16,9 @@ import 'package:coinsight/screens/settings_screen.dart';
 import 'package:coinsight/screens/portfolio_screen.dart';
 import 'package:coinsight/services/dexscreener_service.dart';
 import 'package:coinsight/models/dex_position.dart';
+import 'package:coinsight/models/closed_trade.dart';
 import 'package:coinsight/services/notification_service.dart';
+import 'package:coinsight/services/wallet_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +42,7 @@ class CoinSightApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AnalysisProvider()),
         ChangeNotifierProvider(create: (_) => PortfolioProvider()),
         ChangeNotifierProvider(create: (_) => TierProvider()),
+        ChangeNotifierProvider(create: (_) => WalletService()),
       ],
       child: MaterialApp(
         title: 'CoinSight',
@@ -77,6 +80,12 @@ class _MainNavigationState extends State<MainNavigation> {
     // Start Intelligence Monitoring (Telegram + DEX + GitHub + Reddit)
     context.read<AnalysisProvider>().startIntelligenceMonitoring();
 
+    // Initialize WalletConnect if Project ID is configured
+    final wcProjectId = StorageService.getWalletConnectProjectId();
+    if (wcProjectId != null && wcProjectId.isNotEmpty) {
+      context.read<WalletService>().initialize();
+    }
+
     // Start stop-loss checker if Binance is configured
     _stopLossTimer?.cancel();
     if (BinanceService().hasCredentials) {
@@ -111,16 +120,35 @@ class _MainNavigationState extends State<MainNavigation> {
         final updated = pos.copyWith(currentPrice: price);
         await StorageService.saveDexPosition(updated);
 
-        // SL alert
+        // SL hit
         if (updated.isStopLossHit) {
+          // Spremi u history
+          final pnl = (price * pos.quantity) - pos.entryAmountUsdt;
+          await StorageService.saveClosedTrade(
+            ClosedTrade.fromDexPosition(
+              updated, price,
+              pnl >= 0 ? ClosedTradeResult.profit : ClosedTradeResult.loss,
+            ),
+          );
+          // Oznaci kao SL closed
+          await StorageService.saveDexPosition(
+            updated.copyWith(status: DexPositionStatus.closedSL));
+          // Notifikacija
           await NotificationService.showStopLossAlert(
             symbol: pos.tokenSymbol,
             price: price,
             pnlPercent: updated.pnlPercent,
           );
         }
-        // TP alert
-        if (updated.isTakeProfitHit) {
+        // TP hit
+        else if (updated.isTakeProfitHit) {
+          await StorageService.saveClosedTrade(
+            ClosedTrade.fromDexPosition(
+              updated, price, ClosedTradeResult.profit,
+            ),
+          );
+          await StorageService.saveDexPosition(
+            updated.copyWith(status: DexPositionStatus.closedTP));
           await NotificationService.showTakeProfitAlert(
             symbol: pos.tokenSymbol,
             price: price,
@@ -130,9 +158,6 @@ class _MainNavigationState extends State<MainNavigation> {
       } catch (_) {
         continue;
       }
-
-      // Rate limit courtesy
-      await Future.delayed(const Duration(milliseconds: 300));
     }
   }
 

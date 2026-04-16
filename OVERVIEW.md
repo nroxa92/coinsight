@@ -1,8 +1,8 @@
 # CoinSight — Sveobuhvatni Projektni Dokument
 
-**Verzija:** 6.0.0
+**Verzija:** 7.0.0
 **Datum generiranja:** 2026-04-16
-**Status projekta:** v6.0.0 release — 267 testova, 9 sesija, Three-Tier Investment Framework (SHORT/MID/LONG) + Intelligence Layer + Detail Screens + DEX Position Tracking + Charts & Visualization + Push Notifications
+**Status projekta:** v7.0.0 release — 291+ testova, 10 sesija, Three-Tier Investment Framework (SHORT/MID/LONG) + Intelligence Layer + Detail Screens + DEX Position Tracking + Charts & Visualization + Push Notifications + P&L Dashboard + WalletConnect v2
 **Autor:** Neven (developer) + Claude Code (implementacija)
 **Licenca:** MIT (Copyright (c) 2026 Neven Roksandic)
 
@@ -80,10 +80,12 @@ lib/
 ├── main.dart                                  # Entry point, MultiProvider, 4-tab navigation, background timers + intelligence
 ├── theme/
 │   └── app_theme.dart                         # Dark tema (primary #6C63FF, secondary #03DAC6, surface #1E1E1E)
-├── models/ (15 fajlova)
+├── models/ (17 fajlova)
 │   ├── coin.dart                              # Coin data model (12 polja + sparkline + 1h change)
 │   ├── analysis_log.dart                      # AnalysisLog + parseRecommendationType()
 │   ├── coin_position.dart                     # Binance spot pozicija + P&L getteri
+│   ├── closed_trade.dart                      # Zatvoreni trade model (entry/exit price, P&L, tier, razlog) [v7.0.0]
+│   ├── pnl_analytics.dart                     # P&L analitika (win rate, R/R ratio, equity curve, tier breakdown) [v7.0.0]
 │   ├── dex_position.dart                      # DEX pozicija model (token, entry, qty, DEX, chain, SL/TP) [v5.0.0]
 │   ├── risk_parameters.dart                   # Risk config (max trade, SL/TP, quiet hours, auto-trade)
 │   ├── trade_proposal.dart                    # Pending trade prije korisnikove potvrde (60s expiry)
@@ -102,7 +104,7 @@ lib/
 │   ├── watchlist_provider.dart                # ChangeNotifier: topCoins + watchlist + newListings + dexListings + timer
 │   ├── analysis_provider.dart                 # ChangeNotifier: Claude chat + system prompt + intelligence + auto-log
 │   └── portfolio_provider.dart                # ChangeNotifier: USDT balance + positions + 30s price refresh
-├── services/ (10 fajlova)
+├── services/ (11 fajlova)
 │   ├── coingecko_service.dart                 # CoinGecko REST (getMarketData, searchAndFetch, getNewListings, searchBySymbol)
 │   ├── claude_service.dart                    # Anthropic Messages API klijent
 │   ├── storage_service.dart                   # Hive wrapper za 5 box-ova
@@ -114,8 +116,9 @@ lib/
 │   ├── reddit_monitor.dart                    # Reddit JSON API — 5 subreddita, sentiment [v3.0.0]
 │   ├── intelligence_aggregator.dart           # Multi-source koordinator + confluence scoring [v3.0.0]
 │   ├── chart_data_service.dart                # CoinGecko historical data fetch + predikcija [v6.0.0]
-│   └── notification_service.dart              # Push notifikacije: SL/TP/INTERESTING alerte [v6.0.0]
-├── screens/ (9 fajlova)
+│   ├── notification_service.dart              # Push notifikacije: SL/TP/INTERESTING alerte [v6.0.0]
+│   └── wallet_service.dart                    # WalletConnect v2 integracija (connect, address, swap) [v7.0.0]
+├── screens/ (10 fajlova)
 │   ├── watchlist_screen.dart                  # Tab 0: DEX Early / New Listings / My Watchlist / MID Discovery / LONG Research / Projekti / Top Coins
 │   ├── analysis_screen.dart                   # Tab 1: Claude chat + tier-specific Action Bar (SHORT/MID/LONG)
 │   ├── portfolio_screen.dart                  # Tab 2: USDT balance + positions + DEX positions + MID projects + LONG holdings + Intelligence Dashboard
@@ -124,14 +127,16 @@ lib/
 │   ├── mid_project_detail_screen.dart         # MID projekt detail: thesis, GitHub, entry plan, status, biljeske [v5.0.0]
 │   ├── long_holding_detail_screen.dart        # LONG holding detail: 4 taba (Osnove/Fundamentali/DCA/Biljeske) [v5.0.0]
 │   ├── dex_position_screen.dart               # DEX pozicije: rucni unos, auto price refresh, SL/TP monitoring [v5.0.0]
-│   └── chart_screen.dart                     # Full-screen tier-aware price chart s predikcijom [v6.0.0]
-└── widgets/ (12 fajlova)
+│   ├── chart_screen.dart                      # Full-screen tier-aware price chart s predikcijom [v6.0.0]
+│   └── pnl_dashboard_screen.dart              # P&L dashboard: equity curve, win rate, R/R, tier breakdown [v7.0.0]
+└── widgets/ (13 fajlova)
     ├── coin_card.dart                         # CoinCard (s 1h badge) + CoinCardSkeleton (shimmer)
     ├── chat_bubble.dart                       # Selectable user/assistant chat mjehur
     ├── sparkline_chart.dart                   # 7-day price sparkline, CustomPainter
     ├── dex_signal_card.dart                   # DexSignalCard — DEX pair kartica s chain/dex badge [v3.0.0]
     ├── tier_mode_selector.dart                # TierModeSelector — banner s SHORT/MID/LONG buttonima [v4.0.0]
     ├── price_chart_widget.dart                # Interaktivni price chart (CustomPainter, touch crosshair) [v6.0.0]
+    ├── wallet_connect_button.dart              # WalletConnect spajanje UI widget [v7.0.0]
     └── settings/
         ├── api_settings_tab.dart              # Anthropic + Binance API kljucevi
         ├── bot_settings_tab.dart              # Telegram Monitor konfiguracija
@@ -140,7 +145,7 @@ lib/
         └── app_settings_tab.dart              # About + App Controls (clear/export/reset)
 ```
 
-**Ukupno:** 50 Dart fajl u lib/ (+5 fajlova od v5.0.0: price_chart_data, chart_data_service, notification_service, price_chart_widget, chart_screen).
+**Ukupno:** 55 Dart fajl u lib/ (+5 fajlova od v6.0.0: closed_trade, pnl_analytics, pnl_dashboard_screen, wallet_service, wallet_connect_button).
 
 ### 2.3 Dependency graph
 
@@ -216,7 +221,7 @@ Cetiri `ChangeNotifier` providera registrirana u `main.dart` `MultiProvider`:
 
 ### 2.5 Hive box-ovi
 
-8 box-ova otvorenih u `StorageService.init()`:
+9 box-ova otvorenih u `StorageService.init()`:
 
 | Box | Sadrzaj | Keyevi |
 |-----|---------|--------|
@@ -228,6 +233,7 @@ Cetiri `ChangeNotifier` providera registrirana u `main.dart` `MultiProvider`:
 | `mid_term_projects` | MidTermProject zapisi (coin, catalyst, target, deadline, status) [v4.0.0] | projectId (UUID) |
 | `long_term_holdings` | LongTermHolding zapisi (coin, DCA purchases, thesis, fundamentals) [v4.0.0] | holdingId (UUID) |
 | `dex_positions` | DexPosition zapisi (token, entry, qty, DEX, chain, SL/TP) [v5.0.0] | positionId (UUID) |
+| `closed_trades` | ClosedTrade zapisi (entry/exit price, P&L, tier, razlog zatvaranja) [v7.0.0] | tradeId (UUID) |
 
 **Napomena (v3.0.0):** Intelligence podaci (DexscreenerSignal, GitHubSignal, RedditSignal, IntelligenceReport) su **in-memory only** — nema novih Hive box-ova. Svjestan izbor: intelligence podaci su kratkotrajni i brzo zastarjevaju, persistencija bi stvorila stale data problem.
 
@@ -1038,7 +1044,53 @@ Kontekst: Session 8 zavrsila s v5.0.0 Detail Screens + DEX Position Tracking. Se
 
 ---
 
-## 9. Trenutno stanje (snapshot 2026-04-16, v6.0.0)
+## 8D. Session 10 (2026-04-16) — v7.0.0 P&L Dashboard + WalletConnect v2
+
+Kontekst: Session 9 zavrsila s v6.0.0 Charts & Visualization + Push Notifications. Session 10 dodaje **P&L Dashboard** s equity curve-om, win rate-om, R/R ratiom i per-tier breakdownom, **WalletConnect v2** za spajanje eksternog walleta, i **Trade History** za kompletnu evidenciju zatvorenih trade-ova. 10 faza, 5 novih fajlova, 24+ novih testova.
+
+### 8D.1 Faze 1–3 — ClosedTrade model + PnlAnalytics
+
+**Novi model** `lib/models/closed_trade.dart` — ClosedTrade za zatvorene trade-ove: tradeId, coinId, coinSymbol, tier (SHORT/MID/LONG), entryPrice, exitPrice, quantity, pnlAbsolute, pnlPercent, closeReason (SL/TP/MANUAL), openedAt, closedAt. toMap/fromMap za Hive.
+
+**Novi model** `lib/models/pnl_analytics.dart` — PnlAnalytics za racunanje P&L metrika: winRate (postotak profitabilnih trade-ova), avgWin/avgLoss (prosjecni profit/gubitak), rrRatio (risk/reward omjer), equityCurvePoints (kumulativni P&L kroz vrijeme), perTierStats (Map<InvestmentTier, TierStats>). Factory metoda `fromClosedTrades()` za kalkulaciju iz liste zatvorenih trade-ova.
+
+### 8D.2 Faze 4–5 — PnlDashboardScreen
+
+**Novi screen** `lib/screens/pnl_dashboard_screen.dart` — full-screen P&L dashboard s:
+- **Equity curve** — CustomPainter graf kumulativnog P&L-a kroz vrijeme
+- **Summary kartice** — ukupni P&L, win rate, R/R ratio, broj trade-ova
+- **Per-tier breakdown** — odvojene statistike za SHORT, MID, LONG
+- **Trade history lista** — kronoloski popis svih zatvorenih trade-ova s detaljima
+
+Pristup iz Portfolio taba putem P&L bannera.
+
+### 8D.3 Faze 6–7 — WalletConnect v2 integracija
+
+**Novi service** `lib/services/wallet_service.dart` — WalletService: WalletConnect v2 protokol integracija, `connect()` za spajanje walleta (QR kod/deep link), `disconnect()`, `getAddress()`, `initiateSwap()` za pokretanje token swapova. Zahtijeva Project ID s cloud.reown.com.
+
+**Novi widget** `lib/widgets/wallet_connect_button.dart` — WalletConnectButton: UI widget za prikaz konekcijskog statusa, spojene adrese (truncirane), i connect/disconnect akcija. Integriran u Portfolio i Analysis tabove.
+
+### 8D.4 Faze 8–9 — Trade History + integracija
+
+- TradeService prosiren: closePosition() sada kreira ClosedTrade zapis u Hive `closed_trades` box-u
+- Portfolio tab: P&L banner s sazetkom za navigaciju na PnlDashboardScreen
+- StorageService prosiren s novim box-om `closed_trades` (9. Hive box) i CRUD metodama za ClosedTrade
+- Rucno zatvaranje pozicija sada trazi exit price za precizno P&L racunanje
+
+### 8D.5 Faza 10 — Testovi i finalizacija
+
+**24+ novih testova** za ClosedTrade model, PnlAnalytics (win rate, R/R, equity curve, per-tier), PnlDashboardScreen, WalletService, i WalletConnectButton.
+
+**Session 10 verifikacija:**
+
+- `flutter test` — **291+/291+ passed** (+24 od v6.0.0)
+- `flutter analyze` — 0 issues
+
+**Session 10 rezultat:** CoinSight prosiren s P&L Dashboard-om za centralizirani pregled performansi (equity curve, win rate, R/R ratio, per-tier breakdown), WalletConnect v2 za spajanje eksternih walleta i iniciranje swapova, te Trade History za kompletnu evidenciju zatvorenih trade-ova.
+
+---
+
+## 9. Trenutno stanje (snapshot 2026-04-16, v7.0.0)
 
 ### 9.1 Funkcionalnosti koje rade (kod-level)
 
@@ -1054,7 +1106,7 @@ Kontekst: Session 8 zavrsila s v5.0.0 Detail Screens + DEX Position Tracking. Se
 - MID Discovery pod-tab — live GitHub trending kripto projekte [v5.0.0]
 - LONG Research pod-tab — filtrirani top 200 coinova [v5.0.0]
 - Tiers settings tab u Manage screenu (5 tabova ukupno)
-- Tri Hive box-a: mid_term_projects, long_term_holdings, dex_positions
+- Cetiri Hive box-a: mid_term_projects, long_term_holdings, dex_positions, closed_trades
 
 **Charts & Visualization (v6.0.0):**
 - ChartDataService — tier-aware historical data fetch iz CoinGecko (SHORT 10d+24h, MID 6m+30d, LONG 2y+6m)
@@ -1068,6 +1120,19 @@ Kontekst: Session 8 zavrsila s v5.0.0 Detail Screens + DEX Position Tracking. Se
 - SL/TP alerte — push kad pozicija dostigne stop-loss ili take-profit
 - INTERESTING signal push — notifikacija za nove INTERESTING preporuke
 - Android notification channels za kategorizaciju
+
+**P&L Dashboard (v7.0.0):**
+- PnlDashboardScreen — full-screen dashboard s equity curve, win rate, R/R ratio, per-tier breakdown
+- ClosedTrade model — zatvoreni trade s entry/exit price, P&L, tier, razlog zatvaranja
+- PnlAnalytics model — racunanje metrika: winRate, avgWin/avgLoss, rrRatio, equityCurvePoints, perTierStats
+- Trade History — kronoloski popis svih zatvorenih trade-ova
+- P&L banner u Portfolio tabu za brzi pristup dashboardu
+
+**WalletConnect v2 (v7.0.0):**
+- WalletService — WalletConnect v2 protokol integracija (connect, disconnect, getAddress, initiateSwap)
+- WalletConnectButton widget — UI za wallet konekciju s adresa prikazom
+- Project ID konfiguracija putem cloud.reown.com
+- Integracija u Portfolio i Analysis tabove
 
 **Detail Screens (v5.0.0):**
 - MidProjectDetailScreen — thesis, GitHub link, entry plan, status management, biljeske
@@ -1165,7 +1230,7 @@ Kontekst: Session 8 zavrsila s v5.0.0 Detail Screens + DEX Position Tracking. Se
 
 ```
 flutter analyze      → 0 issues
-flutter test         → 267/267 passed
+flutter test         → 291+/291+ passed
 flutter build apk    → OK (debug)
 flutter build windows → OK (Session 1)
 ```
@@ -1174,7 +1239,7 @@ flutter build windows → OK (Session 1)
 
 - Remote: `origin/main` (javni GitHub repo)
 - Licenca: MIT
-- Verzija: 6.0.0+7
+- Verzija: 7.0.0+8
 
 ### Verzijska historija
 
@@ -1187,18 +1252,19 @@ flutter build windows → OK (Session 1)
 | v4.0.0 | 2026-04-16 | Session 7: Three-Tier Investment Framework (SHORT/MID/LONG) + 232 testova |
 | v5.0.0 | 2026-04-16 | Session 8: Detail Screens + DEX Position Tracking + MID Discovery/LONG Research + 243 testova |
 | v6.0.0 | 2026-04-16 | Session 9: Charts & Visualization + Push Notifications + 267 testova |
+| v7.0.0 | 2026-04-16 | Session 10: P&L Dashboard + WalletConnect v2 + Trade History + 291+ testova |
 
 ### 9.5 Test Coverage Breakdown
 
 | Kategorija | Fajlova | Testova | Pokriva |
 |-----------|---------|---------|---------|
-| Unit/Models | 18 | 152 | coin, coin_position, **dex_position**, risk_parameters, analysis_log, trade_proposal, trade_result, telegram_signal, monitored_channel, dexscreener_signal, github_signal, reddit_signal, intelligence_report, investment_tier, mid_term_project, long_term_holding, tier_provider, **price_chart_data** |
-| Unit/Services | 10 | 80 | coingecko, claude, binance (+LOT_SIZE +timeSync), trade, telegram_monitor, dexscreener, github_intelligence, reddit_monitor, **chart_data_service**, **notification_service** |
-| Widget | 4 | 15 | coin_card, chat_bubble, sparkline_chart, **price_chart_widget** |
+| Unit/Models | 20 | 168 | coin, coin_position, **closed_trade**, **pnl_analytics**, **dex_position**, risk_parameters, analysis_log, trade_proposal, trade_result, telegram_signal, monitored_channel, dexscreener_signal, github_signal, reddit_signal, intelligence_report, investment_tier, mid_term_project, long_term_holding, tier_provider, **price_chart_data** |
+| Unit/Services | 11 | 86 | coingecko, claude, binance (+LOT_SIZE +timeSync), trade, telegram_monitor, dexscreener, github_intelligence, reddit_monitor, **chart_data_service**, **notification_service**, **wallet_service** |
+| Widget | 5 | 18 | coin_card, chat_bubble, sparkline_chart, **price_chart_widget**, **wallet_connect_button** |
 | Integration | 1 | 4 | app navigation (4 tabs, sections) |
-| Screen | 2 | 7 | dex_position_screen, detail_screens, **chart_screen** |
+| Screen | 3 | 10 | dex_position_screen, detail_screens, **chart_screen**, **pnl_dashboard_screen** |
 | Legacy | 1 | 9 | widget_test navigation + tab switching |
-| **UKUPNO** | **36** | **267** | |
+| **UKUPNO** | **41** | **291+** | |
 
 ### 9.6 Identified Issues
 
@@ -1215,6 +1281,8 @@ flutter build windows → OK (Session 1)
 11. ~~**Push notifications za DEX SL/TP**~~ — **ADDRESSED u Session 9** — flutter_local_notifications integriran za SL/TP/INTERESTING alerte kroz NotificationService.
 12. **CoinGecko historical data limiti** — besplatni API tier ima ogranicen raspon historijskih podataka. LONG tier (2y) moze dobiti nepotpune podatke za manje poznate coinove. Graceful degradation implementiran.
 13. **Prediction accuracy** — AI predikcije na chartovima su eksperimentalne. Nema backtesting validacije. Disclaimer prikazan u UI-ju, ali korisnik moze precjenjivati tocnost.
+14. **WalletConnect session persistence** — WalletConnect sesija se gubi kad se app potpuno zatvori. Reconnect je automatski ali moze potrajati 2-3 sekunde pri ponovnom otvaranju.
+15. **P&L Dashboard historijski podaci** — Dashboard prikazuje samo trade-ove od v7.0.0 nadalje. Stariji trade-ovi (zatvoreni prije v7.0.0) nemaju ClosedTrade zapis i nece se pojaviti u equity curve-u.
 
 ---
 
@@ -1249,6 +1317,7 @@ flutter build windows → OK (Session 1)
 | `crypto` | ^3.0.3 | HMAC-SHA256 | BinanceService._sign() |
 | `convert` | ^3.1.1 | UTF-8/hex encoding | BinanceService._sign() |
 | `html` | ^0.15.4 | HTML entity decoding | RedditMonitor (v3.0.0) |
+| `walletconnect_flutter_v2` | ^2.x | WalletConnect v2 protokol | WalletService (v7.0.0) |
 
 ### 11.2 Dev dependencies
 
@@ -1308,10 +1377,10 @@ flutter build windows → OK (Session 1)
 6. **Telegram bot setup** (BotFather -> dodaj u kanale -> konfig token u Manage -> Bot)
 7. **Git commit** rezultata testiranja
 
-### 13.2 Session 9 kandidati
+### 13.2 Session 11 kandidati
 
-- **Local notifications integracija** — push za INTERESTING signale, high-score intelligence alerts, i DEX SL/TP upozorenja dok app nije otvoren
-- **DEX auto-sell integracija** — wallet signing za automatsko izvrsavanje SL/TP na DEX-ovima (zahtijeva WalletConnect ili slicno)
+- ~~**Local notifications integracija**~~ — **IMPLEMENTED u v6.0.0**
+- **DEX auto-sell integracija** — wallet signing za automatsko izvrsavanje SL/TP na DEX-ovima (WalletConnect v2 integriran u v7.0.0, ali auto-sell zahtijeva dodatnu implementaciju)
 - **Order History screen** — vec postoji `getOrderHistory` metoda, fali UI
 - **Analysis Logs screen** — detaljniji view od Portfolio history sekcije, s filter-ima
 - **Kalibracija Claude prompta** na osnovu CHATLOG ishoda — iterativno pojacati precision
@@ -1448,19 +1517,59 @@ ChartScreen (full-screen, tier label, disclaimer)
 
 Chart data flow je **jednosmjeran**: CoinGecko -> ChartDataService -> PriceChartData -> PriceChartWidget. Svaki tier definira vlastiti raspon podataka. Predikcija se racuna unutar ChartDataService i prikazuje kao isprekidana linija na chartu.
 
+### 14.9 P&L Analytics Architecture (v7.0.0)
+
+```
+closePosition() (TradeService)
+        │
+        ▼
+ClosedTrade (Hive: closed_trades box)
+        │
+        ▼
+PnlAnalytics.fromClosedTrades()
+(racuna: winRate, avgWin, avgLoss, rrRatio, equityCurvePoints, perTierStats)
+        │
+        ▼
+PnlDashboardScreen
+(equity curve CustomPainter, summary kartice, per-tier breakdown, trade history lista)
+```
+
+P&L flow: kad se pozicija zatvori (SL/TP/manual), TradeService kreira ClosedTrade zapis u Hive. PnlDashboardScreen ucitava sve ClosedTrade zapise i racuna analitiku kroz PnlAnalytics factory metodu.
+
+### 14.10 WalletConnect Architecture (v7.0.0)
+
+```
+cloud.reown.com (Project ID)
+        │
+        ▼
+WalletService (WalletConnect v2 protokol)
+├── connect() → QR kod / deep link → wallet approval
+├── disconnect()
+├── getAddress() → wallet adresa
+└── initiateSwap() → swap request → wallet potvrda
+        │
+        ▼
+WalletConnectButton (UI widget)
+(prikaz statusa, adrese, connect/disconnect akcija)
+```
+
+WalletConnect flow je **bidirekcijski**: CoinSight salje zahtjev (connect/swap), wallet korisnik odobrava/odbija. Privatni kljucevi NIKAD ne napustaju wallet — WalletConnect je relay-based protokol.
+
 ---
 
 ## 15. Rezime
 
-CoinSight je u **9 sesija** narastao od praznog Flutter scaffolda do **multi-strategy intelligence-driven investment platforme** s AI analizom kao core logikom odlucivanja, 5 nezavisnih intelligence izvora agregirani kroz kvantitativni confluence scoring sustav, Three-Tier Investment Framework-om za tri razlicita investicijska horizonta, i detail screenovima za upravljanje projektima i holdingima. Arhitektura je **strict MVVM + provider pattern** s jasnom separacijom services / models / screens / widgets. Sigurnost kljuceva je konzervativna: sve lokalno u Hive, nikad u source, `.gitignore` zastita.
+CoinSight je u **10 sesija** narastao od praznog Flutter scaffolda do **multi-strategy intelligence-driven investment platforme** s AI analizom kao core logikom odlucivanja, 5 nezavisnih intelligence izvora agregirani kroz kvantitativni confluence scoring sustav, Three-Tier Investment Framework-om za tri razlicita investicijska horizonta, i detail screenovima za upravljanje projektima i holdingima. Arhitektura je **strict MVVM + provider pattern** s jasnom separacijom services / models / screens / widgets. Sigurnost kljuceva je konzervativna: sve lokalno u Hive, nikad u source, `.gitignore` zastita.
 
-**v6.0.0 milestone:**
-- **50 lib/ fajl** rasporeden u 6 direktorija (+5 fajlova od v5.0.0)
-- **267 testova** (unit models, unit services, widget, screen, integration) s mocktail
-- **8 Hive box-ova** za persistenciju (+dex_positions od v4.0.0)
-- **7 eksternih API-ja** integrirano (CoinGecko, Anthropic, Binance, Telegram, Dexscreener, GitHub, Reddit)
+**v7.0.0 milestone:**
+- **55 lib/ fajl** rasporeden u 6 direktorija (+5 fajlova od v6.0.0)
+- **291+ testova** (unit models, unit services, widget, screen, integration) s mocktail
+- **9 Hive box-ova** za persistenciju (+closed_trades od v7.0.0)
+- **8 eksternih API-ja** integrirano (CoinGecko, Anthropic, Binance, Telegram, Dexscreener, GitHub, Reddit, WalletConnect)
 - **5-source intelligence agregacija** s confluence scoring (0–6.0)
 - **Three-Tier Investment Framework** (SHORT/MID/LONG) s tier-specific modelima, UI komponentama, i Claude prompt prilagodama
+- **P&L Dashboard** s equity curve, win rate, R/R ratio, per-tier breakdown i trade history
+- **WalletConnect v2** za spajanje eksternih walleta i pokretanje swapova
 - **Interaktivni tier-aware chartovi** (SHORT 10d+24h, MID 6m+30d, LONG 2y+6m) s AI predikcijskim overlayem
 - **Push notifikacije** za SL/TP alerte i INTERESTING signale kroz NotificationService
 - **Detail screenovi** za MID projekte (MidProjectDetailScreen) i LONG holdinge (LongHoldingDetailScreen)
@@ -1471,10 +1580,10 @@ CoinSight je u **9 sesija** narastao od praznog Flutter scaffolda do **multi-str
 
 Trenutni blocker je **vanjski** (Binance account recovery), kod je verificiran `flutter analyze`/`test` na 0/clean. Kad developer dobije API kljuc, prvi live trade pokrece se iz Manage -> API u 2 minute.
 
-Projekt ima **solidan temelj za Session 9+** — svaka nova funkcionalnost sjeda u jasno definiran sloj (novi service / novi model / novi screen + provider extension), i postojeci pattern-i (skeleton loading, error bar, confirm dialog, status badge header, gated timers, reliability scoring, intelligence aggregation, tier-aware UI) su reusable za nove module.
+Projekt ima **solidan temelj za Session 11+** — svaka nova funkcionalnost sjeda u jasno definiran sloj (novi service / novi model / novi screen + provider extension), i postojeci pattern-i (skeleton loading, error bar, confirm dialog, status badge header, gated timers, reliability scoring, intelligence aggregation, tier-aware UI) su reusable za nove module.
 
 ---
 
 **Generirano:** 2026-04-16
-**Verzija:** 6.0.0
-**Pokriva sesije:** 1, 2, 3, 4, 5, 6, 7, 8, 9
+**Verzija:** 7.0.0
+**Pokriva sesije:** 1, 2, 3, 4, 5, 6, 7, 8, 9, 10

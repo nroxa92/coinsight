@@ -7,6 +7,7 @@ import 'package:coinsight/models/investment_tier.dart';
 import 'package:coinsight/models/mid_term_project.dart';
 import 'package:coinsight/models/long_term_holding.dart';
 import 'package:coinsight/models/dex_position.dart';
+import 'package:coinsight/models/closed_trade.dart';
 
 class StorageService {
   static const _settingsBox = 'settings';
@@ -28,6 +29,8 @@ class StorageService {
   static const _githubTokenField = 'github_personal_token';
   static const _dexPositionsBox = 'dex_positions';
   static const _walletAddressField = 'wallet_address';
+  static const _closedTradesBox = 'closed_trades';
+  static const _walletConnectProjectIdField = 'wc_project_id';
 
   static Future<void> init() async {
     await Hive.initFlutter();
@@ -39,6 +42,7 @@ class StorageService {
     await Hive.openBox(_midProjectsBox);
     await Hive.openBox(_longHoldingsBox);
     await Hive.openBox(_dexPositionsBox);
+    await Hive.openBox(_closedTradesBox);
   }
 
   // API Key
@@ -256,6 +260,7 @@ class StorageService {
     await Hive.box(_midProjectsBox).clear();
     await Hive.box(_longHoldingsBox).clear();
     await Hive.box(_dexPositionsBox).clear();
+    await Hive.box(_closedTradesBox).clear();
   }
 
   // ─── Active Tier ─────────────────────────────────
@@ -406,5 +411,42 @@ class StorageService {
   static Future<void> deleteWalletAddress() async {
     final box = Hive.box(_settingsBox);
     await box.delete(_walletAddressField);
+  }
+
+  // ─── WalletConnect Project ID ─────────────────────
+  static String? getWalletConnectProjectId() {
+    final box = Hive.box(_settingsBox);
+    return box.get(_walletConnectProjectIdField) as String?;
+  }
+
+  static Future<void> saveWalletConnectProjectId(String id) async {
+    await Hive.box(_settingsBox).put(_walletConnectProjectIdField, id);
+  }
+
+  static Future<void> deleteWalletConnectProjectId() async {
+    await Hive.box(_settingsBox).delete(_walletConnectProjectIdField);
+  }
+
+  // ─── Closed Trades ───────────────────────────────
+  static List<ClosedTrade> getClosedTrades() {
+    final box = Hive.box(_closedTradesBox);
+    return box.values
+        .map((v) => ClosedTrade.fromMap(v as Map<dynamic, dynamic>))
+        .toList()
+      ..sort((a, b) => b.closedAt.compareTo(a.closedAt));
+  }
+
+  static Future<void> saveClosedTrade(ClosedTrade trade) async {
+    await Hive.box(_closedTradesBox).put(trade.id, trade.toMap());
+  }
+
+  static List<ClosedTrade> getClosedTradesByTier(InvestmentTier tier) {
+    return getClosedTrades()
+        .where((t) => t.tier == tier)
+        .toList();
+  }
+
+  static Future<void> clearClosedTrades() async {
+    await Hive.box(_closedTradesBox).clear();
   }
 }

@@ -13,6 +13,7 @@ import 'package:coinsight/widgets/settings/bot_settings_tab.dart';
 import 'package:coinsight/widgets/settings/trade_settings_tab.dart';
 import 'package:coinsight/widgets/settings/app_settings_tab.dart';
 import 'package:coinsight/widgets/settings/tier_settings_tab.dart';
+import 'package:coinsight/services/wallet_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -37,6 +38,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _githubConfigured = false;
   final _walletController = TextEditingController();
   bool _walletConfigured = false;
+  final _wcProjectIdController = TextEditingController();
+  bool _wcConfigured = false;
 
   // Trade tab state
   late RiskParameters _risk;
@@ -74,6 +77,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _walletController.text = StorageService.getWalletAddress() ?? '';
     }
 
+    _wcConfigured =
+        StorageService.getWalletConnectProjectId()?.isNotEmpty ?? false;
+    if (_wcConfigured) {
+      _wcProjectIdController.text = '••••••••••••••••';
+    }
+
     _risk = StorageService.getRiskParameters();
     _maxTradeController.text = _risk.maxTradeAmountUsdt.toStringAsFixed(2);
 
@@ -95,6 +104,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _addChannelController.dispose();
     _githubTokenController.dispose();
     _walletController.dispose();
+    _wcProjectIdController.dispose();
     super.dispose();
   }
 
@@ -155,6 +165,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       walletConfigured: _walletConfigured,
                       onSaveWallet: _saveWallet,
                       onRemoveWallet: _removeWallet,
+                      wcProjectIdController: _wcProjectIdController,
+                      wcConfigured: _wcConfigured,
+                      onSaveWcProjectId: _saveWcProjectId,
+                      onRemoveWcProjectId: _removeWcProjectId,
                     ),
                     const TierSettingsTab(),
                     BotSettingsTab(
@@ -412,6 +426,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Wallet adresa uklonjena')),
+    );
+  }
+
+  // ───────── WalletConnect Project ID actions ─────────
+  Future<void> _saveWcProjectId() async {
+    final id = _wcProjectIdController.text.trim();
+    if (id.isEmpty || id.startsWith('\u2022\u2022')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unesi WalletConnect Project ID')),
+      );
+      return;
+    }
+    await StorageService.saveWalletConnectProjectId(id);
+    if (!mounted) return;
+
+    // Initialize WalletService with new project ID
+    if (!mounted) return;
+    await context.read<WalletService>().initialize();
+    if (!mounted) return;
+
+    setState(() {
+      _wcConfigured = true;
+      _wcProjectIdController.text = '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022';
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('WalletConnect Project ID spremljen')),
+    );
+  }
+
+  Future<void> _removeWcProjectId() async {
+    await StorageService.deleteWalletConnectProjectId();
+    if (!mounted) return;
+    setState(() {
+      _wcConfigured = false;
+      _wcProjectIdController.clear();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('WalletConnect Project ID uklonjen')),
     );
   }
 

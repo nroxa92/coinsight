@@ -34,6 +34,11 @@ class ApiSettingsTab extends StatelessWidget {
   final VoidCallback onSaveWallet;
   final VoidCallback onRemoveWallet;
 
+  final TextEditingController wcProjectIdController;
+  final bool wcConfigured;
+  final VoidCallback onSaveWcProjectId;
+  final VoidCallback onRemoveWcProjectId;
+
   const ApiSettingsTab({
     super.key,
     required this.apiKeyController,
@@ -65,6 +70,10 @@ class ApiSettingsTab extends StatelessWidget {
     required this.walletConfigured,
     required this.onSaveWallet,
     required this.onRemoveWallet,
+    required this.wcProjectIdController,
+    required this.wcConfigured,
+    required this.onSaveWcProjectId,
+    required this.onRemoveWcProjectId,
   });
 
   @override
@@ -81,6 +90,8 @@ class ApiSettingsTab extends StatelessWidget {
         _buildGithubSection(context),
         const SizedBox(height: 16),
         _buildWalletSection(context),
+        const SizedBox(height: 16),
+        _buildWcSection(context),
       ],
     );
   }
@@ -118,6 +129,12 @@ class ApiSettingsTab extends StatelessWidget {
               'Web3 Wallet',
               walletConfigured ? 'Connected' : 'Not set',
               walletConfigured,
+            ),
+            const SizedBox(height: 8),
+            _statusRow(
+              'WalletConnect',
+              wcConfigured ? 'Konfiguriran' : 'Nije set',
+              wcConfigured,
             ),
           ],
         ),
@@ -479,6 +496,59 @@ class ApiSettingsTab extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildWcSection(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _sectionHeader(context, Icons.link, 'WalletConnect',
+                statusLabel: wcConfigured ? 'Konfiguriran' : 'Nije set',
+                statusActive: wcConfigured),
+            const SizedBox(height: 8),
+            Text(
+              'Project ID s cloud.reown.com (besplatna registracija). '
+              'Potreban za spajanje MetaMask i Phantom walleta.',
+              style: TextStyle(color: Colors.grey[500], fontSize: 12),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: wcProjectIdController,
+              decoration: const InputDecoration(
+                labelText: 'WalletConnect Project ID',
+                hintText: 'abc123...',
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: onSaveWcProjectId,
+                    child: const Text('Spremi i inicijaliziraj'),
+                  ),
+                ),
+                if (wcConfigured) ...[
+                  const SizedBox(width: 8),
+                  OutlinedButton(
+                    onPressed: onRemoveWcProjectId,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.error,
+                      side: BorderSide(
+                          color: Theme.of(context).colorScheme.error),
+                    ),
+                    child: const Text('Remove'),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

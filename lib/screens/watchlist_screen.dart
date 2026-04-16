@@ -15,6 +15,8 @@ import 'package:coinsight/screens/long_holding_detail_screen.dart';
 import 'package:coinsight/widgets/coin_card.dart';
 import 'package:coinsight/widgets/dex_signal_card.dart';
 import 'package:coinsight/screens/dex_position_screen.dart';
+import 'package:coinsight/services/wallet_service.dart';
+import 'package:coinsight/widgets/wallet_connect_button.dart';
 
 class WatchlistScreen extends StatefulWidget {
   const WatchlistScreen({super.key});
@@ -104,6 +106,27 @@ class _WatchlistScreenState extends State<WatchlistScreen>
           labelStyle:
               const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
           unselectedLabelStyle: const TextStyle(fontSize: 13),
+        ),
+        Consumer<WalletService>(
+          builder: (context, wallet, _) {
+            if (!wallet.isInitialized) return const SizedBox.shrink();
+            return Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 6),
+              child: Row(
+                children: [
+                  const Icon(Icons.swap_horiz,
+                      size: 14, color: Colors.purple),
+                  const SizedBox(width: 6),
+                  const Text('DEX Wallet:',
+                      style: TextStyle(
+                          fontSize: 11, color: Colors.grey)),
+                  const SizedBox(width: 6),
+                  const WalletConnectButton(),
+                ],
+              ),
+            );
+          },
         ),
         Expanded(
           child: TabBarView(

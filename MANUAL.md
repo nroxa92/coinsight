@@ -2,7 +2,7 @@
 
 **Za koga je ovaj priručnik:** netko tko prvi put otvara CoinSight. Ne pretpostavljamo da znaš što je market cap, što je Spot trading, niti kako funkcionira API ključ. Sve se objašnjava u hodu.
 
-**Verzija aplikacije:** 6.0.0
+**Verzija aplikacije:** 7.0.0
 **Licenca:** MIT (open source)
 **Platforma:** Android (primarno) + Windows desktop
 **Datum priručnika:** 2026-04-16
@@ -29,6 +29,9 @@
 3D. [DEX Position Tracking (v5.0.0)](#3d-dex-position-tracking)
 3E. [Charts & Visualization (v6.0.0)](#3e-charts--visualization)
 3F. [Push Notifications (v6.0.0)](#3f-push-notifications)
+3G. [P&L Dashboard (v7.0.0)](#3g-pl-dashboard)
+3H. [WalletConnect v2 (v7.0.0)](#3h-walletconnect-v2)
+3I. [Trade History (v7.0.0)](#3i-trade-history)
 4. [Prvo pokretanje aplikacije — što ćeš vidjeti](#4-prvo-pokretanje-aplikacije)
 5. [Turneja po aplikaciji — 4 taba + DEX Early](#5-turneja-po-aplikaciji)
 6. [Postavljanje API ključeva — korak po korak](#6-postavljanje-api-ključeva)
@@ -78,6 +81,8 @@ Verzija 4.0.0 uvodi **Three-Tier Investment Framework** — umjesto jednog prist
 Verzija 5.0.0 dodaje **detail screenove** za MID projekte i LONG holdinge, **DEX Position Tracking** za rucno pracenje trade-ova s decentraliziranih burzi, te **MID Discovery** (GitHub trending) i **LONG Research** (filtrirani top 200) pod-tabove u Watchlistu.
 
 Verzija 6.0.0 dodaje **interaktivne tier-aware chartove** (SHORT 10d+24h, MID 6m+30d, LONG 2y+6m), **push notifikacije** (SL/TP/INTERESTING alerte), i znacajno prosiren test suite.
+
+Verzija 7.0.0 dodaje **P&L Dashboard** s equity curve-om, win rate-om, R/R ratiom i per-tier breakdownom, **WalletConnect v2** za spajanje eksternog walleta i pokretanje swapova, te **Trade History** za kompletnu evidenciju zatvorenih trade-ova.
 
 > Ako si potpuni pocetnik u crypto svijetu, pogledaj [NEWBIE_GUIDE.md](NEWBIE_GUIDE.md) za pojednostavljen uvod.
 
@@ -439,6 +444,121 @@ CoinSight v6.0.0 integrira `flutter_local_notifications` za slanje lokalnih push
 3. Toggle za svaki tip notifikacije (SL/TP/INTERESTING)
 
 Notifikacije rade lokalno — nema servera, nema cloud messaginga.
+
+---
+
+## 3G. P&L Dashboard (v7.0.0)
+
+### 3G.1 Sto je P&L Dashboard
+
+P&L Dashboard je **centralizirani pregled performansi** svih tvojih trade-ova. Umjesto da rucno racunas koliko si zaradio ili izgubio, Dashboard automatski prikuplja podatke iz svih zatvorenih trade-ova i prikazuje kljucne metrike.
+
+### 3G.2 Kako pristupiti
+
+P&L Dashboard se otvara tapom na **banner** u **Portfolio** tabu. Banner prikazuje sazetak (ukupni P&L, win rate) i vodi na full-screen PnlDashboardScreen.
+
+### 3G.3 Metrike koje prikazuje
+
+| Metrika | Sto znaci |
+|---------|-----------|
+| **Equity Curve** | Grafikon koji prikazuje rast ili pad tvog ukupnog portfolija kroz vrijeme. Uzlazna krivulja = ukupno u plusu, silazna = ukupno u minusu |
+| **Win Rate** | Postotak trade-ova koji su zavrsili s profitom. Npr. 60% win rate znaci da je 6 od 10 trade-ova bilo profitabilno |
+| **R/R Ratio (Risk/Reward)** | Prosjecni omjer profita naspram gubitka. R/R 2.0 znaci da prosjecni profitabilni trade donosi 2x vise nego sto prosjecni gubitnicki trade gubi |
+| **Per-tier breakdown** | P&L razdvojen po tieru — vidis koliko zaradjujes/gubis u SHORT vs MID vs LONG strategiji |
+
+### 3G.4 Equity Curve objasnjenje
+
+Equity curve je **najvazniji grafikon** za praćenje performansi. X-os je vrijeme (datumi trade-ova), Y-os je kumulativni P&L.
+
+- **Ravnomjerno rastuci** graf = konzistentno profitabilna strategija
+- **Rastuci s oscilacijama** = profitabilna ali s volatilnoscu (normalno)
+- **Padajuci** graf = strategija gubi novac — razmotri prilagodbu parametara ili pauzu
+
+### 3G.5 Per-tier breakdown
+
+Dashboard prikazuje odvojene statistike za svaki tier:
+
+```
++------------------------------------------+
+| SHORT tier:  Win 65% | R/R 1.8 | +$42   |
+| MID tier:    Win 55% | R/R 2.5 | +$78   |
+| LONG tier:   Win 70% | R/R 3.1 | +$120  |
++------------------------------------------+
+```
+
+Ovo ti pomaze identificirati koji tier je tvoja najjaca strategija i gdje trebas prilagoditi pristup.
+
+---
+
+## 3H. WalletConnect v2 (v7.0.0)
+
+### 3H.1 Sto je WalletConnect
+
+WalletConnect je **otvoreni protokol** za sigurno spajanje crypto walleta (MetaMask, Trust Wallet, Phantom i drugi) na decentralizirane aplikacije. CoinSight koristi **WalletConnect v2** za povezivanje tvog walleta s aplikacijom.
+
+### 3H.2 Postavljanje
+
+**Preduvjet:** Trebas **Project ID** s WalletConnect Cloud platforme.
+
+▶ **Napravi sad:**
+
+**Korak 1 — Registracija na WalletConnect Cloud:**
+1. Otvori browser i idi na: **https://cloud.reown.com**
+2. Registriraj se (GitHub login ili email)
+3. Kreiraj novi projekt (npr. "CoinSight")
+4. Kopiraj **Project ID** koji dobijes
+
+**Korak 2 — Unesi Project ID u CoinSight:**
+1. Otvori CoinSight --> **Manage** tab --> **API** pod-tab
+2. Pronadi polje **"WalletConnect Project ID"**
+3. Zalijepi kopirani Project ID
+4. Tapni **"Save"**
+
+### 3H.3 Kako spojiti wallet
+
+1. U Portfolio tabu ili Analysis tabu tapni **WalletConnect button**
+2. Pojavljuje se QR kod ili deep link
+3. Otvori svoj wallet (MetaMask, Trust Wallet, Phantom...)
+4. U walletu skeniraj QR kod ili odobri konekciju
+5. Wallet adresa se prikazuje u CoinSightu
+
+### 3H.4 Sto omogucava
+
+- **Prikaz wallet adrese** u aplikaciji — vidis spojeni wallet
+- **Pokretanje swapova** — iz CoinSight-a mozes inicirati token swap na DEX-u
+- **Veza s DEX pozicijama** — automatsko povezivanje wallet adrese s DEX Position Trackingom
+
+> **Vazno:** WalletConnect NE daje CoinSightu pristup tvojim privatnim kljucevima. Svaka transakcija zahtijeva tvoju eksplicitnu potvrdu u walletu.
+
+---
+
+## 3I. Trade History (v7.0.0)
+
+### 3I.1 Sto je Trade History
+
+Trade History je **kompletna evidencija svih zatvorenih trade-ova**. Svaki put kad se pozicija zatvori (rucno, SL trigger, ili TP trigger), CoinSight zapisuje ClosedTrade zapis s detaljima.
+
+### 3I.2 Sto se zapisuje
+
+Za svaki zatvoreni trade:
+- **Coin** — koji coin je bio trgovan
+- **Tier** — u kojem tieru (SHORT/MID/LONG)
+- **Entry price** — cijena ulaza
+- **Exit price** — cijena izlaza
+- **Quantity** — kolicina tokena
+- **P&L** — apsolutni i postotni profit/gubitak
+- **Razlog zatvaranja** — SL trigger, TP trigger, rucno zatvaranje
+- **Datum otvaranja i zatvaranja**
+
+### 3I.3 Rucno zatvaranje s exit price-om
+
+Kad rucno zatvoras poziciju (CLOSE button u Portfolio tabu), CoinSight sada trazi **exit price** za precizno racunanje P&L-a. App automatski predlaze trenutnu trzisnu cijenu, ali mozes unijeti i drugu cijenu (npr. ako si vec prodao na DEX-u po drugoj cijeni).
+
+### 3I.4 Gdje vidjeti
+
+Trade History se prikazuje u:
+- **P&L Dashboard** — kompletna lista u Trade History sekciji
+- **Portfolio tab** — zadnjih N zatvorenih trade-ova u Analysis History sekciji
 
 ---
 
@@ -1935,7 +2055,7 @@ A: Mjera koliko nezavisnih izvora se slaže oko signala za coin. Score ide od 0 
 A: Koristi Manage → App → Export logs before reset. Za potpuni reset: Manage → App → Full reset. Binance pozicije ostaju na Binanceu neovisno o app-u.
 
 **Q: Koliko testova ima CoinSight?**
-A: Test suite sadrži **267 testova** koji pokrivaju servise, widgete i integracije.
+A: Test suite sadrži **291+ testova** koji pokrivaju servise, widgete i integracije.
 
 **Q: Što znači "Timestamp out of sync" greška?**
 A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 automatski sinkronizira putem `/api/v3/time`. Ako se greška ponovi, provjeri da je automatsko vrijeme uključeno na uredjaju.
@@ -1951,6 +2071,7 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 | **Bot Manager** | Full-screen ekran za upravljanje Telegram Monitor kanalima i statistikama |
 | **Bot Token** | Tajni ključ za Telegram bota, dobiven od @BotFather |
 | **BUY NOW** | Button u Trade Action Baru koji pokreće kupnju nakon potvrde |
+| **ClosedTrade** | Model za zatvoreni trade — cuva entry/exit price, P&L, tier, razlog zatvaranja |
 | **CoinGecko** | Besplatan crypto market data servis. CoinSight ga koristi za Watchlist podatke |
 | **Confluence Score** | Mjera koliko nezavisnih izvora se slaže oko signala (0-6.0). Viši = jači signal |
 | **Confirm LIVE** | Warning dialog kad prebacuješ s testnet-a na pravi Binance |
@@ -1961,6 +2082,7 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 | **DexPosition** | Model za rucno pracenu DEX poziciju: token, entry cijena, kolicina, DEX, chain, SL/TP razine |
 | **Dexscreener** | Servis koji prati nove tokene na decentraliziranim burzama. Intelligence Layer ga koristi za DEX Early tab |
 | **ENTERED** | Oznaka u Analysis History za trenutak kad si otvorio poziciju |
+| **Equity Curve** | Grafikon kumulativnog P&L-a kroz vrijeme — prikazuje ukupni rast ili pad portfolija |
 | **EXITED** | Oznaka u Analysis History za trenutak kad si zatvorio poziciju |
 | **exchangeInfo** | Binance endpoint koji vraća pravila za svaki trading par (stepSize, minNotional, itd.) |
 | **Faza 2** | Manualni mode — ti potvrduješ BUY kroz Trade Action Bar |
@@ -1990,9 +2112,12 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 | **My Watchlist** | Tvoj izbor coinova (označeni zvjezdicom) |
 | **New Listings** | Drugi pod-tab Watchlist-a, small-cap coinovi s 1h momentum-om |
 | **P&L** | "Profit and Loss" — koliko si trenutno u plusu/minusu |
+| **P&L Dashboard** | Full-screen ekran s equity curve, win rate, R/R ratio, per-tier breakdown i trade history |
+| **PnlAnalytics** | Model koji racuna P&L metrike: win rate, R/R ratio, equity curve podatke, per-tier statistike |
 | **Quiet hours** | Sati kad auto-trade NE kupuje (default 23:00-07:00) |
 | **Rank** | Market cap rank — pozicija po veličini medju svim coinovima |
 | **Reliability %** | Postotak točnosti signala iz pojedinog Telegram kanala (prikazan u Bot Manageru) |
+| **R/R Ratio (Risk/Reward)** | Prosjecni omjer profita naspram gubitka na trade-ovima — visi R/R = bolje upravljanje rizikom |
 | **Risk Parameters** | Tvoje postavke u Manage → Trade: max iznos, max pozicije, SL%, TP% |
 | **Signal badge** | Narančasti banner na Analysis tabu koji pokazuje broj pending Telegram signala |
 | **SKIP** | Claude preporuka "previše rizično, ne diraj" |
@@ -2016,7 +2141,9 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 | **Value Discovery** | MID tier pristup — identifikacija coinova s neotkrivenom vrijednoscu i predstojecim katalystom |
 | **Volume** | 24h trading volumen u USD-u |
 | **WATCH** | Claude preporuka "ima potencijal, provjeri opet kasnije" |
+| **WalletConnect** | Otvoreni protokol za sigurno spajanje crypto walleta na dApps — CoinSight koristi v2 za wallet konekciju i swap inicijaciju |
 | **Withdrawal** | Povlačenje novca s Binance-a (CoinSight NE koristi; API ključ NE smije imati) |
+| **Win Rate** | Postotak trade-ova koji su zavrsili s profitom — kljucna metrika u P&L Dashboardu |
 
 ---
 
@@ -2036,8 +2163,8 @@ A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 aut
 
 **Ako si ovo pročitao sve:** spreman si za prvi dan. Kreni s malim iznosima, bilježi rezultate, i **ne žuri povećavati rizik**. Konzistentnost kroz tjedne pobjeduje naglu agresivnost.
 
-**CoinSight v6.0.0** — Open Source, MIT License
-**Test suite:** 243 testova
+**CoinSight v7.0.0** — Open Source, MIT License
+**Test suite:** 291+ testova
 **Izvorni kod:** javno dostupan
 
 Sretno!

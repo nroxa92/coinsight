@@ -1,6 +1,6 @@
-# CoinSight v6.0.0 — Vodic za pocetnike
+# CoinSight v7.0.0 — Vodic za pocetnike
 
-**Verzija:** 6.0.0 | **Datum:** 2026  
+**Verzija:** 7.0.0 | **Datum:** 2026  
 **Jezik:** Hrvatski (HR)  
 **Ciljna publika:** Potpuni pocetnici — nikad koristili kripto, wallet ili trading app
 
@@ -24,6 +24,8 @@
 10. [Tvoja prva analiza s Claudeom](#10-tvoja-prva-analiza-s-claudeom)
 11. [Tvoj prvi trade](#11-tvoj-prvi-trade)
 12. [Razumijevanje grafikona](#12-razumijevanje-grafikona)
+12A. [WalletConnect postavljanje](#12a-walletconnect-postavljanje)
+12B. [P&L Dashboard za pocetnike](#12b-pl-dashboard-za-pocetnike)
 13. [Rjecnik pojmova](#13-rjecnik-pojmova)
 14. [Sigurnosna pravila](#14-sigurnosna-pravila)
 
@@ -1063,6 +1065,164 @@ pokazuje 4 informacije:
 
 ---
 
+## 12A. WalletConnect postavljanje
+
+### Sto je WalletConnect?
+
+WalletConnect je nacin da sigurno **spojis svoj crypto wallet** (MetaMask,
+Trust Wallet, Phantom i drugi) s CoinSight-om. Zamisli to kao Bluetooth
+pairing — tvoj wallet i CoinSight se "upoznaju", ali wallet i dalje
+ima kontrolu nad tvojim novcem.
+
+**Vazno:** WalletConnect NIKADA ne daje CoinSightu tvoj privatni kljuc
+ili seed phrase. Svaku transakciju moras odobriti u svom walletu.
+
+### Zasto bih koristio WalletConnect?
+
+Bez WalletConnect-a, kad trgujed na DEX-u (PancakeSwap, Uniswap...),
+moras rucno unositi podatke o trade-ovima u CoinSight. S WalletConnect-om
+mozes:
+
+- **Vidjeti svoju wallet adresu** direktno u CoinSightu
+- **Pokrenuti swap** iz CoinSight-a (ali ga odobri u walletu)
+- **Povezati DEX pozicije** s walletom automatski
+
+### Korak po korak: Postavljanje WalletConnect-a
+
+**Korak 12A.1 — Registriraj se na WalletConnect Cloud**
+
+1. Otvori browser i idi na: **https://cloud.reown.com**
+2. Klikni **"Sign Up"** ili **"Get Started"**
+3. Mozes se registrirati putem **GitHub accounta** ili **emaila**
+4. Kreiraj novi projekt:
+   - Klikni **"Create Project"** ili **"New Project"**
+   - Daj ime projektu, npr. `CoinSight`
+   - Odaberi tip: **App**
+5. Na stranici projekta vidjet ces **Project ID** — dugacak string
+   koji izgleda ovako:
+   ```
+   a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+   ```
+6. **Kopiraj Project ID!**
+
+> Registracija je **besplatna** za osobnu upotrebu.
+
+**Korak 12A.2 — Unesi Project ID u CoinSight**
+
+1. Otvori CoinSight --> **Manage** tab --> **API** pod-tab
+2. Pronadi polje **"WalletConnect Project ID"**
+3. Zalijepi kopirani Project ID
+4. Tapni **"Save"**
+
+**Korak 12A.3 — Spoji wallet**
+
+1. U **Portfolio** ili **Analysis** tabu vidjet ces **WalletConnect button**
+2. Tapni ga — pojavljuje se QR kod
+3. Otvori svoj wallet (MetaMask, Trust Wallet, Phantom...)
+4. U walletu pronadi opciju **"WalletConnect"** ili **"Scan QR"**
+5. Skeniraj QR kod prikazan u CoinSightu
+6. U walletu tapni **"Connect"** ili **"Approve"**
+7. Gotovo! Tvoja wallet adresa se prikazuje u CoinSightu
+
+```
++-----------------------------------------+
+|  WalletConnect              [Connected] |
++-----------------------------------------+
+|                                         |
+|  Adresa: 0x7a3B...4f2E                  |
+|  Mreza: BSC                             |
+|                                         |
+|  [Disconnect]                           |
+|                                         |
++-----------------------------------------+
+```
+
+### Rjesavanje problema
+
+| Problem | Rjesenje |
+|---------|----------|
+| "Invalid Project ID" | Provjeri da si kopirao cijeli ID s cloud.reown.com |
+| QR kod ne radi | Provjeri internet konekciju na oba uredaja |
+| Wallet se ne pojavljuje | Azuriraj wallet app na najnoviju verziju |
+| Konekcija se prekida | Normalno kad se app zatvori — reconnect je automatski |
+
+---
+
+## 12B. P&L Dashboard za pocetnike
+
+### Sto je P&L Dashboard?
+
+P&L Dashboard je tvoj **osobni izvjestaj o performansama**. Kao sto
+sportasi imaju statistiku (golovi, asistencije, pobjedeni%), tako i
+ti imas statistiku svojih trade-ova.
+
+**P&L = Profit and Loss** = koliko si zaradio ili izgubio.
+
+### Kako pristupiti
+
+1. Otvori **Portfolio** tab
+2. Na vrhu ces vidjeti **P&L banner** s kljucnim brojkama
+3. Tapni banner za otvaranje full-screen **P&L Dashboard-a**
+
+### Sto znace brojke na Dashboardu
+
+```
++------------------------------------------+
+| P&L Dashboard                            |
++------------------------------------------+
+|                                          |
+| Ukupni P&L: +$42.50                     |
+| Win Rate: 62%                            |
+| R/R Ratio: 1.8                           |
+| Ukupno trade-ova: 24                     |
+|                                          |
+| [======Equity Curve graf=======]         |
+|                                          |
+| SHORT: Win 65% | +$15                    |
+| MID:   Win 55% | +$12                    |
+| LONG:  Win 70% | +$15.50                |
+|                                          |
++------------------------------------------+
+```
+
+**Win Rate (62%):**
+Od svih trade-ova koje si napravio, 62% ih je zavrsilo u plusu.
+To je kao u kosarci — koliko posto suteva je pogodilo.
+
+**R/R Ratio (1.8):**
+Kad zaradis, prosjecno zaradis 1.8x vise nego sto izgubis kad
+gubis. Npr. prosjecno zaradis $9 po dobrom trade-u i izgubis
+$5 po losom. $9/$5 = 1.8.
+
+Sto je R/R visi, to bolje. R/R iznad 1.5 je solidno za pocetnika.
+
+**Equity Curve (graf):**
+Zamislji ga kao grafikon tvog "stanja racuna" kroz vrijeme.
+Ako linija ide GORE — generalno zaradujes. Ako ide DOLJE —
+generalno gubis. Idealno: linija koja postupno raste s malim
+padovima tu i tamo (normalna volatilnost).
+
+**Per-tier breakdown:**
+Razdvojene statistike za svaku strategiju:
+- **SHORT** — kratkorocni trade-ovi (sati do dana)
+- **MID** — srednjorocni projekti (tjedni do mjeseci)
+- **LONG** — dugorocna drzanja (mjeseci do godina)
+
+Ovo ti pomaze vidjeti koja strategija ti najbolje lezi.
+
+### Savjeti za pocetnike
+
+- **Ne brini** se o Dashboardu prvih tjedan dana — nemas dovoljno
+  podataka za smislenu statistiku
+- **Win Rate ispod 50%** ne znaci nuzno gubitak — ako je R/R visok
+  (npr. 3.0), mozes gubiti 60% trade-ova i i dalje biti u plusu
+- **Equity Curve pad** kroz vise dana znaci da trebas **pauzirati**
+  i preispitati strategiju
+- **Per-tier breakdown** koristiti za fokusiranje na tier koji ti
+  najbolje ide
+
+---
+
 ## 13. Rjecnik pojmova
 
 Abecednim redom, svi pojmovi koje ces sresti koristeci CoinSight
@@ -1138,6 +1298,11 @@ Strategija kupovanja u vise navrata po razlicitim cijenama, umjesto
 sve odjednom. Smanjuje rizik loseg tajminga. Npr: kupi $50 BTC
 svaki tjedan, neovisno o cijeni.
 
+**ClosedTrade**
+Zapis o trade-u koji je zavrsen (zatvoren). Cuva podatke o entry/exit
+cijeni, profitu ili gubitku, tieru, i razlogu zatvaranja (SL, TP,
+rucno). Koristi se za P&L Dashboard statistike.
+
 **DeFi (Decentralized Finance)**
 Financijski servisi izgradjeni na blockchainu — lending, borrowing,
 trading — bez banaka i posrednika.
@@ -1150,6 +1315,11 @@ Nema registracije, nema KYC-a. Koristis wallet direktno.
 "Napravi vlastito istrazivanje." Zlatno pravilo kriptovaluta:
 nikad ne ulazi u investiciju samo zato sto je netko drugi rekao
 da je dobra. CoinSight analizira — ti odlucujes.
+
+**Equity Curve**
+Grafikon koji prikazuje kumulativni profit ili gubitak kroz vrijeme.
+Ako linija ide gore — strategija zaradduje. Ako ide dolje — gubi.
+Vidljiv u P&L Dashboardu.
 
 **Entry Point**
 Cijena po kojoj planiras kupiti coin. Dobar entry point je kad je
@@ -1246,6 +1416,15 @@ analiza gleda transakcije, adrese i aktivnost na blockchainu.
 Dobit ili gubitak na poziciji. Prikazuje se u apsolutnom iznosu
 ($) i postotku (%). Zeleno = profit, crveno = gubitak.
 
+**P&L Dashboard**
+Centralizirani ekran u CoinSightu koji prikazuje equity curve,
+win rate, R/R ratio, per-tier breakdown i trade history. Pristupa
+se iz Portfolio taba tapom na P&L banner.
+
+**PnlAnalytics**
+Interni model koji racuna sve P&L metrike iz zatvorenih trade-ova:
+win rate, prosjecni profit/gubitak, R/R ratio, equity curve podatke.
+
 **Pair (Par)**
 Dva tokena koji se trguju jedan za drugi. BTC/USDT znaci da
 kupujes Bitcoin za USDT (stablecoin). LINK/ETH znaci da kupujes
@@ -1268,6 +1447,11 @@ i onda prodaje (dump), ostavljajuci kasne kupce s gubitkom.
 **Resistance**
 Razina cijene na kojoj se cijena obicno "odbija" i pada.
 Ako cijena probije resistance, to je bullish signal.
+
+**R/R Ratio (Risk/Reward)**
+Omjer prosjecnog profita naspram prosjecnog gubitka. R/R 2.0 znaci
+da prosjecno zaradis dvaput vise kad zaradis nego sto izgubis kad
+gubis. Prikazan u P&L Dashboardu.
 
 **ROI (Return on Investment)**
 Povrat na investiciju. Ako si ulozio $100 i sad vrijedi $150,
@@ -1368,7 +1552,14 @@ Digitalni novcanik za cuvanje kripto imovine. Moze biti softverski
 
 **WalletConnect**
 Protokol za sigurno spajanje walleta na decentralizirane aplikacije
-(dApps). Skeniras QR kod walletom da se spojis.
+(dApps). Skeniras QR kod walletom da se spojis. CoinSight koristi
+WalletConnect v2 za povezivanje walleta i pokretanje swapova.
+Zahtijeva besplatan Project ID s cloud.reown.com.
+
+**Win Rate**
+Postotak trade-ova koji su zavrsili s profitom. Npr. 60% win rate
+znaci da je 6 od 10 trade-ova bilo profitabilno. Prikazan u P&L
+Dashboardu.
 
 **Whale (Kit)**
 Investitor s velikim iznosom kripto imovine. Whale transakcije
@@ -1569,6 +1760,6 @@ rezultati ne garantiraju buduce prinose.*
 
 ---
 
-**Verzija dokumenta:** 1.0  
+**Verzija dokumenta:** 1.1  
 **Zadnja izmjena:** 2026-04-16  
-**Aplikacija:** CoinSight v6.0.0
+**Aplikacija:** CoinSight v7.0.0

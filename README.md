@@ -41,6 +41,18 @@ se adaptiraju aktivnom tieru.
 - **Prediction overlay** — AI-generirane projekcije (disclaimer ukljucen)
 - **Pristup** — ikona chart na CoinCard-u ili iz Analysis screena
 
+### P&L Dashboard (v7.0.0)
+- **Equity curve** — vizualni prikaz rasta/pada ukupnog portfolija kroz vrijeme
+- **Win rate** — postotak uspjesnih (profitabilnih) trade-ova
+- **Risk/Reward ratio** — prosjecni omjer profita naspram gubitka
+- **Per-tier breakdown** — P&L statistike po investicijskom tieru (SHORT/MID/LONG)
+- **Trade history** — kompletna povijest zatvorenih trade-ova s exit cijenama
+
+### WalletConnect v2 (v7.0.0)
+- **Wallet connection** — spajanje eksternog walleta putem WalletConnect v2 protokola
+- **Address display** — prikaz spojene wallet adrese u aplikaciji
+- **Swap initiation** — pokretanje token swapova iz CoinSight-a
+
 ### Push Notifications (v6.0.0)
 - **SL/TP alerte** — notifikacija kad pozicija dostigne stop-loss ili take-profit
 - **INTERESTING signali** — push kad Claude oznaci coin kao INTERESTING
@@ -104,6 +116,8 @@ lib/
 ├── models/
 │   ├── coin.dart                # CoinGecko data model
 │   ├── coin_position.dart       # Otvorena trading pozicija
+│   ├── closed_trade.dart        # Zatvoreni trade (P&L history)
+│   ├── pnl_analytics.dart       # P&L analitika (win rate, R/R, equity curve)
 │   ├── dex_position.dart        # DEX pozicija model
 │   ├── risk_parameters.dart     # Risk management konfiguracija
 │   ├── analysis_log.dart        # Log Claude analiza
@@ -135,7 +149,8 @@ lib/
 │   ├── reddit_monitor.dart      # Reddit sentiment monitoring
 │   ├── intelligence_aggregator.dart # Multi-source koordinator
 │   ├── chart_data_service.dart  # CoinGecko historical data + predikcija
-│   └── notification_service.dart # Push notifikacije (SL/TP/INTERESTING)
+│   ├── notification_service.dart # Push notifikacije (SL/TP/INTERESTING)
+│   └── wallet_service.dart      # WalletConnect v2 integracija
 ├── screens/
 │   ├── watchlist_screen.dart    # DEX Early, New Listings, Watchlist, Top Coins
 │   ├── analysis_screen.dart     # Claude AI chat + Trade Action Bar
@@ -145,7 +160,8 @@ lib/
 │   ├── mid_project_detail_screen.dart  # MID projekt detail
 │   ├── long_holding_detail_screen.dart # LONG holding detail
 │   ├── dex_position_screen.dart # DEX pozicije management
-│   └── chart_screen.dart        # Full-screen tier-aware price chart
+│   ├── chart_screen.dart        # Full-screen tier-aware price chart
+│   └── pnl_dashboard_screen.dart # P&L dashboard s equity curve i statistikama
 ├── widgets/
 │   ├── coin_card.dart           # Coin display + skeleton loader
 │   ├── chat_bubble.dart         # Chat poruka
@@ -153,6 +169,7 @@ lib/
 │   ├── dex_signal_card.dart     # DEX pair kartica
 │   ├── tier_mode_selector.dart  # SHORT/MID/LONG selector banner
 │   ├── price_chart_widget.dart  # Interaktivni price chart (CustomPainter)
+│   ├── wallet_connect_button.dart # WalletConnect spajanje buttona
 │   └── settings/
 │       ├── api_settings_tab.dart
 │       ├── bot_settings_tab.dart

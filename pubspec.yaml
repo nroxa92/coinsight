@@ -1,7 +1,7 @@
 name: coinsight
 description: "CoinSight — AI-powered cryptocurrency signal detector. Monitors new listings, analyzes with Claude AI, executes Binance Spot orders. Open source."
 publish_to: 'none'
-version: 6.0.0+7
+version: 7.0.0+8
 
 environment:
   sdk: ^3.11.4
@@ -28,6 +28,8 @@ dependencies:
   convert: ^3.1.1
   # Intelligence sources
   html: ^0.15.4
+  # WalletConnect v2
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:

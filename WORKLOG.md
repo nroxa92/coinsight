@@ -1471,6 +1471,127 @@ Dodano na kraj system prompta: confluence analiza instrukcije (score 5-6 / 3-4.9
 
 ---
 
+## Session 10: 2026-04-16 — WalletConnect v2 Integration (Phases 6-7)
+
+### Faza 6 — WalletConnect v2 (WalletService)
+- Added `url_launcher` dependency to pubspec.yaml
+- Added WalletConnect Project ID storage to `StorageService` (get/save/delete)
+- Created `lib/services/wallet_service.dart` — **STUB implementation**
+  - Full public interface matching the spec (init, connect, disconnect, getBalance, sendSwapTransaction, initiateSwap)
+  - Stores isConnected/address in memory with session persistence via StorageService
+  - connect() shows info dialog with simulate option (reown_appkit not bundled due to platform constraints)
+  - All transaction methods return placeholder results with informative error messages
+- Registered `WalletService` as `ChangeNotifierProvider` in `main.dart`
+- WalletService auto-initializes on app start if Project ID is configured
+- Added WalletConnect Project ID section to `ApiSettingsTab` (save/remove/status)
+- Updated `SettingsScreen` with `_wcProjectIdController`, `_wcConfigured` state, save/remove callbacks
+
+### Faza 7 — WalletConnect Button + Integration
+- Created `lib/widgets/wallet_connect_button.dart`
+  - Not connected: "Spoji Wallet" purple button
+  - Connected: truncated address (0xAB...CD) + chain name in green container
+  - Tap connected state opens disconnect dialog
+- Added `WalletConnectButton` at top of SHORT tier layout in `watchlist_screen.dart` (above DEX Early tab)
+- Added `WalletConnectButton` in SHORT portfolio header in `portfolio_screen.dart`
+
+### Verification
+- `flutter analyze` — 0 issues
+
+### Files changed
+- `pubspec.yaml`
+- `lib/services/storage_service.dart`
+- `lib/services/wallet_service.dart` (NEW)
+- `lib/widgets/wallet_connect_button.dart` (NEW)
+- `lib/main.dart`
+- `lib/widgets/settings/api_settings_tab.dart`
+- `lib/screens/settings_screen.dart`
+- `lib/screens/watchlist_screen.dart`
+- `lib/screens/portfolio_screen.dart`
+- `WORKLOG.md`
+
+---
+
+---
+
+## Session 10: 2026-04-16 — v7.0.0 P&L Dashboard, WalletConnect v2, Prefinal
+
+**Kontekst:** Session 9 dodala charts i push notifikacije. Session 10 je prefinal — P&L analytics dashboard, WalletConnect v2 integracija, trade history za zatvorene pozicije, i code cleanup.
+
+---
+
+### Faza 1 — ClosedTrade Model + Storage
+**Status:** Completed
+- `lib/models/closed_trade.dart` — ClosedTrade (tier, symbol, entry/exit prices, invested/returned USDT, P&L computed, holdDays/Hours), ClosedTradeType enum, ClosedTradeResult enum, factory fromDexPosition
+- StorageService: closed_trades Hive box + CRUD
+
+### Faza 2 — PnlAnalytics Model
+**Status:** Completed
+- `lib/models/pnl_analytics.dart` — PnlAnalytics (totalRealizedPnl, winRate, winCount/lossCount, avgReturn, avgWin/Loss, riskRewardRatio, avgHoldHours, bestTrade/worstTrade, equityCurve, tier breakdown), EquityPoint, PnlAnalyticsBuilder.build()
+
+### Faza 3 — PnlDashboardScreen
+**Status:** Completed
+- `lib/screens/pnl_dashboard_screen.dart` — 4-tab layout (Overview/SHORT/MID/LONG): total P&L card + 3x3 metrics grid, equity curve (fl_chart), tier breakdown, open positions summary, recent trades list
+
+### Faza 4 — DEX Position Close with Trade History
+**Status:** Completed
+- main.dart: _refreshDexPrices() creates ClosedTrade on SL/TP hit
+- portfolio_screen.dart: manual close creates ClosedTrade with custom exit price dialog
+
+### Faza 5 — P&L Dashboard Navigation
+**Status:** Completed
+- Gradient dashboard banner u svim 3 tier portfolio views → PnlDashboardScreen
+
+### Faza 6 — WalletConnect v2
+**Status:** Completed (stub implementation)
+- `lib/services/wallet_service.dart` — WalletService ChangeNotifier s full interface (connect/disconnect/balance/swap). Stub verzija — reown_appkit zahtijeva platform-specifičnu konfiguraciju
+- StorageService: WalletConnect Project ID field
+- Settings: WC Project ID sekcija u API tabu
+
+### Faza 7 — WalletConnect Button + Integration
+**Status:** Completed
+- `lib/widgets/wallet_connect_button.dart` — compact status widget (connect/address/disconnect)
+- Watchlist: WalletConnectButton u SHORT DEX Early header
+- Portfolio: WalletConnectButton u SHORT portfolio header
+
+### Faza 8 — Code Cleanup
+**Status:** Completed
+- CLAUDE.md ažuriran za v7.0.0 (kompletna arhitektura)
+- flutter analyze: 0 issues
+
+### Faza 9 — Testovi
+**Status:** Completed
+- `test/unit/models/closed_trade_test.dart` (6 testova)
+- `test/unit/models/pnl_analytics_test.dart` (6 testova)
+- Svi Hive setups ažurirani za closed_trades box
+- **280/280 passed**
+
+### Faza 10 — Finalizacija
+**Status:** Completed
+- `pubspec.yaml` — version 6.0.0+7 → 7.0.0+8
+- `flutter analyze` — **0 issues**
+- `flutter test` — **280/280 passed**
+- `flutter build apk --debug` — **uspješan**
+
+**Novi fajlovi (7):**
+- `lib/models/closed_trade.dart`, `pnl_analytics.dart`
+- `lib/services/wallet_service.dart`
+- `lib/screens/pnl_dashboard_screen.dart`
+- `lib/widgets/wallet_connect_button.dart`
+- `test/unit/models/closed_trade_test.dart`, `pnl_analytics_test.dart`
+
+**Promijenjeni fajlovi (10):**
+- `lib/services/storage_service.dart` (closed_trades box + WC Project ID)
+- `lib/main.dart` (WalletService provider + DEX close flow + dex price timer)
+- `lib/screens/portfolio_screen.dart` (dashboard banner + manual DEX close + WC button)
+- `lib/screens/watchlist_screen.dart` (WC button in SHORT DEX header)
+- `lib/screens/settings_screen.dart` (WC Project ID state)
+- `lib/widgets/settings/api_settings_tab.dart` (WC section)
+- `lib/widgets/dex_signal_card.dart` (existing)
+- `pubspec.yaml` (version + url_launcher)
+- `CLAUDE.md` (v7.0.0 architecture)
+
+---
+
 ---
 
 ## Identified Issues
@@ -1483,7 +1604,9 @@ Dodano na kraj system prompta: confluence analiza instrukcije (score 5-6 / 3-4.9
 - ~~**Dexscreener pair age**~~ — FIXED Session 7
 - ~~**MID Discovery placeholder**~~ — FIXED Session 8
 - ~~**LONG Research basic**~~ — FIXED Session 8
-- ~~**DEX auto-sell not implemented**~~ — SL/TP sada šalje push notifikacije (Session 9 Faza 6). Actual auto-swap via WalletConnect ostaje za buduću sesiju.
-- ~~**Push notifikacije za SL/TP**~~ — **FIXED Session 9 Faza 6** — NotificationService integriran
-- **CoinGecko historical data limited:** besplatni tier ograničen na 1 godinu za hourly data. LONG tier (2 god) koristi daily interval kao fallback.
-- **Chart prediction accuracy:** Claude predikcija je sentiment-based, ne matematički model. Uncertainty band pomaže ali korisnici mogu precjeniti preciznost.
+- ~~**DEX auto-sell**~~ — SL/TP now auto-closes + saves ClosedTrade (Session 10 Faza 4)
+- ~~**Push notifikacije**~~ — FIXED Session 9
+- **CoinGecko historical data limited:** besplatni tier ograničen na 1 godinu za hourly data.
+- **Chart prediction accuracy:** Claude predikcija je sentiment-based, ne matematički model.
+- **WalletConnect stub:** reown_appkit zahtijeva platform konfiguraciju. Trenutno stub — full implementacija u SESSION_11 s web3dart.
+- **P&L historical data:** closed_trades box se popunjava samo za DEX pozicije. Binance close (TradeService.closePosition) još ne kreira ClosedTrade — dodati u SESSION_11.
