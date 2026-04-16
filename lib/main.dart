@@ -65,8 +65,8 @@ class _MainNavigationState extends State<MainNavigation> {
   }
 
   void _startBackgroundServices() {
-    // Start Telegram Monitor via AnalysisProvider
-    context.read<AnalysisProvider>().startTelegramMonitor();
+    // Start Intelligence Monitoring (Telegram + DEX + GitHub + Reddit)
+    context.read<AnalysisProvider>().startIntelligenceMonitoring();
 
     // Start stop-loss checker if Binance is configured
     _stopLossTimer?.cancel();

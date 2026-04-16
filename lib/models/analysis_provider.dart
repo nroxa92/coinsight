@@ -2,14 +2,20 @@ import 'package:flutter/foundation.dart';
 import 'package:coinsight/services/claude_service.dart';
 import 'package:coinsight/services/storage_service.dart';
 import 'package:coinsight/services/telegram_monitor.dart';
+import 'package:coinsight/services/intelligence_aggregator.dart';
 import 'package:coinsight/models/coin.dart';
 import 'package:coinsight/models/analysis_log.dart';
 import 'package:coinsight/models/telegram_signal.dart';
+import 'package:coinsight/models/intelligence_report.dart';
 
 class AnalysisProvider extends ChangeNotifier {
   final ClaudeService _claudeService;
   final TelegramMonitor _telegramMonitor;
+  final IntelligenceAggregator _intelligence;
   final List<TelegramSignal> _pendingSignals = [];
+
+  IntelligenceReport? _lastReport;
+  bool _isGatheringIntelligence = false;
 
   List<ChatMessage> _messages = [];
   bool _isLoading = false;
@@ -31,11 +37,30 @@ class AnalysisProvider extends ChangeNotifier {
       'Nakon oznake, jedna do dvije rečenice konkretnog razloga. Zatim predloži jedan konkretan sljedeći korak: "Provjeri opet za 2 sata", "Pogledaj Twitter/X aktivnost", "Volume trend kroz sljedeći sat je ključan" i slično.\n\n'
       'Kada nemaš dovoljno podataka za procjenu, reci koji točno podatak nedostaje — ne davaj praznu analizu.\n\n'
       'Nikad ne garantiraš profit. Ovo je analiza obrazaca, ne financijski savjet.\n\n'
-      'Jezik: ako korisnik piše na hrvatskom, odgovaraj na hrvatskom. Ako na engleskom, na engleskom.';
+      'Jezik: ako korisnik piše na hrvatskom, odgovaraj na hrvatskom. Ako na engleskom, na engleskom.\n\n'
+      'KADA DOBIJEŠ INTELLIGENCE REPORT:\n'
+      'Intelligence Report sadrži podatke iz do 5 izvora: DEX listing, GitHub, Reddit, Telegram i CoinGecko market data. Svaki izvor ima težinu i score.\n\n'
+      'Confluence analiza — kako interpretirati:\n'
+      'Score 5.0-6.0: Svi izvori konvergiraju pozitivno. Rijetko se događa, ali kad se dogodi — ozbiljan signal. Provjeri duplo jer visok score zna privući i manipulatore.\n'
+      'Score 3.0-4.9: Više izvora se slaže. Vrijedi detaljnija analiza kroz sva tri objektiva.\n'
+      'Score 1.5-2.9: Slabi signal, jedan do dva izvora. WATCH je maksimalna preporuka.\n'
+      'Score <1.5: Nedovoljno podataka ili slabi signal. SKIP osim ako postoji jasan specifičan razlog.\n\n'
+      'DEX listing uvijek ponderiraš više nego ostale jer je vremenski najraniji signal — coin još nije na CEX-u.\n'
+      'GitHub signal je legitimacy filter — nema repo ili neaktivan repo = žuti signal bez obzira na ostale izvore.\n'
+      'Reddit signal ponderiraš manje — retail kasni za smartim novcem.\n'
+      'Telegram whale alert ponderiraš visoko — smart money se pomiče.\n\n'
+      'Scoring hint koji dobiješ (STRONG_INTERESTING, POSSIBLE_WATCH, itd.) je matematička kalkulacija — nije tvoja obveza složiti se. Tvoja analiza kroz tri objektiva ima prioritet.\n\n'
+      'Ako dobiješ report s activeSources < 2 — jasno napiši da nema dovoljno podataka za pouzdanu analizu.\n'
+      'Ako dobiješ report bez DEX signala ali s visokim Telegram/Reddit score-om — to može biti CEX listing koji dolazi — WATCH, prati.\n'
+      'Ako dobiješ report s DEX signalom ali bez GitHub-a — povećani rizik scama, naglasi u analizi.';
 
-  AnalysisProvider({ClaudeService? claudeService, TelegramMonitor? telegramMonitor})
-      : _claudeService = claudeService ?? ClaudeService(),
-        _telegramMonitor = telegramMonitor ?? TelegramMonitor() {
+  AnalysisProvider({
+    ClaudeService? claudeService,
+    TelegramMonitor? telegramMonitor,
+    IntelligenceAggregator? intelligence,
+  })  : _claudeService = claudeService ?? ClaudeService(),
+        _telegramMonitor = telegramMonitor ?? TelegramMonitor(),
+        _intelligence = intelligence ?? IntelligenceAggregator() {
     final savedKey = StorageService.getApiKey();
     if (savedKey != null && savedKey.isNotEmpty) {
       _claudeService.setApiKey(savedKey);
@@ -45,6 +70,10 @@ class AnalysisProvider extends ChangeNotifier {
       if (_pendingSignals.length > 10) _pendingSignals.removeAt(0);
       notifyListeners();
     };
+    _intelligence.onHighScoreSignal = (report) {
+      _lastReport = report;
+      notifyListeners();
+    };
   }
 
   List<ChatMessage> get messages => _messages;
@@ -52,6 +81,8 @@ class AnalysisProvider extends ChangeNotifier {
   String? get error => _error;
   bool get hasApiKey => _claudeService.hasApiKey;
   int get pendingSignalsCount => _pendingSignals.length;
+  IntelligenceReport? get lastReport => _lastReport;
+  bool get isGatheringIntelligence => _isGatheringIntelligence;
 
   void setApiKey(String key) {
     _claudeService.setApiKey(key);
@@ -101,27 +132,36 @@ class AnalysisProvider extends ChangeNotifier {
   String _buildUserMessage(String text, List<Coin>? coins) {
     final buffer = StringBuffer();
 
-    if (coins != null && coins.isNotEmpty) {
-      final coinData = coins.map((c) {
-        final change = c.priceChangePercentage24h >= 0 ? '+' : '';
-        return '${c.name} (${c.symbol.toUpperCase()}): '
-            '\$${c.currentPrice.toStringAsFixed(2)}, '
-            '$change${c.priceChangePercentage24h.toStringAsFixed(2)}% 24h, '
-            'MCap rank #${c.marketCapRank}';
-      }).join('\n');
-      buffer.writeln('My watchlist:\n$coinData\n');
-    }
+    // 1. Intelligence Report (najvažniji kontekst)
+    if (_lastReport != null) {
+      buffer.writeln(_lastReport!.toClaudeContext());
+      buffer.writeln();
+      _lastReport = null;
+    } else {
+      // 2. Watchlist kontekst
+      if (coins != null && coins.isNotEmpty) {
+        final coinData = coins.map((c) {
+          final change = c.priceChangePercentage24h >= 0 ? '+' : '';
+          return '${c.name} (${c.symbol.toUpperCase()}): '
+              '\$${c.currentPrice.toStringAsFixed(2)}, '
+              '$change${c.priceChangePercentage24h.toStringAsFixed(2)}% 24h, '
+              'MCap rank #${c.marketCapRank}';
+        }).join('\n');
+        buffer.writeln('Watchlist kontekst:\n$coinData\n');
+      }
 
-    if (_pendingSignals.isNotEmpty) {
-      final signalContext =
-          _pendingSignals.map((s) => s.toClaudeContext()).join('\n\n');
-      buffer.writeln(
-          '[TELEGRAM INTELLIGENCE - zadnjih ${_pendingSignals.length} signala]:\n$signalContext\n');
-      _pendingSignals.clear();
+      // 3. Telegram signali
+      if (_pendingSignals.isNotEmpty) {
+        final signalContext =
+            _pendingSignals.map((s) => s.toClaudeContext()).join('\n\n');
+        buffer.writeln(
+            '[TELEGRAM INTELLIGENCE — ${_pendingSignals.length} signala]:\n$signalContext\n');
+        _pendingSignals.clear();
+      }
     }
 
     if (buffer.isNotEmpty) {
-      buffer.write('Question: $text');
+      buffer.write('Pitanje: $text');
       return buffer.toString();
     }
     return text;
@@ -155,7 +195,43 @@ class AnalysisProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Telegram Monitor lifecycle
+  /// Korisnik pita o specifičnom coinu — sakupi intelligence odmah
+  Future<void> gatherIntelligenceForCoin(String symbol,
+      {Coin? marketData}) async {
+    _isGatheringIntelligence = true;
+    notifyListeners();
+
+    try {
+      _lastReport = await _intelligence.buildReportForSymbol(
+        symbol: symbol,
+        marketData: marketData,
+      );
+    } catch (_) {
+      _lastReport = null;
+    }
+
+    _isGatheringIntelligence = false;
+    notifyListeners();
+  }
+
+  // Intelligence + Telegram lifecycle
+  void startIntelligenceMonitoring() {
+    // Only start background scanning if user has API key configured
+    if (hasApiKey) {
+      _intelligence.startAutoScan();
+    }
+    _telegramMonitor.reloadCredentials();
+    if (_telegramMonitor.isConfigured) {
+      _telegramMonitor.startMonitoring();
+    }
+  }
+
+  void stopIntelligenceMonitoring() {
+    _intelligence.stopAutoScan();
+    _telegramMonitor.stopMonitoring();
+  }
+
+  // Keep for backward compatibility with settings
   void startTelegramMonitor() {
     _telegramMonitor.reloadCredentials();
     if (_telegramMonitor.isConfigured) {

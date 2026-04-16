@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:coinsight/models/portfolio_provider.dart';
+import 'package:coinsight/models/analysis_provider.dart';
 import 'package:coinsight/models/coin_position.dart';
 import 'package:coinsight/models/analysis_log.dart';
+import 'package:coinsight/models/intelligence_report.dart';
 import 'package:coinsight/services/storage_service.dart';
 
 class PortfolioScreen extends StatefulWidget {
@@ -53,6 +55,8 @@ class _PortfolioScreenState extends State<PortfolioScreen>
             padding: const EdgeInsets.all(16),
             children: [
               _buildHeader(provider),
+              const SizedBox(height: 16),
+              _buildIntelligenceSection(),
               const SizedBox(height: 16),
               _buildPositionsSection(provider),
               const SizedBox(height: 16),
@@ -273,6 +277,169 @@ class _PortfolioScreenState extends State<PortfolioScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildIntelligenceSection() {
+    return Consumer<AnalysisProvider>(
+      builder: (context, provider, _) {
+        final report = provider.lastReport;
+        final isGathering = provider.isGatheringIntelligence;
+
+        if (isGathering) {
+          return Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  const SizedBox(width: 12),
+                  Text('Prikupljam intelligence...',
+                      style:
+                          TextStyle(color: Colors.grey[400], fontSize: 13)),
+                ],
+              ),
+            ),
+          );
+        }
+
+        if (report == null) {
+          return Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.radar, size: 18, color: Colors.grey[500]),
+                      const SizedBox(width: 8),
+                      Text('Intelligence Radar',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[400],
+                          )),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Tapni "Analiziraj" na DEX Early ili New Listings coinu za puni cross-channel report.',
+                    style:
+                        TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return _buildReportCard(report);
+      },
+    );
+  }
+
+  Widget _buildReportCard(IntelligenceReport report) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.radar, size: 18, color: report.scoreColor),
+                const SizedBox(width: 8),
+                Text('Intelligence: ${report.symbol}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: report.scoreColor,
+                    )),
+                const Spacer(),
+                Text(
+                  '${report.confluenceScore.toStringAsFixed(1)}/6.0',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: report.scoreColor,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: report.confluenceScore / 6.0,
+                backgroundColor: Colors.grey[800],
+                valueColor:
+                    AlwaysStoppedAnimation(report.scoreColor),
+                minHeight: 6,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _sourceIndicator(
+                    'DEX', report.dexScore, Colors.purple),
+                _sourceIndicator(
+                    'GH', report.githubScore, Colors.yellow),
+                _sourceIndicator(
+                    'Reddit', report.redditScore, Colors.orange),
+                _sourceIndicator(
+                    'TG', report.telegramScore, Colors.blue),
+                _sourceIndicator(
+                    'MCap', report.marketScore, Colors.green),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text('Hint: ${report.scoringHint}',
+                style:
+                    TextStyle(fontSize: 11, color: Colors.grey[500])),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _sourceIndicator(
+      String label, double score, Color color) {
+    final isActive = score > 0;
+    return Column(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isActive
+                ? color.withValues(alpha: 0.2)
+                : Colors.grey[800],
+            border: Border.all(
+                color: isActive ? color : Colors.grey[700]!),
+          ),
+          child: Center(
+            child: Text(
+              score.toStringAsFixed(1),
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: isActive ? color : Colors.grey[600],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(label,
+            style:
+                TextStyle(fontSize: 9, color: Colors.grey[500])),
+      ],
     );
   }
 

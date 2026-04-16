@@ -44,6 +44,9 @@ class TelegramMonitor {
   // Callback invoked by AnalysisProvider when a relevant signal arrives
   Function(TelegramSignal signal)? onSignalReceived;
 
+  // Cache recentnih signala (max 50) za IntelligenceAggregator
+  final List<TelegramSignal> _recentSignals = [];
+
   TelegramMonitor({http.Client? client})
       : _client = client ?? http.Client() {
     _botToken = StorageService.getTelegramMonitorToken();
@@ -134,8 +137,23 @@ class TelegramMonitor {
       messageId: (post['message_id'] as int?)?.toString() ?? '',
     );
 
+    _recentSignals.add(signal);
+    if (_recentSignals.length > 50) _recentSignals.removeAt(0);
+
     onSignalReceived?.call(signal);
   }
+
+  /// Vraća recentne signale koji spominju određeni simbol
+  List<TelegramSignal> getRecentSignalsForSymbol(String symbol) {
+    final symbolLower = symbol.toLowerCase();
+    return _recentSignals
+        .where((s) => s.text.toLowerCase().contains(symbolLower))
+        .toList();
+  }
+
+  /// Vraća sve recentne signale (za dashboard)
+  List<TelegramSignal> get recentSignals =>
+      List.unmodifiable(_recentSignals);
 
   /// Tests connection - returns bot username if token is valid
   Future<String?> testConnection() async {

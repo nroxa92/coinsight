@@ -22,6 +22,13 @@ opcionalnom automatskom egzekucijom Binance Spot orderima.
 - **Portfolio tracking** — live P&L praćenje otvorenih pozicija i
   history svih analiza
 
+### Intelligence Layer (v3.0)
+- **DEX Early Detection** — prati Uniswap, PancakeSwap, Raydium i ostale DEX-ove za listinge koji prethode CEX-u 1-14 dana
+- **GitHub Intelligence** — legitimacy signal kroz praćenje crypto repozitorija (aktivnost, stars, contributors)
+- **Reddit Monitoring** — community sentiment iz r/CryptoMoonShots, r/altcoin i srodnih
+- **Cross-Channel Scoring** — confluence score 0-6.0 agregira sve izvore s težinskim faktorima
+- **Intelligence Dashboard** — vizualni score breakdown po izvoru u Portfolio screenu
+
 ## Tehnički stack
 
 | Komponenta | Tehnologija |
@@ -31,7 +38,7 @@ opcionalnom automatskom egzekucijom Binance Spot orderima.
 | Tržišni podaci | CoinGecko API v3 (besplatno) |
 | AI analiza | Anthropic Claude API |
 | Trading | Binance Spot REST API |
-| Intelligence | Telegram Bot API (channel monitoring) |
+| Intelligence | Telegram + Dexscreener + GitHub + Reddit |
 | Storage | Hive (lokalno, na uređaju) |
 
 ## Preduvjeti

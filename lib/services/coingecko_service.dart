@@ -132,6 +132,34 @@ class CoinGeckoService {
     }
   }
 
+  /// Traži coin po simbolu — vraća do 5 rezultata
+  Future<List<Coin>> searchBySymbol(String symbol) async {
+    final uri = Uri.parse(
+      '$_baseUrl/coins/markets'
+      '?vs_currency=usd'
+      '&order=volume_desc'
+      '&per_page=250'
+      '&sparkline=false'
+      '&price_change_percentage=1h,24h',
+    );
+
+    try {
+      final res = await _client.get(uri).timeout(_timeout);
+      if (res.statusCode != 200) return [];
+
+      final List<dynamic> data = json.decode(res.body);
+      return data
+          .map((item) => Coin.fromJson(item))
+          .where((c) =>
+              c.symbol.toUpperCase() == symbol.toUpperCase() ||
+              c.name.toLowerCase().contains(symbol.toLowerCase()))
+          .take(5)
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
   void dispose() {
     _client.close();
   }

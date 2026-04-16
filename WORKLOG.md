@@ -1061,9 +1061,119 @@ Ključni dodani insight-i (nisu bili eksplicitni u WORKLOG-u):
 
 ---
 
+## Session 6: 2026-04-16 — v3.0.0 Full Intelligence Layer
+
+**Kontekst:** Major version bump. Session 5 završila s bugfixevima i Bot Managerom. Session 6 dodaje multi-source intelligence agregaciju: Dexscreener (DEX listinzi), GitHub (legitimacy), Reddit (community sentiment), plus existing Telegram i CoinGecko — sve agregirano kroz IntelligenceAggregator s cross-channel scoring sustavom (0-6.0 confluence score).
+
+---
+
+### Faza 1 — Intelligence Signal Modeli (4 nova modela)
+**Status:** Completed
+
+**Kreirani fajlovi:**
+- `lib/models/dexscreener_signal.dart` — DEX listing signal: pairAddress, baseToken, quoteToken, dexId, chainId, priceUsd, volumeUsd24h, liquidityUsd, priceChange1h/24h, pairCreatedAt. Computed: ageHours, volumeLiquidityRatio, hasMinimumLiquidity ($10k), isFresh (<=24h). fromJson() i toClaudeContext()
+- `lib/models/github_signal.dart` — GitHub repo signal: repoName, description, language, stars, starsToday, forks, openIssues, pushedAt, createdAt, topics. Computed: ageDays, isRecentlyActive (<=7d), starVelocity, hasCryptoTopics (14 crypto keywords). fromJson() i toClaudeContext()
+- `lib/models/reddit_signal.dart` — Reddit post signal: postId, title, subreddit, upvotes, comments, upvoteRatio, mentionedSymbols. Computed: ageHours, isFresh (<=12h), momentumScore (upvotes*ratio/hours)
+- `lib/models/intelligence_report.dart` — Centralni agregirani model: per-source signali + Scoring Engine (dexScore 0-2, githubScore 0-1, redditScore 0-1, telegramScore 0-1, marketScore 0-1). confluenceScore (0-6), scoringHint (STRONG_INTERESTING/POSSIBLE_WATCH/WEAK_SIGNAL/LIKELY_SKIP/INSUFFICIENT_DATA), scoreColor, toClaudeContext() formatiran report
+
+**Dodana dependency:** `html: ^0.15.4`
+
+### Faza 2 — DexscreenerService
+**Status:** Completed
+
+- `lib/services/dexscreener_service.dart` — 6 chainova (ethereum, bsc, solana, polygon, arbitrum, base). getNewPairs() s filterima: min liquidity $10k, min volume $5k, max age 48h, ignoriraj stablecoins i large caps. searchBySymbol() vraća par s najviše likvidnosti. Rate limit zaštita 200ms između chainova.
+
+### Faza 3 — GitHubIntelligence
+**Status:** Completed
+
+- `lib/services/github_intelligence.dart` — GitHub Search API. searchNewCryptoRepos() traži po 5 crypto topica (zadnjih 24h), deduplikacija. searchByCoinName() za specifičan coin. getTrendingCryptoToday() za trending crypto repoe. getRemainingRateLimit() provjera. 500ms rate limit delay.
+
+### Faza 4 — RedditMonitor
+**Status:** Completed
+
+- `lib/services/reddit_monitor.dart` — Reddit JSON API. 5 subreddita (CryptoMoonShots, altcoin, CryptoCurrency, defi, SatoshiStreetBets). getNewPosts() s filterima: min 10 upvotes, max 6h starost. _extractSymbols() regex za uppercase 2-10 char simbole s ignore listom. searchBySymbol() za specifičan coin. 300ms rate limit delay.
+
+### Faza 5 — IntelligenceAggregator
+**Status:** Completed
+
+- `lib/services/intelligence_aggregator.dart` — koordinator svih servisa. startAutoScan() s 15min intervalom. Paralelni fetch (Future.wait) svih izvora. _findCrossSourceMatches() traži coinove koji se pojavljuju u više izvora. buildReportForSymbol() za on-demand report. onHighScoreSignal callback za score >= 3.0. Cache zadnjeg skena.
+- Ažuriran `lib/services/telegram_monitor.dart` — dodan `_recentSignals` cache (max 50), `getRecentSignalsForSymbol()`, `recentSignals` getter
+- Ažuriran `lib/services/coingecko_service.dart` — dodan `searchBySymbol()` metoda
+
+### Faza 6 — AnalysisProvider Integracija
+**Status:** Completed
+
+- `lib/models/analysis_provider.dart` — kompletno ažuriran: dodan IntelligenceAggregator field, _lastReport, _isGatheringIntelligence. Konstruktor prima optional intelligence param, registrira onHighScoreSignal callback. `_buildUserMessage()` sada prioritizira IntelligenceReport (ako postoji) > watchlist + telegram signali. Nova metoda `gatherIntelligenceForCoin()`. Lifecycle: `startIntelligenceMonitoring()` (gated na hasApiKey), `stopIntelligenceMonitoring()`. System prompt proširen s cross-channel analitičkim instrukcijama (confluence score interpretacija, izvor ponderiranje, edge case handling).
+- `lib/main.dart` — `startTelegramMonitor()` → `startIntelligenceMonitoring()`
+
+### Faza 7 — Watchlist DEX Early Tab
+**Status:** Completed
+
+- `lib/widgets/dex_signal_card.dart` — DexSignalCard widget: dexId badge (purple), chainId badge (blue), token symbol/name, cijena, 1h change, Vol/Liq/V-L ratio stats, "Analiziraj" gumb
+- `lib/models/watchlist_provider.dart` — dodan DexscreenerService, _dexListings, _isDexLoading, _dexRefreshTimer. Metode: fetchDexListings(), startDexAutoRefresh() (10min), stopDexAutoRefresh()
+- `lib/screens/watchlist_screen.dart` — 4 taba (DEX Early | New Listings | My Watchlist | Top Coins). isScrollable TabBar. DEX tab s DexSignalCard listom + "Analiziraj" → gatherIntelligenceForCoin()
+
+### Faza 8 — Claude Sistemski Prompt Nadogradnja
+**Status:** Completed (ugrađeno u Fazu 6)
+
+Dodano na kraj system prompta: confluence analiza instrukcije (score 5-6 / 3-4.9 / 1.5-2.9 / <1.5), izvor ponderiranje (DEX > Telegram whale > GitHub > Reddit), edge cases (activeSources < 2, bez DEX ali visok TG/Reddit, DEX bez GitHub)
+
+### Faza 9 — Intelligence Dashboard
+**Status:** Completed
+
+- `lib/screens/portfolio_screen.dart` — nova _buildIntelligenceSection() s 3 stanja: gathering (spinner), no report (radar icon + hint), report card (confluence score bar, 5 source indikatori s kružnim badgeovima, scoring hint)
+
+### Faza 10 — Testovi
+**Status:** Completed
+
+**Kreirani fajlovi (7):**
+- `test/unit/models/dexscreener_signal_test.dart` (13 testova)
+- `test/unit/models/github_signal_test.dart` (13 testova)
+- `test/unit/models/reddit_signal_test.dart` (6 testova)
+- `test/unit/models/intelligence_report_test.dart` (27 testova) — scoring engine, confluence, hints, activeSources, toClaudeContext
+- `test/unit/services/dexscreener_service_test.dart` (7 testova)
+- `test/unit/services/github_intelligence_test.dart` (10 testova)
+- `test/unit/services/reddit_monitor_test.dart` (7 testova)
+
+**Rezultat:** 192/192 testova prolazi
+
+### Faza 11 — Finalizacija
+**Status:** Completed
+
+- `pubspec.yaml` — version 2.1.0+3 → 3.0.0+4, dodana `html: ^0.15.4`
+- `README.md` — dodana Intelligence Layer v3.0 sekcija
+- `flutter analyze` — **0 issues**
+- `flutter test` — **192/192 passed**
+- `flutter build apk --debug` — **uspješan**
+
+**Novi fajlovi (15):**
+- `lib/models/dexscreener_signal.dart`, `github_signal.dart`, `reddit_signal.dart`, `intelligence_report.dart`
+- `lib/services/dexscreener_service.dart`, `github_intelligence.dart`, `reddit_monitor.dart`, `intelligence_aggregator.dart`
+- `lib/widgets/dex_signal_card.dart`
+- `test/unit/models/dexscreener_signal_test.dart`, `github_signal_test.dart`, `reddit_signal_test.dart`, `intelligence_report_test.dart`
+- `test/unit/services/dexscreener_service_test.dart`, `github_intelligence_test.dart`, `reddit_monitor_test.dart`
+
+**Promijenjeni fajlovi (9):**
+- `lib/models/analysis_provider.dart` (intelligence integration + prompt extension)
+- `lib/models/watchlist_provider.dart` (+DEX listings)
+- `lib/services/telegram_monitor.dart` (+recentSignals cache)
+- `lib/services/coingecko_service.dart` (+searchBySymbol)
+- `lib/screens/watchlist_screen.dart` (4 taba, DEX Early prvi)
+- `lib/screens/portfolio_screen.dart` (+intelligence dashboard)
+- `lib/main.dart` (startIntelligenceMonitoring)
+- `pubspec.yaml` (version + html dep)
+- `README.md` (intelligence layer section)
+
+---
+
+---
+
 ## Identified Issues
 
 - **Binance account lockout (developer):** SMS 2FA ne stiže, duplicate account na broju — blokira live testing. Status: developer planira live chat / Account Appeal.
 - **API Management only on desktop web:** Binance je uklonio API sekciju iz mobilne app-a, pa se ključevi mogu generirati samo preko desktop weba.
-- ~~**LOT_SIZE precision hardcoded**~~ — **FIXED u Session 5 Faza 1** — dynamic stepSize fetch iz /exchangeInfo s in-memory cache
-- ~~**Timestamp drift**~~ — **FIXED u Session 5 Faza 2** — server time sync via /api/v3/time s auto-resync na -1021
+- ~~**LOT_SIZE precision hardcoded**~~ — **FIXED u Session 5 Faza 1**
+- ~~**Timestamp drift**~~ — **FIXED u Session 5 Faza 2**
+- **GitHub API rate limit (60 req/h):** bez autentikacije, agregator troši ~15-20 req po full scan ciklusu. S 15min intervalom = ~80 req/h = blizu limita. Moguće rješenje: dodati optional GitHub token u Settings za veći limit (5000 req/h).
+- **Reddit rate limiting:** Reddit ponekad vraća 429 za prečeste requestove. Trenutno silent fail — ne crashira ali može propustiti signale. Moguće rješenje: duži delay između subreddita ili OAuth2 autentikacija.
+- **Dexscreener pair age accuracy:** `pairCreatedAt` timestamp ovisi o Dexscreeneru da ga pravilno postavi. Za neke chainove može biti netočan. Identified Issues — ne fix u Session 6.

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:coinsight/models/watchlist_provider.dart';
+import 'package:coinsight/models/analysis_provider.dart';
 import 'package:coinsight/widgets/coin_card.dart';
+import 'package:coinsight/widgets/dex_signal_card.dart';
 
 class WatchlistScreen extends StatefulWidget {
   const WatchlistScreen({super.key});
@@ -17,21 +19,27 @@ class _WatchlistScreenState extends State<WatchlistScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(_onTabChanged);
     final provider = context.read<WatchlistProvider>();
     Future.microtask(() {
+      provider.fetchDexListings();
       provider.fetchNewListings();
       provider.fetchTopCoins();
-      provider.startNewListingsAutoRefresh();
+      // DEX auto-refresh starts via _onTabChanged when tab 0 is active
     });
   }
 
   void _onTabChanged() {
     final provider = context.read<WatchlistProvider>();
     if (_tabController.index == 0) {
+      provider.startDexAutoRefresh();
+      provider.stopNewListingsAutoRefresh();
+    } else if (_tabController.index == 1) {
       provider.startNewListingsAutoRefresh();
+      provider.stopDexAutoRefresh();
     } else {
+      provider.stopDexAutoRefresh();
       provider.stopNewListingsAutoRefresh();
     }
   }
@@ -50,20 +58,24 @@ class _WatchlistScreenState extends State<WatchlistScreen>
         TabBar(
           controller: _tabController,
           tabs: const [
+            Tab(text: 'DEX Early'),
             Tab(text: 'New Listings'),
             Tab(text: 'My Watchlist'),
             Tab(text: 'Top Coins'),
           ],
+          isScrollable: true,
           indicatorColor: Theme.of(context).colorScheme.primary,
           labelColor: Theme.of(context).colorScheme.primary,
           unselectedLabelColor: Colors.grey,
-          labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          labelStyle:
+              const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
           unselectedLabelStyle: const TextStyle(fontSize: 13),
         ),
         Expanded(
           child: TabBarView(
             controller: _tabController,
             children: [
+              _buildDexTab(),
               _buildNewListingsTab(),
               _buildWatchlistTab(),
               _buildTopCoinsTab(),
@@ -82,6 +94,59 @@ class _WatchlistScreenState extends State<WatchlistScreen>
     );
   }
 
+  // ───────── DEX Early Tab ─────────
+  Widget _buildDexTab() {
+    return Consumer<WatchlistProvider>(
+      builder: (context, provider, _) {
+        if (provider.isDexLoading && provider.dexListings.isEmpty) {
+          return _buildSkeletonList();
+        }
+
+        if (provider.dexListings.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.swap_horiz, size: 64, color: Colors.grey[700]),
+                const SizedBox(height: 16),
+                Text(
+                  'Skeniranje DEX marketa...',
+                  style: TextStyle(color: Colors.grey[500], fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Pratimo Uniswap, PancakeSwap, Raydium i ostale',
+                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: provider.fetchDexListings,
+          child: ListView.builder(
+            padding: const EdgeInsets.only(top: 8, bottom: 16),
+            itemCount: provider.dexListings.length,
+            itemBuilder: (context, index) {
+              final signal = provider.dexListings[index];
+              return DexSignalCard(
+                signal: signal,
+                onAnalyze: () {
+                  context.read<AnalysisProvider>().gatherIntelligenceForCoin(
+                        signal.baseTokenSymbol,
+                      );
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  // ───────── New Listings Tab ─────────
   Widget _buildNewListingsTab() {
     return Consumer<WatchlistProvider>(
       builder: (context, provider, _) {
@@ -156,6 +221,7 @@ class _WatchlistScreenState extends State<WatchlistScreen>
     );
   }
 
+  // ───────── Watchlist Tab ─────────
   Widget _buildWatchlistTab() {
     return Consumer<WatchlistProvider>(
       builder: (context, provider, _) {
@@ -203,6 +269,7 @@ class _WatchlistScreenState extends State<WatchlistScreen>
     );
   }
 
+  // ───────── Top Coins Tab ─────────
   Widget _buildTopCoinsTab() {
     return Consumer<WatchlistProvider>(
       builder: (context, provider, _) {
