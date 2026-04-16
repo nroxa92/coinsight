@@ -99,12 +99,6 @@ class TelegramMonitor {
         post['text'] as String? ?? post['caption'] as String? ?? '';
     if (text.isEmpty) return;
 
-    // Filter by trigger keywords (case insensitive)
-    final lowerText = text.toLowerCase();
-    final hasKeyword =
-        _triggerKeywords.any((kw) => lowerText.contains(kw));
-    if (!hasKeyword) return;
-
     // Get channel info
     final chat = post['chat'] as Map<String, dynamic>? ?? {};
     final channelTitle =
@@ -118,6 +112,19 @@ class TelegramMonitor {
       (c) => c == channelUsername || c == chat['id'].toString(),
     );
     if (!isMonitored) return;
+
+    // Filter by trigger keywords (case insensitive)
+    final lowerText = text.toLowerCase();
+    final hasKeyword =
+        _triggerKeywords.any((kw) => lowerText.contains(kw));
+
+    // Track stats for all messages from monitored channels
+    StorageService.updateChannelStats(
+      username: channelUsername,
+      wasRelevant: hasKeyword,
+    );
+
+    if (!hasKeyword) return;
 
     final signal = TelegramSignal(
       text: text,

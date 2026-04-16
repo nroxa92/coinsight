@@ -53,7 +53,7 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
-  final _titles = const ['Watchlist', 'Analysis', 'Portfolio', 'Settings'];
+  final _titles = const ['Watchlist', 'Analysis', 'Portfolio', 'Manage'];
 
   final TradeService _tradeService = TradeService();
   Timer? _stopLossTimer;
@@ -120,9 +120,9 @@ class _MainNavigationState extends State<MainNavigation> {
             label: 'Portfolio',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings_outlined),
-            activeIcon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.tune_outlined),
+            activeIcon: Icon(Icons.tune),
+            label: 'Manage',
           ),
         ],
       ),

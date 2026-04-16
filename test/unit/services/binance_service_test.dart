@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:coinsight/services/binance_service.dart';
 import 'package:coinsight/services/storage_service.dart';
@@ -16,6 +17,7 @@ void main() {
     await Hive.openBox('watchlist');
     await Hive.openBox('analysis_logs');
     await Hive.openBox('positions');
+    await Hive.openBox('monitored_channels_detail');
   });
 
   setUp(() async {
@@ -172,6 +174,36 @@ void main() {
         transactTime: DateTime.now(),
       );
       expect(order.avgPrice, 0);
+    });
+
+    test('serverTimeOffsetMs getter returns current offset', () {
+      final service = BinanceService();
+      expect(service.serverTimeOffsetMs, isA<int>());
+    });
+
+    test('syncServerTime calculates correct offset', () async {
+      final serverTime = DateTime.now().millisecondsSinceEpoch + 500;
+      final response = json.encode({'serverTime': serverTime});
+      final client = HttpClientFactory.returning(response);
+      final service = BinanceService(client: client);
+      await service.syncServerTime();
+      // Offset should be approximately 500ms (with some tolerance for execution time)
+      expect(service.serverTimeOffsetMs, greaterThan(400));
+      expect(service.serverTimeOffsetMs, lessThan(600));
+    });
+
+    test('ping calls syncServerTime on success', () async {
+      final serverTime = DateTime.now().millisecondsSinceEpoch + 100;
+      // First call returns ping OK, second returns server time
+      final client = HttpClientFactory.returningSequence([
+        http.Response('{}', 200),
+        http.Response(json.encode({'serverTime': serverTime}), 200),
+      ]);
+      final service = BinanceService(client: client);
+      final result = await service.ping();
+      expect(result, true);
+      // Offset should have been set
+      expect(service.serverTimeOffsetMs, isNot(0));
     });
   });
 }

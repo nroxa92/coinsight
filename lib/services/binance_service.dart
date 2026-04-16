@@ -64,6 +64,8 @@ class BinanceService {
   String? _apiKey;
   String? _apiSecret;
   bool _useTestnet;
+  final Map<String, int> _lotSizeCache = {};
+  int _serverTimeOffsetMs = 0;
 
   BinanceService({http.Client? client})
       : _client = client ?? http.Client(),
@@ -76,6 +78,7 @@ class BinanceService {
   bool get hasCredentials =>
       (_apiKey?.isNotEmpty ?? false) && (_apiSecret?.isNotEmpty ?? false);
   bool get isTestnet => _useTestnet;
+  int get serverTimeOffsetMs => _serverTimeOffsetMs;
 
   void reloadCredentials() {
     _apiKey = StorageService.getBinanceApiKey();
@@ -104,7 +107,7 @@ class BinanceService {
   String _signedQuery(Map<String, String> params) {
     final withTs = {
       ...params,
-      'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
+      'timestamp': _correctedTimestamp.toString(),
       'recvWindow': _recvWindow.toString(),
     };
     final qs = _buildQuery(withTs);
@@ -118,8 +121,12 @@ class BinanceService {
       final code = body['code'] as int?;
       final msg = body['msg'] as String? ?? 'Unknown Binance error';
       if (code == -1021) {
-        throw BinanceException('Timestamp out of sync with Binance server',
-            code: code);
+        syncServerTime(); // fire-and-forget resync
+        throw BinanceException(
+          'Sat uređaja nije sinkroniziran s Binance serverom. '
+          'Pokušaj ponovo — offset je korigiran.',
+          code: code,
+        );
       }
       if (code == -2010) {
         throw BinanceException('Insufficient balance or order rejected',
@@ -140,7 +147,11 @@ class BinanceService {
       final res = await _client
           .get(Uri.parse('$_baseUrl/api/v3/ping'))
           .timeout(_timeout);
-      return res.statusCode == 200;
+      if (res.statusCode == 200) {
+        await syncServerTime();
+        return true;
+      }
+      return false;
     } on TimeoutException {
       return false;
     } catch (_) {
@@ -229,11 +240,12 @@ class BinanceService {
     if (!hasCredentials) {
       throw BinanceException('Binance credentials not configured');
     }
+    final decimals = await _getLotSizeDecimals(symbol);
     final qs = _signedQuery({
       'symbol': symbol,
       'side': 'SELL',
       'type': 'MARKET',
-      'quantity': quantity.toStringAsFixed(6),
+      'quantity': quantity.toStringAsFixed(decimals),
     });
     final uri = Uri.parse('$_baseUrl/api/v3/order?$qs');
     late http.Response res;
@@ -276,5 +288,73 @@ class BinanceService {
     } on FormatException {
       throw BinanceException('Invalid response from Binance');
     }
+  }
+
+  // ───────── Server Time Sync ─────────
+
+  int get _correctedTimestamp =>
+      DateTime.now().millisecondsSinceEpoch + _serverTimeOffsetMs;
+
+  Future<void> syncServerTime() async {
+    try {
+      final uri = Uri.parse('$_baseUrl/api/v3/time');
+      final res = await _client.get(uri).timeout(_timeout);
+      if (res.statusCode != 200) return;
+
+      final data = json.decode(res.body) as Map<String, dynamic>;
+      final serverTime = data['serverTime'] as int?;
+      if (serverTime == null) return;
+
+      final localTime = DateTime.now().millisecondsSinceEpoch;
+      _serverTimeOffsetMs = serverTime - localTime;
+    } catch (_) {
+      _serverTimeOffsetMs = 0;
+    }
+  }
+
+  // ───────── LOT_SIZE Dynamic Precision ─────────
+
+  Future<int> _getLotSizeDecimals(String symbol) async {
+    if (_lotSizeCache.containsKey(symbol)) {
+      return _lotSizeCache[symbol]!;
+    }
+
+    try {
+      final uri = Uri.parse(
+        '$_baseUrl/api/v3/exchangeInfo?symbol=${Uri.encodeQueryComponent(symbol)}',
+      );
+      final res = await _client.get(uri).timeout(_timeout);
+      if (res.statusCode != 200) return 6;
+
+      final data = json.decode(res.body) as Map<String, dynamic>;
+      final symbols = data['symbols'] as List<dynamic>? ?? [];
+      if (symbols.isEmpty) return 6;
+
+      final symbolInfo = symbols.first as Map<String, dynamic>;
+      final filters = symbolInfo['filters'] as List<dynamic>? ?? [];
+
+      for (final f in filters) {
+        final filter = f as Map<String, dynamic>;
+        if (filter['filterType'] == 'LOT_SIZE') {
+          final stepSize = filter['stepSize'] as String? ?? '0.000001';
+          final decimals = _stepSizeToDecimals(stepSize);
+          _lotSizeCache[symbol] = decimals;
+          return decimals;
+        }
+      }
+    } catch (_) {
+      // Fallback to 6 decimals if fetch fails
+    }
+
+    _lotSizeCache[symbol] = 6;
+    return 6;
+  }
+
+  int _stepSizeToDecimals(String stepSize) {
+    final normalized = stepSize.replaceAll(RegExp(r'0+$'), '');
+    final dotIndex = normalized.indexOf('.');
+    if (dotIndex == -1) return 0;
+    final decimals = normalized.length - dotIndex - 1;
+    return decimals < 0 ? 0 : decimals;
   }
 }

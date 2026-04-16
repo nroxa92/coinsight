@@ -15,6 +15,7 @@ void main() {
     await Hive.openBox('watchlist');
     await Hive.openBox('analysis_logs');
     await Hive.openBox('positions');
+    await Hive.openBox('monitored_channels_detail');
   });
 
   setUp(() async {

@@ -13,6 +13,7 @@ void main() {
     if (!Hive.isBoxOpen('watchlist')) await Hive.openBox('watchlist');
     if (!Hive.isBoxOpen('analysis_logs')) await Hive.openBox('analysis_logs');
     if (!Hive.isBoxOpen('positions')) await Hive.openBox('positions');
+    if (!Hive.isBoxOpen('monitored_channels_detail')) await Hive.openBox('monitored_channels_detail');
   });
 
   group('App Navigation', () {
@@ -23,7 +24,7 @@ void main() {
       expect(find.text('Watchlist'), findsWidgets);
       expect(find.text('Analysis'), findsOneWidget);
       expect(find.text('Portfolio'), findsOneWidget);
-      expect(find.text('Settings'), findsOneWidget);
+      expect(find.text('Manage'), findsOneWidget);
     });
 
     testWidgets('tapping Analysis tab shows API key required',
@@ -37,16 +38,19 @@ void main() {
       expect(find.text('API Key Required'), findsOneWidget);
     });
 
-    testWidgets('tapping Settings tab shows settings sections',
+    testWidgets('tapping Manage tab shows tabbed settings',
         (tester) async {
       await tester.pumpWidget(const CoinSightApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Settings'));
+      await tester.tap(find.text('Manage'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Anthropic API Key'), findsOneWidget);
-      expect(find.text('Binance API'), findsOneWidget);
+      // Tabbed layout with 4 tabs
+      expect(find.text('API'), findsWidgets);
+      expect(find.text('Bot'), findsOneWidget);
+      expect(find.text('Trade'), findsOneWidget);
+      expect(find.text('App'), findsOneWidget);
     });
 
     testWidgets('tapping Portfolio tab shows portfolio screen',

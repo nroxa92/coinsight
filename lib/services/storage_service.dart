@@ -1,6 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:coinsight/models/analysis_log.dart';
 import 'package:coinsight/models/coin_position.dart';
+import 'package:coinsight/models/monitored_channel.dart';
 import 'package:coinsight/models/risk_parameters.dart';
 
 class StorageService {
@@ -15,6 +16,7 @@ class StorageService {
   static const _binanceTestnetField = 'binance_testnet';
   static const _telegramMonitorTokenField = 'telegram_monitor_token';
   static const _monitoredChannelsField = 'monitored_channels';
+  static const _monitoredChannelsDetailBox = 'monitored_channels_detail';
   static const _riskParamsField = 'risk_parameters';
 
   static Future<void> init() async {
@@ -23,6 +25,7 @@ class StorageService {
     await Hive.openBox(_watchlistBox);
     await Hive.openBox(_analysisLogBox);
     await Hive.openBox(_positionsBox);
+    await Hive.openBox(_monitoredChannelsDetailBox);
   }
 
   // API Key
@@ -160,5 +163,82 @@ class StorageService {
         .map((item) => CoinPosition.fromMap(item as Map<dynamic, dynamic>))
         .toList()
       ..sort((a, b) => b.entryTime.compareTo(a.entryTime));
+  }
+
+  // Monitored Channels Detail
+  static List<MonitoredChannel> getMonitoredChannelsDetail() {
+    final box = Hive.box(_monitoredChannelsDetailBox);
+    return box.values
+        .map((item) =>
+            MonitoredChannel.fromMap(item as Map<dynamic, dynamic>))
+        .toList();
+  }
+
+  static Future<void> saveMonitoredChannel(MonitoredChannel channel) async {
+    final box = Hive.box(_monitoredChannelsDetailBox);
+    await box.put(channel.username, channel.toMap());
+  }
+
+  static Future<void> updateChannelStats({
+    required String username,
+    required bool wasRelevant,
+  }) async {
+    final box = Hive.box(_monitoredChannelsDetailBox);
+    final existing = box.get(username);
+    if (existing == null) {
+      // Create new entry
+      final channel = MonitoredChannel(
+        username: username,
+        displayName: username,
+        signalsReceived: 1,
+        signalsRelevant: wasRelevant ? 1 : 0,
+        lastSignal: wasRelevant ? DateTime.now() : null,
+      );
+      await box.put(username, channel.toMap());
+    } else {
+      final channel =
+          MonitoredChannel.fromMap(existing as Map<dynamic, dynamic>);
+      final updated = channel.copyWith(
+        signalsReceived: channel.signalsReceived + 1,
+        signalsRelevant:
+            wasRelevant ? channel.signalsRelevant + 1 : null,
+        lastSignal: wasRelevant ? DateTime.now() : null,
+      );
+      await box.put(username, updated.toMap());
+    }
+  }
+
+  static Future<void> removeMonitoredChannel(String username) async {
+    final box = Hive.box(_monitoredChannelsDetailBox);
+    await box.delete(username);
+    // Also remove from custom channels list
+    final channels = getMonitoredChannels();
+    channels.remove(username);
+    await saveMonitoredChannels(channels);
+  }
+
+  static Future<void> toggleChannelActive(
+      String username, bool active) async {
+    final box = Hive.box(_monitoredChannelsDetailBox);
+    final existing = box.get(username);
+    if (existing == null) return;
+    final channel =
+        MonitoredChannel.fromMap(existing as Map<dynamic, dynamic>);
+    await box.put(username, channel.copyWith(isActive: active).toMap());
+  }
+
+  // Clear analysis logs
+  static Future<void> clearAnalysisLogs() async {
+    final box = Hive.box(_analysisLogBox);
+    await box.clear();
+  }
+
+  // Full reset
+  static Future<void> resetAll() async {
+    await Hive.box(_settingsBox).clear();
+    await Hive.box(_watchlistBox).clear();
+    await Hive.box(_analysisLogBox).clear();
+    await Hive.box(_positionsBox).clear();
+    await Hive.box(_monitoredChannelsDetailBox).clear();
   }
 }

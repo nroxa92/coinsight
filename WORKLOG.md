@@ -940,9 +940,130 @@ Ključni dodani insight-i (nisu bili eksplicitni u WORKLOG-u):
 
 ---
 
+## Session 5: 2026-04-16 — v2.1.0 Bugfixes, Bot Manager, App Management
+
+**Kontekst:** Session 4 završila s v2.0.0 release. Session 5 popravlja dva Identified Issues buga (LOT_SIZE, timestamp drift), dodaje Bot Manager screen za upravljanje Telegram kanalima, i refaktorira Settings u tabbed App Management screen.
+
+---
+
+### Faza 1 — Bugfix: LOT_SIZE Dynamic Precision
+**Status:** Completed
+
+**Problem:** `placeSellOrder` koristio hardkodirani `toStringAsFixed(6)` za quantity. Binance za svaki par definira `LOT_SIZE` filter s različitim `stepSize`.
+
+**Ažurirani fajlovi:**
+- `lib/services/binance_service.dart`:
+  - Dodan `_lotSizeCache` (Map<String, int>) za in-memory cache
+  - Nova metoda `_getLotSizeDecimals(symbol)` — fetch `/api/v3/exchangeInfo`, parse LOT_SIZE filter, cache rezultat, fallback na 6
+  - Nova metoda `_stepSizeToDecimals(stepSize)` — konvertira '0.00100000' → 3
+  - `placeSellOrder` koristi `await _getLotSizeDecimals(symbol)` umjesto hardkodiranog 6
+
+### Faza 2 — Bugfix: Timestamp Offset (Drift Korekcija)
+**Status:** Completed
+
+**Problem:** `_signedQuery` koristio `DateTime.now().millisecondsSinceEpoch` koji ovisi o sistemskom satu. Drift > 5000ms uzrokuje Binance error -1021.
+
+**Ažurirani fajlovi:**
+- `lib/services/binance_service.dart`:
+  - Dodan `_serverTimeOffsetMs` field + `serverTimeOffsetMs` getter
+  - Nova javna metoda `syncServerTime()` — fetch `/api/v3/time`, izračuna offset
+  - Dodan `_correctedTimestamp` getter koji primjenjuje offset
+  - `_signedQuery` koristi `_correctedTimestamp` umjesto `DateTime.now()`
+  - `ping()` poziva `syncServerTime()` nakon uspješnog pinga
+  - `_throwForResponse` pri -1021 poziva `syncServerTime()` fire-and-forget
+- `lib/screens/settings_screen.dart`:
+  - Test Binance gumb prikazuje offset u SnackBar poruci
+
+---
+
+### Faza 3 — Telegram Bot Manager Screen
+**Status:** Completed
+
+**Kreirani fajlovi:**
+- `lib/models/monitored_channel.dart` (~85 linija) — model s username, displayName, isDefault, signalsReceived, signalsRelevant, lastSignal, isActive. Computed: reliabilityScore (-1 ako <10 signala, inače relevant/received), reliabilityLabel (Novo/Niska/Srednja/Visoka), reliabilityColor. copyWith, toMap, fromMap.
+- `lib/screens/bot_manager_screen.dart` (~370 linija) — full screen route s 4 sekcije: Status Header (aktivan/neaktivan badge, ukupno kanala/signala), Aktivni kanali (ListView s reliability chipovima, pauziraj/obriši), Dodaj kanal (TextField + validacija), Preporučeni kanali (7 statičnih predloga: gate_io, mexc, bybit, cointelegraph, cryptonews, defipulse, onchaindata)
+
+**Ažurirani fajlovi:**
+- `lib/services/storage_service.dart` — novi box `monitored_channels_detail`, metode: getMonitoredChannelsDetail, saveMonitoredChannel, updateChannelStats, removeMonitoredChannel, toggleChannelActive, clearAnalysisLogs, resetAll
+- `lib/services/telegram_monitor.dart` — `_processUpdate()` poziva `StorageService.updateChannelStats()` za sve poruke iz praćenih kanala (wasRelevant: true/false)
+- `lib/screens/settings_screen.dart` — dodan "Otvori Bot Manager" gumb
+
+---
+
+### Faza 4 — App Management Screen Refactoring
+**Status:** Completed
+
+**Opis:** Settings screen (900 linija) razdijeljen u 4 tab widgeta unutar DefaultTabController.
+
+**Kreirani fajlovi:**
+- `lib/widgets/settings/api_settings_tab.dart` — Anthropic + Binance sekcije sa summary cardom
+- `lib/widgets/settings/bot_settings_tab.dart` — Telegram Monitor sekcija s Bot Manager gumbom
+- `lib/widgets/settings/trade_settings_tab.dart` — Risk Parameters sa summary cardom
+- `lib/widgets/settings/app_settings_tab.dart` — About + App Controls (clear history, export logs, reset all)
+
+**Ažurirani fajlovi:**
+- `lib/screens/settings_screen.dart` — kompletno prepisan kao tabbed container (API/Bot/Trade/App). Sva logika (callbacks) ostaje u parent, tab widgeti su StatelessWidget.
+- `lib/main.dart` — tab label 'Settings' → 'Manage', ikona settings → tune
+- `lib/screens/settings_screen.dart` — dodan `_exportLogs()` (clipboard), `_confirmClearLogs()`, `_confirmFullReset()`
+
+---
+
+### Faza 5 — Test Ažuriranja
+**Status:** Completed
+
+**Kreirani fajlovi:**
+- `test/unit/models/monitored_channel_test.dart` (8 testova) — reliabilityScore/Label za Novo/Niska/Srednja/Visoka, toMap/fromMap roundtrip, copyWith
+
+**Ažurirani fajlovi:**
+- `test/unit/services/binance_service_test.dart` — dodana 3 testa: serverTimeOffsetMs getter, syncServerTime offset calc, ping calls syncServerTime
+- `test/widget_test.dart` — Settings → Manage, ažurirani expects za tabbed layout
+- `test/integration/app_navigation_test.dart` — Settings → Manage, provjera 4 tabova (API/Bot/Trade/App)
+- Svi test setUpAll: dodano `Hive.openBox('monitored_channels_detail')`
+
+**Rezultat:** 108/108 testova prolazi
+
+---
+
+### Faza 6 — Finalizacija
+**Status:** Completed
+
+- `pubspec.yaml` — version 2.0.0+2 → 2.1.0+3
+- `flutter analyze` — **0 issues**
+- `flutter test` — **108/108 passed**
+- `flutter build apk --debug` — **uspješan**
+- Stari TelegramService reference — **0**
+- Hardkodirani secreti — **0**
+- `toStringAsFixed(6)` u binance_service.dart — **0** (LOT_SIZE fix verified)
+
+**Novi fajlovi (7):**
+- `lib/models/monitored_channel.dart`
+- `lib/screens/bot_manager_screen.dart`
+- `lib/widgets/settings/api_settings_tab.dart`
+- `lib/widgets/settings/bot_settings_tab.dart`
+- `lib/widgets/settings/trade_settings_tab.dart`
+- `lib/widgets/settings/app_settings_tab.dart`
+- `test/unit/models/monitored_channel_test.dart`
+
+**Promijenjeni fajlovi (11):**
+- `lib/services/binance_service.dart` (LOT_SIZE + timestamp sync)
+- `lib/services/storage_service.dart` (monitored channels detail box + CRUD)
+- `lib/services/telegram_monitor.dart` (channel stats tracking)
+- `lib/screens/settings_screen.dart` (kompletno prepisan — tabbed layout)
+- `lib/main.dart` (Settings → Manage)
+- `pubspec.yaml` (version bump)
+- `test/unit/services/binance_service_test.dart` (+3 testa)
+- `test/widget_test.dart` (Settings → Manage)
+- `test/integration/app_navigation_test.dart` (Settings → Manage + tab check)
+- `test/unit/services/telegram_monitor_test.dart` (Hive box)
+- `test/unit/services/trade_service_test.dart` (Hive box)
+
+---
+
+---
+
 ## Identified Issues
 
-- **Binance account lockout (developer):** SMS 2FA ne stiže, duplicate account na broju — blokira live testing. Nije bug u appu, ali blocker za verifikaciju Session 3 rada. Status: developer planira live chat / Account Appeal.
-- **API Management only on desktop web:** Binance je uklonio API sekciju iz mobilne app-a, pa se ključevi mogu generirati samo preko desktop weba — što traži prolazak 2FA. Nije naš bug, ali ograničenje tooling-a.
-- **LOT_SIZE precision hardcoded:** `placeSellOrder` koristi fiksno 6 decimala — Binance može vratiti -1013 za neke simbole. Rješenje: fetch `/api/v3/exchangeInfo` i cache LOT_SIZE stepSize per simbol. Popravak čeka live test da potvrdi realnu pojavu.
-- **Timestamp drift:** ako sistemski sat driftuje, Binance vraća -1021. Trenutno sa `recvWindow=5000ms`. Za robusnost dodati `/api/v3/time` offset calc pri prvoj konekciji.
+- **Binance account lockout (developer):** SMS 2FA ne stiže, duplicate account na broju — blokira live testing. Status: developer planira live chat / Account Appeal.
+- **API Management only on desktop web:** Binance je uklonio API sekciju iz mobilne app-a, pa se ključevi mogu generirati samo preko desktop weba.
+- ~~**LOT_SIZE precision hardcoded**~~ — **FIXED u Session 5 Faza 1** — dynamic stepSize fetch iz /exchangeInfo s in-memory cache
+- ~~**Timestamp drift**~~ — **FIXED u Session 5 Faza 2** — server time sync via /api/v3/time s auto-resync na -1021

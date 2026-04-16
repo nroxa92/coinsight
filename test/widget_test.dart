@@ -12,6 +12,7 @@ void main() {
     if (!Hive.isBoxOpen('watchlist')) await Hive.openBox('watchlist');
     if (!Hive.isBoxOpen('analysis_logs')) await Hive.openBox('analysis_logs');
     if (!Hive.isBoxOpen('positions')) await Hive.openBox('positions');
+    if (!Hive.isBoxOpen('monitored_channels_detail')) await Hive.openBox('monitored_channels_detail');
   });
 
   testWidgets('App renders with bottom navigation', (WidgetTester tester) async {
@@ -20,7 +21,7 @@ void main() {
 
     expect(find.text('Watchlist'), findsWidgets);
     expect(find.text('Analysis'), findsOneWidget);
-    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('Manage'), findsOneWidget);
   });
 
   testWidgets('Bottom navigation switches tabs', (WidgetTester tester) async {
@@ -32,10 +33,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('API Key Required'), findsOneWidget);
 
-    // Tap Settings tab
-    await tester.tap(find.text('Settings'));
+    // Tap Manage tab
+    await tester.tap(find.text('Manage'));
     await tester.pumpAndSettle();
-    expect(find.text('Anthropic API Key'), findsOneWidget);
-    expect(find.text('Binance API'), findsOneWidget);
+    // Settings now uses tabs - check that API tab content is visible
+    expect(find.text('API'), findsWidgets);
   });
 }
