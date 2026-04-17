@@ -1,4 +1,4 @@
-# CoinSight — Korisnicki Priručnik
+# CoinSight— Korisnicki Priručnik
 
 **Za koga je ovaj priručnik:** netko tko prvi put otvara CoinSight. Ne pretpostavljamo da znaš što je market cap, što je Spot trading, niti kako funkcionira API ključ. Sve se objašnjava u hodu.
 
