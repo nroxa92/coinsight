@@ -4,7 +4,7 @@
 **Datum generiranja:** 2026-04-16
 **Status projekta:** v7.0.0 release — 280 testova, 10 sesija, Three-Tier Investment Framework (SHORT/MID/LONG) + Intelligence Layer + Detail Screens + DEX Position Tracking + Charts & Visualization + Push Notifications + P&L Dashboard + WalletConnect v2
 **Autor:** Neven (developer) + Claude Code (implementacija)
-**Licenca:** MIT (Copyright (c) 2026 Neven Roksandic)
+**Licenca:** MIT (Copyright (c) 2026 Neven Roksa)
 
 ---
 
