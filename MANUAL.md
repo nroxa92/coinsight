@@ -1,4 +1,4 @@
-# CoinSight— Korisnicki Priručnik
+# CoinSight — Korisnički priručnik
 
 **Za koga je ovaj priručnik:** netko tko prvi put otvara CoinSight. Ne pretpostavljamo da znaš što je market cap, što je Spot trading, niti kako funkcionira API ključ. Sve se objašnjava u hodu.
 
@@ -11,7 +11,7 @@
 
 ## Kako čitati ovaj priručnik
 
-- Prodi **redom od 1 do 10**. Svaka sekcija se nadovezuje na prethodnu.
+- Prođi **redom od 1 do 10**. Svaka se sekcija nadovezuje na prethodnu.
 - Sekcije **11 nadalje** (Telegram Monitor, scenariji, troubleshooting) čitaj po potrebi.
 - Gdje god vidiš ▶ **to napravi sad** — to je korak koji bi trebao izvršiti dok čitaš.
 - Ako nešto ne razumiješ, potraži pojam u **Rječniku** na kraju (sekcija 18).
@@ -21,8 +21,8 @@
 ## Sadržaj
 
 1. [Što je CoinSight i koji je cilj](#1-što-je-coinsight)
-2. [Osnovne crypto pojmove koje trebaš razumjeti](#2-osnovne-crypto-pojmove)
-3. [Što ti treba prije nego kreneš](#3-što-ti-treba-prije-nego-kreneš)
+2. [Osnovni crypto pojmovi koje trebaš razumjeti](#2-osnovne-crypto-pojmove)
+3. [Što ti treba prije nego što kreneš](#3-što-ti-treba-prije-nego-što-kreneš)
 3A. [Three-Tier Investment Framework (v4.0.0)](#3a-three-tier-investment-framework)
 3B. [MidProjectDetailScreen (v5.0.0)](#3b-midprojectdetailscreen)
 3C. [LongHoldingDetailScreen (v5.0.0)](#3c-longholdingdetailscreen)
@@ -44,7 +44,7 @@
 13. [Telegram Monitor — pasivno obavještajno prikupljanje](#13-telegram-monitor)
 13A. [Intelligence Layer — multi-source obavještajni sustav](#13a-intelligence-layer)
 14. [Bot Manager — upravljanje kanalima](#14-bot-manager)
-15. [Tipični scenariji — što se dogadja tijekom dana](#15-tipični-scenariji)
+15. [Tipični scenariji — što se događa tijekom dana](#15-tipični-scenariji)
 16. [Problemi i rješenja](#16-problemi-i-rješenja)
 17. [Sigurnost — što moraš znati](#17-sigurnost)
 18. [Često postavljana pitanja](#18-često-postavljana-pitanja)
@@ -56,7 +56,7 @@
 
 ### 1.1 U jednoj rečenici
 
-CoinSight je aplikacija koja ti pomaže **pronaći male kripto valute** koje trenutno rastu, **pitati AI** je li rast stvaran ili prijevara, i **kupiti ih** jednim tapom — sve unutar iste app-e.
+CoinSight je aplikacija koja ti pomaže **pronaći male kripto valute** koje trenutno rastu, **pitati AI** je li rast stvaran ili prijevara i **kupiti ih** jednim tapom — sve unutar iste app-e.
 
 ### 1.2 Što rješava (ili zašto postoji)
 
@@ -69,35 +69,35 @@ Zamisli uobičajeni proces kad netko želi uhvatiti crypto "pump":
 5. Pregledava Telegram kanale — čita li netko o tome
 6. Prebacuje se u Binance, traži coin
 7. Ručno računa koliko kupiti
-8. Klika Buy, potvrduje
+8. Klika Buy, potvrđuje
 9. Prebacuje se u neku app za praćenje P&L-a
 
 Traje 10-15 minuta po coinu. **CoinSight sve to radi u jednoj app-i u ~60 sekundi.**
 
 Verzija 3.0.0 dodala je **Intelligence Layer** — sustav koji prati DEX listinge, GitHub aktivnost, Reddit diskusije i Telegram kanale, te sve to objedinjuje u obavještajni izvještaj za Claude analizu.
 
-Verzija 4.0.0 uvodi **Three-Tier Investment Framework** — umjesto jednog pristupa za sve, sada imas tri razlicita investicijska moda: **SHORT** (kratkorocni momentum, do 48h), **MID** (srednjorocni projekti, tjedni do mjeseci) i **LONG** (dugorocna fundamentalna ulaganja, mjeseci do godine). Svaki tier ima vlastite alate, analizu i portfolio prikaz.
+Verzija 4.0.0 uvodi **Three-Tier Investment Framework** — umjesto jednog pristupa za sve, sada imaš tri različita investicijska moda: **SHORT** (kratkoročni momentum, do 48h), **MID** (srednjoročni projekti, tjedni do mjeseci) i **LONG** (dugoročna fundamentalna ulaganja, mjeseci do godine). Svaki tier ima vlastite alate, analizu i portfolio prikaz.
 
-Verzija 5.0.0 dodaje **detail screenove** za MID projekte i LONG holdinge, **DEX Position Tracking** za rucno pracenje trade-ova s decentraliziranih burzi, te **MID Discovery** (GitHub trending) i **LONG Research** (filtrirani top 200) pod-tabove u Watchlistu.
+Verzija 5.0.0 dodaje **detail screenove** za MID projekte i LONG holdinge, **DEX Position Tracking** za ručno praćenje trade-ova s decentraliziranih burzi te **MID Discovery** (GitHub trending) i **LONG Research** (filtrirani top 200) pod-tabove u Watchlistu.
 
-Verzija 6.0.0 dodaje **interaktivne tier-aware chartove** (SHORT 10d+24h, MID 6m+30d, LONG 2y+6m), **push notifikacije** (SL/TP/INTERESTING alerte), i znacajno prosiren test suite.
+Verzija 6.0.0 dodaje **interaktivne tier-aware chartove** (SHORT 10d+24h, MID 6m+30d, LONG 2y+6m), **push notifikacije** (SL/TP/INTERESTING alerte) i značajno proširen test suite.
 
-Verzija 7.0.0 dodaje **P&L Dashboard** s equity curve-om, win rate-om, R/R ratiom i per-tier breakdownom, **WalletConnect v2** za spajanje eksternog walleta i pokretanje swapova, te **Trade History** za kompletnu evidenciju zatvorenih trade-ova.
+Verzija 7.0.0 dodaje **P&L Dashboard** s equity curveom, win rateom, R/R ratiom i per-tier breakdownom, **WalletConnect v2** za spajanje eksternog walleta i pokretanje swapova te **Trade History** za kompletnu evidenciju zatvorenih trade-ova.
 
-> Ako si potpuni pocetnik u crypto svijetu, pogledaj [NEWBIE_GUIDE.md](NEWBIE_GUIDE.md) za pojednostavljen uvod.
+> Ako si potpuni početnik u crypto svijetu, pogledaj [NEWBIE_GUIDE.md](NEWBIE_GUIDE.md) za pojednostavljen uvod.
 
 ### 1.3 Što CoinSight NIJE
 
 - **Nije magija.** Ne zna budućnost. Njegova AI procjena je korisna u ~60-70% slučajeva, ne 100%.
-- **Nije za pasivno držanje bez strategije.** CoinSight podržava tri investicijska horizonta (SHORT/MID/LONG), ali svaki zahtijeva aktivno praćenje i disciplinu. LONG tier nije "kupi i zaboravi" — ukljucuje DCA kupnje i praćenje fundamentala.
+- **Nije za pasivno držanje bez strategije.** CoinSight podržava tri investicijska horizonta (SHORT/MID/LONG), ali svaki zahtijeva aktivno praćenje i disciplinu. LONG tier nije "kupi i zaboravi" — uključuje DCA kupnje i praćenje fundamentala.
 - **Nije financijski savjet.** Ti odlučuješ, ti snosiš gubitke.
 - **Nije vlasnik tvog novca.** Tvoj novac ostaje na Binanceu. CoinSight samo komunicira s Binance API-jem u tvoje ime.
 
 ### 1.4 Koji AI se koristi
 
-**Claude** od Anthropica — jedan od najnaprednijih AI asistenata. CoinSight ga koristi kroz službeni Anthropic API. AI dobija podatke o coinu (cijena, volumen, trendovi) i vraća procjenu: **WATCH / SKIP / INTERESTING**.
+**Claude** od Anthropica — jedan od najnaprednijih AI asistenata. CoinSight ga koristi kroz službeni Anthropic API. AI dobiva podatke o coinu (cijena, volumen, trendovi) i vraća procjenu: **WATCH / SKIP / INTERESTING**.
 
-U v3.0.0+, Claude automatski prima strukturirani Intelligence Report iz višestrukih izvora — DEX listinzi, GitHub aktivnost, Reddit diskusije, Telegram signali — te ih koristi za precizniju analizu. U v4.0.0, Claude dodatno prilagodava analizu ovisno o aktivnom tier-u (SHORT/MID/LONG) — svaki tier ima vlastite suggestion chipove i action bar akcije.
+U v3.0.0+, Claude automatski prima strukturirani Intelligence Report iz višestrukih izvora — DEX listinzi, GitHub aktivnost, Reddit diskusije, Telegram signali — te ih koristi za precizniju analizu. U v4.0.0 Claude dodatno prilagođava analizu ovisno o aktivnom tieru (SHORT/MID/LONG) — svaki tier ima vlastite suggestion chipove i action bar akcije.
 
 ### 1.5 Open source
 
@@ -105,9 +105,9 @@ CoinSight je open source projekt pod **MIT licencom**. Možeš slobodno koristit
 
 ---
 
-## 2. Osnovne crypto pojmove
+## 2. Osnovni crypto pojmovi
 
-Pojmovi koje moraš razumjeti prije korištenja app-a. Ako ti je sve poznato, preskoči na sekciju 3.
+Pojmovi koje moraš razumjeti prije korištenja app-e. Ako ti je sve poznato, preskoči na sekciju 3.
 
 ### 2.1 Coin / Token
 
@@ -122,7 +122,7 @@ Koliko **ukupno vrijedi** taj coin u cijelom svijetu. Formula: `broj_coinova_u_o
 - **Small-cap** ($10M-$500M): srednje rizično, brži pokreti
 - **Micro-cap** (<$10M): vrlo rizično, moguć 10x ili gubitak 90%
 
-CoinSight lovi **small i micro cap** kod kojih je moguć 20-100% rast u satima.
+CoinSight lovi **small i micro cap** coinove kod kojih je moguć 20-100% rast u satima.
 
 ### 2.3 Market cap rank (rang)
 
@@ -130,7 +130,7 @@ Pozicija coina po market capu. Bitcoin je #1. Ethereum je #2. CoinSight u New Li
 
 ### 2.4 Volume (volumen)
 
-Koliko se **tog coina trgovalo u zadnjih 24 sata** u USD-u. Primjer: ako piše volume $2M, to znači da su ljudi u zadnjih 24h kupili i prodali ukupno $2 milijuna vrijedno tog coina.
+Koliko se **tog coina trgovalo u zadnja 24 sata** u USD-u. Primjer: ako piše volume $2M, to znači da su ljudi u zadnja 24h kupili i prodali ukupno $2 milijuna vrijedno tog coina.
 
 - **Premali volumen** (<$50k) = malo ljudi trguje = teško prodati kad zatreba = **slippage** (prodaš po goroj cijeni od očekivane)
 - **Idealan za CoinSight** ($50k-$50M) = dovoljno aktivnosti da je realno, ne previsoko da bude već mainstream
@@ -139,7 +139,7 @@ Koliko se **tog coina trgovalo u zadnjih 24 sata** u USD-u. Primjer: ako piše v
 ### 2.5 Price change (promjena cijene)
 
 - **1h change**: koliko je cijena porasla ili pala u **zadnjem satu**. Pokazuje **trenutni momentum**.
-- **24h change**: u **zadnjih 24h**. Pokazuje kratki trend.
+- **24h change**: u **zadnja 24h**. Pokazuje kratki trend.
 
 CoinSight sortira po 1h — ono što raste **upravo sada** je na vrhu liste.
 
@@ -151,7 +151,7 @@ Mali grafikon u CoinCard-u koji pokazuje **7-dnevnu krivulju cijene**. Brzi vizu
 
 Najosnovniji oblik trgovine: **kupiš coin, imaš ga, možeš prodati**. Za razliku od:
 - **Futures** — tradaš derivativima bez posjedovanja coina (CoinSight **NE** podržava — previše rizično za početnike)
-- **Margin** — trgovanje posudjenim novcem (CoinSight **NE** podržava)
+- **Margin** — trgovanje posuđenim novcem (CoinSight **NE** podržava)
 
 CoinSight = **isključivo Spot**.
 
@@ -164,20 +164,20 @@ Oba su **sigurnosne mreže** — ne moraš buljiti u ekran cijeli dan.
 
 ### 2.9 Slippage
 
-Razlika izmedju **cijene koju si vidio** i **cijene po kojoj si stvarno kupio/prodao**. Na small-cap coinovima s malim volume-om može biti značajan (1-5%).
+Razlika između **cijene koju si vidio** i **cijene po kojoj si stvarno kupio/prodao**. Na small-cap coinovima s malim volumenom može biti značajna (1-5%).
 
 ### 2.10 API ključ
 
 Sigurnosni "kod" koji aplikacija koristi da komunicira sa servisom (Binance, Claude) u tvoje ime. **Važno**: API ključ **nije tvoja lozinka**. Lozinka je za prijavu na web, API ključ je samo za automatizaciju.
 
-Kod Binance API ključa postoje **permissionsi**:
+Kod Binance API ključa postoje **permissioni**:
 - **Read**: samo gleda balans i cijene
 - **Spot Trading**: kupuje i prodaje u tvoje ime (potrebno)
 - **Withdrawal**: povlači novac s računa (NIKAD ne uključuj)
 
 ---
 
-## 3. Što ti treba prije nego kreneš
+## 3. Što ti treba prije nego što kreneš
 
 ### 3.1 Check-lista
 
@@ -185,7 +185,7 @@ Prije prvog korištenja:
 
 | Stvar | Obavezno? | Gdje nabaviti |
 |-------|-----------|---------------|
-| Android telefon ili Windows PC | Obavezno | Tvoj uredjaj |
+| Android telefon ili Windows PC | Obavezno | Tvoj uređaj |
 | Internet veza | Obavezno | — |
 | **Anthropic API ključ** (za AI analizu) | Ako želiš AI | Kreiraš na console.anthropic.com (~10 min) |
 | **Binance Spot account** (za kupovanje) | Za trading | binance.com, registracija + KYC (~30 min + čekanje verifikacije) |
@@ -208,7 +208,7 @@ Zašto toliko:
 
 - **Anthropic AI**: cca **$0.003-0.01 po jednoj analizi** (ovisno o modelu). Mjesečno ~$5-20 ako svakodnevno analiziraš
 - **Binance trading fee**: **0.1% po tradeu** (kupuješ $10, plaćaš $0.01 fee). Zanemarivo
-- **CoinSight app**: besplatan, open source (MIT licenca)
+- **CoinSight app**: besplatna, open source (MIT licenca)
 
 Za mjesečni budžet: **$10-30** za AI + fee.
 
@@ -218,9 +218,9 @@ Za mjesečni budžet: **$10-30** za AI + fee.
 
 ### 3A.1 Što su tier-ovi
 
-Verzija 4.0.0 uvodi **tri investicijska tier-a** — tri potpuno razlicita nacina koristenja CoinSight-a, svaki s vlastitim alatima, analizom i portfolio prikazom:
+Verzija 4.0.0 uvodi **tri investicijska tiera** — tri potpuno različita načina korištenja CoinSighta, svaki s vlastitim alatima, analizom i portfolio prikazom:
 
-| Tier | Horizont | Fokus | Tipicni coinovi |
+| Tier | Horizont | Fokus | Tipični coinovi |
 |------|----------|-------|-----------------|
 | **SHORT** | Sati do 48h | Momentum trading, brzi ulaz/izlaz | Micro-cap, meme coinovi, DEX listinzi |
 | **MID** | Tjedni do mjeseci | Projekti s katalystom (launch, partnerstvo, upgrade) | Small-cap s jasnim roadmapom |
@@ -228,7 +228,7 @@ Verzija 4.0.0 uvodi **tri investicijska tier-a** — tri potpuno razlicita nacin
 
 ### 3A.2 Kako prebaciti tier
 
-Na vrhu app-e, odmah ispod AppBara, vidjet ces **TierModeSelector** banner s tri buttona:
+Na vrhu app-e, odmah ispod AppBara, vidjet ćeš **TierModeSelector** banner s tri buttona:
 
 ```
 +------------------------------------------+
@@ -236,56 +236,56 @@ Na vrhu app-e, odmah ispod AppBara, vidjet ces **TierModeSelector** banner s tri
 +------------------------------------------+
 ```
 
-- **SHORT** je default (isto ponasanje kao u v3.0.0)
+- **SHORT** je default (isto ponašanje kao u v3.0.0)
 - Tapni **MID** ili **LONG** za prebacivanje
-- Aktivni tier je istaknut bojom (SHORT = primary ljubicasta, MID = teal, LONG = amber)
-- Prebacivanje tier-a mijenja: suggestion chipove u Analysis tabu, akcije u Trade Action Baru, prikaz u Portfolio tabu
+- Aktivni tier je istaknut bojom (SHORT = primary ljubičasta, MID = teal, LONG = amber)
+- Prebacivanje tiera mijenja: suggestion chipove u Analysis tabu, akcije u Trade Action Baru, prikaz u Portfolio tabu
 
 ### 3A.3 SHORT tier (default)
 
-Sve sto si dosad koristio u CoinSight-u. Brzi momentum, WATCH/SKIP/INTERESTING, Trade Action Bar s BUY NOW, SL/TP automatski. Nema promjena u odnosu na v3.0.0 za ovaj tier.
+Sve što si dosad koristio u CoinSightu. Brzi momentum, WATCH/SKIP/INTERESTING, Trade Action Bar s BUY NOW, SL/TP automatski. Nema promjena u odnosu na v3.0.0 za ovaj tier.
 
-### 3A.4 MID tier — srednjorocni projekti
+### 3A.4 MID tier — srednjoročni projekti
 
-MID tier je za coinove koje ne kupujes na 2 sata, nego ih **pratis tjednima** s jasnim katalystom (npr. mainnet launch za 3 tjedna, partnerstvo, token unlock).
+MID tier je za coinove koje ne kupuješ na 2 sata, nego ih **pratiš tjednima** s jasnim katalystom (npr. mainnet launch za 3 tjedna, partnerstvo, token unlock).
 
 **Kako koristiti:**
 
-1. Prebaci na **MID** tier u TierModeSelector-u
-2. U **Analysis tabu**, suggestion chipovi se mijenjaju u MID-specificne:
+1. Prebaci na **MID** tier u TierModeSelectoru
+2. U **Analysis tabu**, suggestion chipovi se mijenjaju u MID-specifične:
    - "Procijeni MID-term potencijal"
    - "Kreiraj MID projekt za [coin]"
    - "Analiziraj katalyst timeline"
 3. Kad Claude identificira MID-term priliku, pojavljuje se **MID Action Bar** (umjesto standardnog Trade Action Bara):
    - **CREATE PROJECT** — kreira MidTermProject zapis za taj coin
-   - **SKIP** — preskoci
-4. Kreirani projekti se vide u **Watchlist → Projekti** pod-tabu (novi pod-tab u v4.0.0)
-5. U **Portfolio tabu**, MID sekcija prikazuje tvoje aktivne MID projekte s progress barom do katalysta
+   - **SKIP** — preskoči
+4. Kreirani projekti se vide u pod-tabu **Watchlist → Projekti** (novi pod-tab u v4.0.0)
+5. U **Portfolio tabu** MID sekcija prikazuje tvoje aktivne MID projekte s progress barom do katalysta
 
-**MidTermProject** sadrzi: coin info, entry price, target price, katalyst opis, deadline, notes, status (ACTIVE/COMPLETED/ABANDONED).
+**MidTermProject** sadrži: coin info, entry price, target price, katalyst opis, deadline, notes, status (ACTIVE/COMPLETED/ABANDONED).
 
-### 3A.5 LONG tier — dugorocna fundamentalna ulaganja
+### 3A.5 LONG tier — dugoročna fundamentalna ulaganja
 
-LONG tier je za coinove u koje vjerujes dugorocno i kupujes ih postupno kroz **DCA (Dollar-Cost Averaging)** — redovite male kupnje neovisno o cijeni.
+LONG tier je za coinove u koje vjeruješ dugoročno i kupuješ ih postupno kroz **DCA (Dollar-Cost Averaging)** — redovite male kupnje neovisno o cijeni.
 
 **Kako koristiti:**
 
-1. Prebaci na **LONG** tier u TierModeSelector-u
-2. U **Analysis tabu**, suggestion chipovi se mijenjaju u LONG-specificne:
+1. Prebaci na **LONG** tier u TierModeSelectoru
+2. U **Analysis tabu**, suggestion chipovi se mijenjaju u LONG-specifične:
    - "Fundamentalna analiza [coin]"
    - "Kreiraj LONG holding za [coin]"
    - "DCA strategija za [coin]"
 3. Kad Claude potvrdi fundamentalnu snagu, pojavljuje se **LONG Action Bar**:
    - **CREATE HOLDING** — kreira LongTermHolding zapis
-   - **DCA BUY** — izvrsava DCA kupnju za postojeci holding
-   - **SKIP** — preskoci
-4. U **Portfolio tabu**, LONG sekcija prikazuje tvoje holdinge s prosjecnom kupovnom cijenom, ukupnom kolicinom, i fundamentals summary
+   - **DCA BUY** — izvršava DCA kupnju za postojeći holding
+   - **SKIP** — preskoči
+4. U **Portfolio tabu** LONG sekcija prikazuje tvoje holdinge s prosječnom kupovnom cijenom, ukupnom količinom i fundamentals summary
 
-**LongTermHolding** sadrzi: coin info, DCA purchases lista (svaka s cijenom, kolicinom, datumom), prosjecna cijena, thesis (zasto drzis ovaj coin), fundamentals notes.
+**LongTermHolding** sadrži: coin info, DCA purchases listu (svaka s cijenom, količinom, datumom), prosječnu cijenu, thesis (zašto držiš ovaj coin), fundamentals notes.
 
-### 3A.6 Tier-ovi i analiza
+### 3A.6 Tierovi i analiza
 
-Claude prilagodava analizu ovisno o aktivnom tier-u:
+Claude prilagođava analizu ovisno o aktivnom tieru:
 
 - **SHORT**: fokus na momentum, volume spike, pump-and-dump rizik, 1h/24h konzistentnost → WATCH/SKIP/INTERESTING
 - **MID**: fokus na katalyst timeline, project legitimacy, community growth, token unlock schedule → CREATE PROJECT / SKIP
@@ -295,152 +295,152 @@ Claude prilagodava analizu ovisno o aktivnom tier-u:
 
 ## 3B. MidProjectDetailScreen (v5.0.0)
 
-### 3B.1 Sto je MidProjectDetailScreen
+### 3B.1 Što je MidProjectDetailScreen
 
-MidProjectDetailScreen je **detaljan ekran za upravljanje pojedinacnim MID tier projektom**. Otvara se tapom na projekt iz Portfolio MID sekcije ili kreiranjem novog projekta iz Analysis MID action bara ili Discovery taba.
+MidProjectDetailScreen je **detaljan ekran za upravljanje pojedinačnim MID tier projektom**. Otvara se tapom na projekt iz Portfolio MID sekcije ili kreiranjem novog projekta iz Analysis MID action bara ili Discovery taba.
 
 ### 3B.2 Kako koristiti
 
 **Kreiranje projekta:**
-1. Prebaci na **MID** tier u TierModeSelector-u
+1. Prebaci na **MID** tier u TierModeSelectoru
 2. U **Analysis tabu**, kad Claude identificira MID-term priliku, tapni **CREATE PROJECT** u MID Action Baru
-3. Alternativno: u **Watchlist → MID Discovery** tabu pronadi coin i kreiraj projekt direktno
+3. Alternativno: u tabu **Watchlist → MID Discovery** pronađi coin i kreiraj projekt direktno
 
-**Sto mozes raditi na detail screenu:**
-- **Editiraj thesis** — upisi zasto pratis ovaj projekt, koji je tvoj investicijski teorem
-- **Editiraj GitHub link** — dodaj link na GitHub repozitorij projekta za pracenje razvoja
-- **Editiraj entry plan** — definisi plan ulaza (cijena, uvjeti, iznos)
-- **Upravljaj statusom** — prebaci projekt izmedu statusa: ACTIVE / COMPLETED / ABANDONED
-- **Dodaj biljeske** — zapisuj zapazanja, vijesti, katalyst update-ove
+**Što možeš raditi na detail screenu:**
+- **Editiraj thesis** — upiši zašto pratiš ovaj projekt, koji je tvoj investicijski teorem
+- **Editiraj GitHub link** — dodaj link na GitHub repozitorij projekta za praćenje razvoja
+- **Editiraj entry plan** — definiraj plan ulaza (cijena, uvjeti, iznos)
+- **Upravljaj statusom** — prebaci projekt između statusa: ACTIVE / COMPLETED / ABANDONED
+- **Dodaj bilješke** — zapisuj zapažanja, vijesti, katalyst update-ove
 
 ### 3B.3 Status lifecycle
 
-| Status | Znacenje |
+| Status | Značenje |
 |--------|----------|
 | **ACTIVE** | Projekt se aktivno prati, katalyst u tijeku |
-| **COMPLETED** | Uspjesno zavrsen (profit ostvaren ili cilj postignut) |
-| **ABANDONED** | Napusten (uvjeti se promijenili, projekt propao) |
+| **COMPLETED** | Uspješno završen (profit ostvaren ili cilj postignut) |
+| **ABANDONED** | Napušten (uvjeti se promijenili, projekt propao) |
 
 ---
 
 ## 3C. LongHoldingDetailScreen (v5.0.0)
 
-### 3C.1 Sto je LongHoldingDetailScreen
+### 3C.1 Što je LongHoldingDetailScreen
 
-LongHoldingDetailScreen je **detaljan ekran za upravljanje pojedinacnim LONG tier holdingom** s cetiri taba za organizirane informacije.
+LongHoldingDetailScreen je **detaljan ekran za upravljanje pojedinačnim LONG tier holdingom** s četiri taba za organizirane informacije.
 
-### 3C.2 Cetiri taba
+### 3C.2 Četiri taba
 
-| Tab | Sadrzaj |
+| Tab | Sadržaj |
 |-----|---------|
-| **Osnove** | Osnovne informacije o holdingu: coin info, thesis, prosjecna cijena, ukupna kolicina, ukupna investicija |
-| **Fundamentali** | Pracenje fundamentala projekta: team, tehnologija, adoption, tokenomics, competitive positioning |
-| **DCA** | Pregled i dodavanje DCA kupnji — svaka kupnja s cijenom, kolicinom i datumom. Prikaz prosjecne DCA cijene |
-| **Biljeske** | Slobodne biljeske o holdingu — zapazanja, makro trendovi, rebalancing planovi |
+| **Osnove** | Osnovne informacije o holdingu: coin info, thesis, prosječna cijena, ukupna količina, ukupna investicija |
+| **Fundamentali** | Praćenje fundamentala projekta: team, tehnologija, adoption, tokenomics, competitive positioning |
+| **DCA** | Pregled i dodavanje DCA kupnji — svaka kupnja s cijenom, količinom i datumom. Prikaz prosječne DCA cijene |
+| **Bilješke** | Slobodne bilješke o holdingu — zapažanja, makro trendovi, rebalancing planovi |
 
 ### 3C.3 Kako dodati DCA kupnju
 
-1. Otvori LongHoldingDetailScreen za zeljeni holding
-2. Prebaci na **DCA** tab
-3. Tapni **+ Dodaj DCA kupnju** button
-4. Unesi **cijenu**, **kolicinu** i **datum** kupnje
-5. Potvrdi — kupnja se sprema i prosjecna cijena se automatski preracunava
+1. Otvori LongHoldingDetailScreen za željeni holding
+2. Prebaci na tab **DCA**
+3. Tapni button **+ Dodaj DCA kupnju**
+4. Unesi **cijenu**, **količinu** i **datum** kupnje
+5. Potvrdi — kupnja se sprema i prosječna se cijena automatski preračunava
 
 ### 3C.4 Upravljanje fundamentalima
 
-Na **Fundamentali** tabu mozes pratiti kljucne aspekte projekta:
-- Team kvaliteta i track record
-- Tehnoloska inovacija i roadmap progress
-- Adoption metrke (korisnici, TVL, transakcije)
+Na tabu **Fundamentali** možeš pratiti ključne aspekte projekta:
+- Kvaliteta teama i track record
+- Tehnološka inovacija i roadmap progress
+- Adoption metrike (korisnici, TVL, transakcije)
 - Tokenomics (supply, distribucija, unlock schedule)
 
 ---
 
 ## 3D. DEX Position Tracking (v5.0.0)
 
-### 3D.1 Sto je DEX Position Tracking
+### 3D.1 Što je DEX Position Tracking
 
-DEX Position Tracking omogucava **rucno pracenje trade-ova s decentraliziranih burzi** (Dexscreener). Buduci da CoinSight ne moze direktno izvrsavati trade-ove na DEX-ovima (za razliku od Binance Spot-a), korisnik rucno unosi podatke o trade-ovima.
+DEX Position Tracking omogućava **ručno praćenje trade-ova s decentraliziranih burzi** (Dexscreener). Budući da CoinSight ne može direktno izvršavati trade-ove na DEX-ovima (za razliku od Binance Spota), korisnik ručno unosi podatke o trade-ovima.
 
 ### 3D.2 Kako koristiti
 
-1. Izvrsi trade na DEX-u (Uniswap, PancakeSwap, Raydium, itd.) koristeci svoj wallet
-2. U CoinSight-u, otvori **Portfolio → SHORT** sekciju → **DEX pozicije**
+1. Izvrši trade na DEX-u (Uniswap, PancakeSwap, Raydium itd.) koristeći svoj wallet
+2. U CoinSightu otvori sekciju **Portfolio → SHORT** → **DEX pozicije**
 3. Tapni **+ Nova DEX pozicija**
-4. Unesi podatke s Dexscreenera: token adresa/simbol, entry cijena, kolicina, DEX, chain
+4. Unesi podatke s Dexscreenera: token adresa/simbol, entry cijena, količina, DEX, chain
 5. Postavi **SL (Stop-Loss)** i **TP (Take-Profit)** razine
 
 ### 3D.3 Automatski price refresh
 
-- CoinSight automatski osvjezava cijenu DEX pozicija putem Dexscreener API-ja
-- P&L se racuna u realnom vremenu na osnovu trenutne cijene
+- CoinSight automatski osvježava cijenu DEX pozicija putem Dexscreener API-ja
+- P&L se računa u realnom vremenu na temelju trenutne cijene
 
 ### 3D.4 SL/TP monitoring
 
 - App prati SL i TP razine za DEX pozicije
-- Kad cijena dosegne SL ili TP, **dobivas vizualno upozorenje** (app ne moze automatski prodati na DEX-u)
-- Ti rucno zatvaras poziciju na DEX-u i oznacavas je kao zatvorenu u CoinSight-u
+- Kad cijena dosegne SL ili TP, **dobivaš vizualno upozorenje** (app ne može automatski prodati na DEX-u)
+- Ti ručno zatvaraš poziciju na DEX-u i označavaš je kao zatvorenu u CoinSightu
 
-### 3D.5 Vazna razlika od Binance pozicija
+### 3D.5 Važna razlika u odnosu na Binance pozicije
 
 | Binance Spot | DEX pozicije |
 |-------------|-------------|
-| App automatski kupuje/prodaje | Rucni unos trade-ova |
-| SL/TP automatski izvrsava sell | SL/TP samo upozorava (vizualno) |
-| Podaci iz Binance API-ja | Podaci iz Dexscreener-a + rucni unos |
+| App automatski kupuje/prodaje | Ručni unos trade-ova |
+| SL/TP automatski izvršava sell | SL/TP samo upozorava (vizualno) |
+| Podaci iz Binance API-ja | Podaci iz Dexscreenera + ručni unos |
 
 ---
 
 ## 3E. Charts & Visualization (v6.0.0)
 
-### 3E.1 Sto su chartovi
+### 3E.1 Što su chartovi
 
 CoinSight v6.0.0 dodaje **interaktivne price chartove** za svaki coin. Chartovi prikazuju historijske cijene i (opcionalno) AI-generirane predikcije.
 
 ### 3E.2 Kako otvoriti chart
 
-Na bilo kojem **CoinCard-u** (Watchlist, DEX Early, Top Coins) tapni ikonu **chart** (ikona trenda). Alternativno, iz **Analysis screena** tapni ikonu charta u AppBaru nakon sto odaberes coin.
+Na bilo kojem **CoinCardu** (Watchlist, DEX Early, Top Coins) tapni ikonu **chart** (ikona trenda). Alternativno, iz **Analysis screena** tapni ikonu charta u AppBaru nakon što odabereš coin.
 
-### 3E.3 Sto svaki tier prikazuje
+### 3E.3 Što svaki tier prikazuje
 
-| Tier | Duzi period | Kraci period |
+| Tier | Duži period | Kraći period |
 |------|------------|-------------|
 | **SHORT** | 10 dana | 24 sata |
 | **MID** | 6 mjeseci | 30 dana |
 | **LONG** | 2 godine | 6 mjeseci |
 
-Chartovi se automatski prilagodavaju aktivnom tieru. Mozes prebaciti tier kroz TierModeSelector i chart ce se osvjeziti.
+Chartovi se automatski prilagođavaju aktivnom tieru. Možeš prebaciti tier kroz TierModeSelector i chart će se osvježiti.
 
 ### 3E.4 Interakcija
 
-- **Dodir i drzanje** na chartu prikazuje crosshair s tocnom cijenom i datumom
-- **Pomicanje** po chartu mijenja tocku crosshair-a
+- **Dodir i držanje** na chartu prikazuje crosshair s točnom cijenom i datumom
+- **Pomicanje** po chartu mijenja točku crosshaira
 - Predikcijska linija (ako postoji) prikazana je isprekidano
 
-### 3E.5 Tocnost predikcije
+### 3E.5 Točnost predikcije
 
-**Vazno:** AI predikcije su **eksperimentalne** i sluze kao vizualna pomoc, ne kao financijski savjet. Historijska tocnost varira. Nikad ne donosite investicijske odluke iskljucivo na osnovu predikcije.
+**Važno:** AI predikcije su **eksperimentalne** i služe kao vizualna pomoć, a ne kao financijski savjet. Historijska točnost varira. Nikad ne donosi investicijske odluke isključivo na temelju predikcije.
 
 ---
 
 ## 3F. Push Notifications (v6.0.0)
 
-### 3F.1 Sto su push notifikacije
+### 3F.1 Što su push notifikacije
 
-CoinSight v6.0.0 integrira `flutter_local_notifications` za slanje lokalnih push obavijesti cak i kad app nije u prvom planu.
+CoinSight v6.0.0 integrira `flutter_local_notifications` za slanje lokalnih push obavijesti čak i kad app nije u prvom planu.
 
 ### 3F.2 Tipovi notifikacija
 
 | Tip | Opis |
 |-----|------|
-| **SL alert** | Pozicija je dostigla stop-loss razinu — potrebna akcija |
+| **SL alert** | Pozicija je dostigla stop-loss razinu — potrebna je akcija |
 | **TP alert** | Pozicija je dostigla take-profit razinu — razmotri prodaju |
-| **INTERESTING signal** | Claude je oznacio coin kao INTERESTING — nova prilika |
+| **INTERESTING signal** | Claude je označio coin kao INTERESTING — nova prilika |
 
 ### 3F.3 Kako konfigurirati
 
 1. Otvori **Manage** tab (ikona tune)
-2. Idi na **Trade** pod-tab
+2. Idi na pod-tab **Trade**
 3. Toggle za svaki tip notifikacije (SL/TP/INTERESTING)
 
 Notifikacije rade lokalno — nema servera, nema cloud messaginga.
@@ -449,30 +449,30 @@ Notifikacije rade lokalno — nema servera, nema cloud messaginga.
 
 ## 3G. P&L Dashboard (v7.0.0)
 
-### 3G.1 Sto je P&L Dashboard
+### 3G.1 Što je P&L Dashboard
 
-P&L Dashboard je **centralizirani pregled performansi** svih tvojih trade-ova. Umjesto da rucno racunas koliko si zaradio ili izgubio, Dashboard automatski prikuplja podatke iz svih zatvorenih trade-ova i prikazuje kljucne metrike.
+P&L Dashboard je **centralizirani pregled performansi** svih tvojih trade-ova. Umjesto da ručno računaš koliko si zaradio ili izgubio, Dashboard automatski prikuplja podatke iz svih zatvorenih trade-ova i prikazuje ključne metrike.
 
 ### 3G.2 Kako pristupiti
 
-P&L Dashboard se otvara tapom na **banner** u **Portfolio** tabu. Banner prikazuje sazetak (ukupni P&L, win rate) i vodi na full-screen PnlDashboardScreen.
+P&L Dashboard se otvara tapom na **banner** u **Portfolio** tabu. Banner prikazuje sažetak (ukupni P&L, win rate) i vodi na full-screen PnlDashboardScreen.
 
 ### 3G.3 Metrike koje prikazuje
 
-| Metrika | Sto znaci |
+| Metrika | Što znači |
 |---------|-----------|
 | **Equity Curve** | Grafikon koji prikazuje rast ili pad tvog ukupnog portfolija kroz vrijeme. Uzlazna krivulja = ukupno u plusu, silazna = ukupno u minusu |
-| **Win Rate** | Postotak trade-ova koji su zavrsili s profitom. Npr. 60% win rate znaci da je 6 od 10 trade-ova bilo profitabilno |
-| **R/R Ratio (Risk/Reward)** | Prosjecni omjer profita naspram gubitka. R/R 2.0 znaci da prosjecni profitabilni trade donosi 2x vise nego sto prosjecni gubitnicki trade gubi |
-| **Per-tier breakdown** | P&L razdvojen po tieru — vidis koliko zaradjujes/gubis u SHORT vs MID vs LONG strategiji |
+| **Win Rate** | Postotak trade-ova koji su završili s profitom. Npr. 60% win rate znači da je 6 od 10 trade-ova bilo profitabilno |
+| **R/R Ratio (Risk/Reward)** | Prosječni omjer profita naspram gubitka. R/R 2.0 znači da prosječni profitabilni trade donosi 2x više nego što prosječni gubitnički trade gubi |
+| **Per-tier breakdown** | P&L razdvojen po tieru — vidiš koliko zarađuješ/gubiš u SHORT vs. MID vs. LONG strategiji |
 
-### 3G.4 Equity Curve objasnjenje
+### 3G.4 Equity Curve objašnjenje
 
-Equity curve je **najvazniji grafikon** za praćenje performansi. X-os je vrijeme (datumi trade-ova), Y-os je kumulativni P&L.
+Equity curve je **najvažniji grafikon** za praćenje performansi. X-os je vrijeme (datumi trade-ova), Y-os je kumulativni P&L.
 
-- **Ravnomjerno rastuci** graf = konzistentno profitabilna strategija
-- **Rastuci s oscilacijama** = profitabilna ali s volatilnoscu (normalno)
-- **Padajuci** graf = strategija gubi novac — razmotri prilagodbu parametara ili pauzu
+- **Ravnomjerno rastući** graf = konzistentno profitabilna strategija
+- **Rastući s oscilacijama** = profitabilna, ali s volatilnošću (normalno)
+- **Padajući** graf = strategija gubi novac — razmotri prilagodbu parametara ili pauzu
 
 ### 3G.5 Per-tier breakdown
 
@@ -486,7 +486,7 @@ Dashboard prikazuje odvojene statistike za svaki tier:
 +------------------------------------------+
 ```
 
-Ovo ti pomaze identificirati koji tier je tvoja najjaca strategija i gdje trebas prilagoditi pristup.
+Ovo ti pomaže identificirati koji je tier tvoja najjača strategija i gdje trebaš prilagoditi pristup.
 
 ### 3G.6 Kad početi pratiti Dashboard
 
@@ -510,13 +510,13 @@ Ako SL ili TP automatski triggeraju — app automatski zatvara poziciju i sprema
 
 ## 3H. WalletConnect v2 (v7.0.0)
 
-### 3H.1 Sto je WalletConnect
+### 3H.1 Što je WalletConnect
 
 WalletConnect je **otvoreni protokol** za sigurno spajanje crypto walleta (MetaMask, Trust Wallet, Phantom i drugi) na decentralizirane aplikacije. CoinSight koristi **WalletConnect v2** za povezivanje tvog walleta s aplikacijom.
 
 ### 3H.2 Postavljanje
 
-**Preduvjet:** Trebas **Project ID** s WalletConnect Cloud platforme.
+**Preduvjet:** trebaš **Project ID** s WalletConnect Cloud platforme.
 
 ▶ **Napravi sad:**
 
@@ -524,11 +524,11 @@ WalletConnect je **otvoreni protokol** za sigurno spajanje crypto walleta (MetaM
 1. Otvori browser i idi na: **https://cloud.reown.com**
 2. Registriraj se (GitHub login ili email)
 3. Kreiraj novi projekt (npr. "CoinSight")
-4. Kopiraj **Project ID** koji dobijes
+4. Kopiraj **Project ID** koji dobiješ
 
 **Korak 2 — Unesi Project ID u CoinSight:**
-1. Otvori CoinSight --> **Manage** tab --> **API** pod-tab
-2. Pronadi polje **"WalletConnect Project ID"**
+1. Otvori CoinSight --> **Manage** tab --> pod-tab **API**
+2. Pronađi polje **"WalletConnect Project ID"**
 3. Zalijepi kopirani Project ID
 4. Tapni **"Save"**
 
@@ -540,37 +540,37 @@ WalletConnect je **otvoreni protokol** za sigurno spajanje crypto walleta (MetaM
 4. U walletu skeniraj QR kod ili odobri konekciju
 5. Wallet adresa se prikazuje u CoinSightu
 
-### 3H.4 Sto omogucava
+### 3H.4 Što omogućava
 
-- **Prikaz wallet adrese** u aplikaciji — vidis spojeni wallet
-- **Pokretanje swapova** — iz CoinSight-a mozes inicirati token swap na DEX-u
+- **Prikaz wallet adrese** u aplikaciji — vidiš spojeni wallet
+- **Pokretanje swapova** — iz CoinSighta možeš inicirati token swap na DEX-u
 - **Veza s DEX pozicijama** — automatsko povezivanje wallet adrese s DEX Position Trackingom
 
-> **Vazno:** WalletConnect NE daje CoinSightu pristup tvojim privatnim kljucevima. Svaka transakcija zahtijeva tvoju eksplicitnu potvrdu u walletu.
+> **Važno:** WalletConnect NE daje CoinSightu pristup tvojim privatnim ključevima. Svaka transakcija zahtijeva tvoju eksplicitnu potvrdu u walletu.
 
 ---
 
 ## 3I. Trade History (v7.0.0)
 
-### 3I.1 Sto je Trade History
+### 3I.1 Što je Trade History
 
-Trade History je **kompletna evidencija svih zatvorenih trade-ova**. Svaki put kad se pozicija zatvori (rucno, SL trigger, ili TP trigger), CoinSight zapisuje ClosedTrade zapis s detaljima.
+Trade History je **kompletna evidencija svih zatvorenih trade-ova**. Svaki put kad se pozicija zatvori (ručno, SL trigger ili TP trigger), CoinSight zapisuje ClosedTrade zapis s detaljima.
 
-### 3I.2 Sto se zapisuje
+### 3I.2 Što se zapisuje
 
 Za svaki zatvoreni trade:
-- **Coin** — koji coin je bio trgovan
+- **Coin** — koji je coin bio trgovan
 - **Tier** — u kojem tieru (SHORT/MID/LONG)
 - **Entry price** — cijena ulaza
 - **Exit price** — cijena izlaza
-- **Quantity** — kolicina tokena
+- **Quantity** — količina tokena
 - **P&L** — apsolutni i postotni profit/gubitak
-- **Razlog zatvaranja** — SL trigger, TP trigger, rucno zatvaranje
+- **Razlog zatvaranja** — SL trigger, TP trigger, ručno zatvaranje
 - **Datum otvaranja i zatvaranja**
 
-### 3I.3 Rucno zatvaranje s exit price-om
+### 3I.3 Ručno zatvaranje s exit priceom
 
-Kad rucno zatvoras poziciju (CLOSE button u Portfolio tabu), CoinSight sada trazi **exit price** za precizno racunanje P&L-a. App automatski predlaze trenutnu trzisnu cijenu, ali mozes unijeti i drugu cijenu (npr. ako si vec prodao na DEX-u po drugoj cijeni).
+Kad ručno zatvaraš poziciju (CLOSE button u Portfolio tabu), CoinSight sada traži **exit price** za precizno računanje P&L-a. App automatski predlaže trenutnu tržišnu cijenu, ali možeš unijeti i drugu cijenu (npr. ako si već prodao na DEX-u po drugoj cijeni).
 
 ### 3I.4 Gdje vidjeti
 
@@ -591,7 +591,7 @@ Trade History se prikazuje u:
 
 **Windows:**
 1. Preuzmi `coinsight.exe` i pripadajuće datoteke iz GitHub releasea (ili build-aj lokalno)
-2. Extract ZIP u direktorij po izboru
+2. Ekstrahiraj ZIP u direktorij po izboru
 3. Dupli klik na `coinsight.exe`
 
 **Build iz izvora:**
@@ -624,7 +624,7 @@ Kad prvi put otvoriš app vidjet ćeš:
 
 Nakon 2-3 sekunde skeleton nestaje i pojavljuju se **stvarni coinovi** — lista 20-ak small-cap coinova koji trenutno rastu.
 
-**TierModeSelector banner (v4.0.0):** Ispod AppBara vidis tri buttona — SHORT, MID, LONG. Default je SHORT (ljubicasti). Ovo kontrolira koji investicijski tier je aktivan i utjece na suggestion chipove u Analysis tabu, akcije u Trade Action Baru, i prikaz u Portfolio tabu. Za pocetak ostavi na SHORT.
+**TierModeSelector banner (v4.0.0):** Ispod AppBara vidiš tri buttona — SHORT, MID, LONG. Default je SHORT (ljubičasti). Ovo kontrolira koji je investicijski tier aktivan i utječe na suggestion chipove u Analysis tabu, akcije u Trade Action Baru i prikaz u Portfolio tabu. Za početak ostavi na SHORT.
 
 ▶ **Napravi sad:** samo pogledaj listu. Ne moraš još ništa tapnuti.
 
@@ -641,13 +641,13 @@ Nakon 2-3 sekunde skeleton nestaje i pojavljuju se **stvarni coinovi** — lista
 
 Odozgo dolje, lijevo-desno:
 - **#523** — market cap rank (523. po veličini, micro-cap)
-- **[ikona]** — ikonica coina (ako ne učita, prikaže se placeholder)
+- **[ikona]** — ikonica coina (ako se ne učita, prikaže se placeholder)
 - **PepeRocket** — puno ime coina
-- **[1H +12.4%]** — zelena oznaka: u zadnjem satu porasao 12.4%
+- **[1H +12.4%]** — zelena oznaka: u zadnjem satu porastao 12.4%
 - **PEPR** — ticker simbol (kratica)
 - **..../\....** — sparkline, 7-dnevni trend (raste blago do polovice tjedna pa stabilizacija)
 - **$0.000423** — trenutna cijena
-- **+45.3% 24H** — zeleno: u zadnjih 24h porasao 45.3%
+- **+45.3% 24H** — zeleno: u zadnja 24h porastao 45.3%
 - **[*]** — zvjezdica za dodavanje u My Watchlist (ako je sjajna, već je u watchlistu)
 
 ### 4.4 Pull-to-refresh
@@ -681,7 +681,7 @@ Sada ćemo proći svaki tab da vidiš što je gdje. **Ne treba ništa konfigurir
 
 ### 5.1 Tab [*] Watchlist — pod-tabi (tier-zavisni)
 
-Prvi tab koji vidiš kad otvoriš app. Tab bar je **scrollable** (isScrollable: true) — swipe lijevo-desno ako ti ne stanu svi na ekran. Broj i sadrzaj pod-tabova ovisi o aktivnom tier-u.
+Prvi tab koji vidiš kad otvoriš app. Tab bar je **scrollable** (isScrollable: true) — swipe lijevo-desno ako ti ne stanu svi na ekran. Broj i sadržaj pod-tabova ovisi o aktivnom tieru.
 
 **SHORT tier:** DEX Early | New Listings | My Watchlist | Top Coins
 **MID tier:** DEX Early | New Listings | My Watchlist | **MID Discovery** | Projekti | Top Coins
@@ -689,7 +689,7 @@ Prvi tab koji vidiš kad otvoriš app. Tab bar je **scrollable** (isScrollable: 
 
 **MID Discovery (v5.0.0):** Prikazuje **live GitHub trending** kripto projekte — repozitorije s naglim porastom zvjezdica i aktivnosti u zadnjih 24h. Korisno za otkrivanje novih projekata s razvojnim momentumom.
 
-**LONG Research (v5.0.0):** Prikazuje **filtrirani top 200** coinova po market capu, optimizirano za fundamentalnu analizu — fokus na etablirane projekte s dokazanim track recordom pogodne za dugorocno drzanje.
+**LONG Research (v5.0.0):** Prikazuje **filtrirani top 200** coinova po market capu, optimizirano za fundamentalnu analizu — fokus na etablirane projekte s dokazanim track recordom pogodne za dugoročno držanje.
 
 **Pod-tab 1: DEX Early (default, prvi) — NOVO u v3.0.0**
 
@@ -712,7 +712,7 @@ Svaka kartica prikazuje:
 - **Volume** (24h trading volumen)
 - **Liquidity** (koliko likvidnosti je u pool-u)
 - **V/L ratio** (Volume/Liquidity) — viši omjer = aktivniji trading u odnosu na likvidnost
-- **"Analiziraj" button** — pokreće punu intelligence analizu za taj coin (vidi sekciju 5.6)
+- **"Analiziraj" button** — pokreće potpunu intelligence analizu za taj coin (vidi sekciju 5.6)
 
 - Auto se osvježava svakih 3 minute
 - Pull-to-refresh radi ručno
@@ -743,13 +743,13 @@ Top 25 najvećih kripto valuta po market capu. Bitcoin, Ethereum, Tether, itd.
 
 Kad tapneš **"Analiziraj"** na DEX Early kartici:
 
-1. App pokreće **puno intelligence prikupljanje** za taj specifični coin
+1. App pokreće **potpuno intelligence prikupljanje** za taj specifični coin
 2. IntelligenceAggregator provjerava svih 5 izvora (DEX, GitHub, Reddit, Telegram, Market Cap)
-3. Gradi se **IntelligenceReport** s confluence score-om (0-6.0)
+3. Gradi se **IntelligenceReport** s confluence scoreom (0-6.0)
 4. Report se šalje Claudeu kao strukturirani multi-source kontekst
 5. Claude odgovara s analizom koja uzima u obzir **sve** prikupljene podatke
 
-Ovo je moćnije od obične analize jer Claude ne dobija samo watchlist brojke, nego kompletan obavještajni izvještaj iz više nezavisnih izvora.
+Ovo je moćnije od obične analize jer Claude ne dobiva samo watchlist brojke, nego kompletan obavještajni izvještaj iz više nezavisnih izvora.
 
 ### 5.2 Tab [**] Analysis — Claude chat
 
@@ -788,9 +788,9 @@ Kad **dodaš ključ**, tab prelazi u chat sučelje:
 +----------------------------------+
 ```
 
-Ispod su 3 "suggestion chipa" — tapneš i pošalje tu poruku umjesto tebe. Dobro za prvi pokušaj.
+Ispod su 3 "suggestion chipa" — tapneš ih i pošalje tu poruku umjesto tebe. Dobro za prvi pokušaj.
 
-**Suggestion chipovi ovise o aktivnom tier-u (v4.0.0):**
+**Suggestion chipovi ovise o aktivnom tieru (v4.0.0):**
 
 **SHORT tier (default):**
 1. **"Analiziraj New Listings"** — Claude pregleda sve coinove iz New Listings taba
@@ -798,9 +798,9 @@ Ispod su 3 "suggestion chipa" — tapneš i pošalje tu poruku umjesto tebe. Dob
 3. **"Procijeni rizik watchliste"** — Claude analizira risk profil tvog watchlista
 
 **MID tier:**
-1. **"Procijeni MID-term potencijal"** — Claude analizira srednjorocne prilike
+1. **"Procijeni MID-term potencijal"** — Claude analizira srednjoročne prilike
 2. **"Kreiraj MID projekt za [coin]"** — priprema MidTermProject
-3. **"Analiziraj katalyst timeline"** — analiza predstojecih katalysta
+3. **"Analiziraj katalyst timeline"** — analiza predstojećih katalysta
 
 **LONG tier:**
 1. **"Fundamentalna analiza [coin]"** — duboka analiza fundamentala
@@ -809,7 +809,7 @@ Ispod su 3 "suggestion chipa" — tapneš i pošalje tu poruku umjesto tebe. Dob
 
 **Intelligence Report kontekst (v3.0.0):**
 
-Kad postoji aktivan Intelligence Report (npr. generiran "Analiziraj" buttonom na DEX kartici), Claude ga automatski prima kao strukturirani multi-source kontekst umjesto samo watchlist podataka. Report sadrži podatke iz svih 5 izvora s confluence score-om.
+Kad postoji aktivan Intelligence Report (npr. generiran "Analiziraj" buttonom na DEX kartici), Claude ga automatski prima kao strukturirani multi-source kontekst umjesto samo watchlist podataka. Report sadrži podatke iz svih 5 izvora s confluence scoreom.
 
 **Signal badge (narančasti banner):**
 
@@ -875,15 +875,15 @@ S pozicijom:
 
 **SHORT Portfolio prikaz (v5.0.0):**
 
-Uz Binance Spot pozicije, SHORT tier sada prikazuje i **DEX pozicije** — rucno unesene trade-ove s decentraliziranih burzi s automatskim price refreshom i SL/TP monitoringom. Vidi sekciju 3D za detalje.
+Uz Binance Spot pozicije, SHORT tier sada prikazuje i **DEX pozicije** — ručno unesene trade-ove s decentraliziranih burzi s automatskim price refreshom i SL/TP monitoringom. Vidi sekciju 3D za detalje.
 
 **MID Portfolio prikaz (v4.0.0+):**
 
-Kad je aktivan MID tier, Portfolio tab prikazuje tvoje **MidTermProject** zapise — svaki projekt s coin info, katalyst opisom, target cijenom, deadline-om, i progress barom do katalysta. **Novo u v5.0.0:** FAB (Floating Action Button) za brzo kreiranje novog MID projekta direktno iz Portfolio taba. Tap otvara MidProjectDetailScreen.
+Kad je aktivan MID tier, Portfolio tab prikazuje tvoje **MidTermProject** zapise — svaki projekt s coin info, katalyst opisom, target cijenom, deadlineom i progress barom do katalysta. **Novo u v5.0.0:** FAB (Floating Action Button) za brzo kreiranje novog MID projekta direktno iz Portfolio taba. Tap otvara MidProjectDetailScreen.
 
 **LONG Portfolio prikaz (v4.0.0+):**
 
-Kad je aktivan LONG tier, Portfolio tab prikazuje tvoje **LongTermHolding** zapise — svaki holding s prosjecnom DCA cijenom, ukupnom kolicinom, thesis opisom, i listom svih DCA kupnji. **Novo u v5.0.0:** FAB (Floating Action Button) za brzo kreiranje novog LONG holdinga direktno iz Portfolio taba. Tap otvara LongHoldingDetailScreen.
+Kad je aktivan LONG tier, Portfolio tab prikazuje tvoje **LongTermHolding** zapise — svaki holding s prosječnom DCA cijenom, ukupnom količinom, thesis opisom i listom svih DCA kupnji. **Novo u v5.0.0:** FAB (Floating Action Button) za brzo kreiranje novog LONG holdinga direktno iz Portfolio taba. Tap otvara LongHoldingDetailScreen.
 
 **Intelligence Dashboard (v3.0.0):**
 
@@ -947,11 +947,11 @@ Risk parametri za trgovanje:
 
 **Pod-tab 4: Tiers (NOVO v4.0.0)**
 
-Konfiguracija Three-Tier Investment Framework-a:
+Konfiguracija Three-Tier Investment Frameworka:
 - **Aktivni tier** prikaz — trenutno odabrani tier (SHORT/MID/LONG)
 - **MID tier postavke** — default target %, katalyst reminder interval
-- **LONG tier postavke** — DCA iznos, DCA interval (tjedno/mjesecno), fundamentals checklist
-- **Tier statistike** — broj aktivnih projekata/holdinga po tier-u
+- **LONG tier postavke** — DCA iznos, DCA interval (tjedno/mjesečno), fundamentals checklist
+- **Tier statistike** — broj aktivnih projekata/holdinga po tieru
 
 **Pod-tab 5: App**
 
@@ -965,7 +965,7 @@ Opće postavke i kontrole:
 
 ## 6. Postavljanje API ključeva
 
-Sada pravi setup. Proći ćemo dva obavezna ključa: **Anthropic** i **Binance**. Telegram Monitor (opcionalan) se postavlja u sekciji 13.
+Sada pravi setup. Proći ćemo dva obavezna ključa: **Anthropic** i **Binance**. Telegram Monitor (opcionalan) postavlja se u sekciji 13.
 
 ### 6.1 Anthropic API ključ (za AI)
 
@@ -992,13 +992,13 @@ UPOZORENJE: **Ovaj ključ se prikazuje SAMO JEDNOM.** Ako ga izgubiš, moraš kr
 
 **Korak 4 — Upiši u CoinSight:**
 1. Otvori CoinSight → tapni **[=] Manage** tab
-2. Odaberi **API** pod-tab (prvi, default)
+2. Odaberi pod-tab **API** (prvi, default)
 3. **Anthropic API Key** sekcija → tapni polje ispod teksta `sk-ant-...`
-4. Paste ključ (long press → Paste, ili Ctrl+V na PC-u)
+4. Paste ključ (long press → Paste ili Ctrl+V na PC-u)
 5. Tapni **Save Key**
 6. Vidjet ćeš "API key saved" potvrdu i status badge se mijenja u zeleni **Active**
 
-Anthropic ključ postavljen.
+Anthropic ključ je postavljen.
 
 ### 6.2 Binance account i API ključ (za trading)
 
@@ -1008,7 +1008,7 @@ UPOZORENJE: **Preduvjet:** moraš imati Binance account i proći KYC (identity v
 
 **Korak A — Registracija (ako još nemaš account):**
 1. Otvori binance.com
-2. Register s e-mailom + lozinkom
+2. Registriraj se s e-mailom + lozinkom
 3. Verificiraj e-mail
 4. **KYC verifikacija**: Account → **Identification** → slikaj osobnu iskaznicu ili putovnicu + selfie. Čekaj 1-48h da Binance odobri.
 
@@ -1033,14 +1033,14 @@ Ako si na mobitelu:
 Na PC-u:
 1. Uloguj se na `binance.com`
 2. Gornji desni kut → **ikona profila** → **Account** → **API Management**
-3. **Create API** → odaberi **System generated** → upiši ime (npr. "CoinSight") → prodji 2FA verifikaciju
+3. **Create API** → odaberi **System generated** → upiši ime (npr. "CoinSight") → prođi 2FA verifikaciju
 4. Kopiraj:
    - **API Key** (duži string)
    - **Secret Key** (prikazuje se **samo jednom**)
 
 **Korak D — SIGURNOSNE POSTAVKE (kritično):**
 
-Na novi ključu klikni **Edit restrictions**:
+Na novom ključu klikni **Edit restrictions**:
 
 UKLJUČI:
 - Enable Reading (automatski)
@@ -1054,10 +1054,10 @@ ISKLJUČI OBAVEZNO:
 - Enable Margin
 - Enable Options
 
-Ako ovo zaboraviš i neki hacker dodje do tvog ključa → izvuče sav novac. Ako je Withdrawal OFF, hacker ne može ništa izvući.
+Ako ovo zaboraviš i neki hacker dođe do tvog ključa → izvuče sav novac. Ako je Withdrawal OFF, hacker ne može ništa izvući.
 
 **IP Restriction** (opcionalno):
-- Ako imaš fiksni kućni internet → **Restrict to trusted IPs** i dodaj svoj IP (Google "what is my IP")
+- Ako imaš fiksni kućni internet → **Restrict to trusted IPs** i dodaj svoj IP (guglaj "what is my IP")
 - Ako ti se IP mijenja (mobilna mreža, koristiš više WiFi mreža) → **Unrestricted** je OK jer si isključio withdrawal
 
 Save. Sada imaš:
@@ -1065,26 +1065,26 @@ Save. Sada imaš:
 - Secret Key string
 
 **Korak E — Upiši u CoinSight:**
-1. CoinSight → **[=] Manage** → **API** pod-tab
+1. CoinSight → **[=] Manage** → pod-tab **API**
 2. **Binance API** sekcija
 3. Pročitaj narančasti warning ("Osiguraj da API ključ NEMA dozvolu za Withdrawal")
 4. **API Key** polje: paste svoj API Key
 5. **API Secret** polje: paste svoj Secret Key
 6. **Testnet mode** switch:
-   - Ako prvi put i želiš testirati bez pravog novca → **ostavi ON** (alternativa: vidi korak F)
+   - Ako si prvi put i želiš testirati bez pravog novca → **ostavi ON** (alternativa: vidi korak F)
    - Ako ideš odmah pravim novcem → **OFF** (otvorit će se dialog "Prebaci na LIVE?" → Confirm LIVE)
 7. Tapni **Save**
 8. Tapni **Test** → očekivani rezultat: `OK — USDT balance: $100.00 (live)` ili `(testnet)`
 
-Binance ključ postavljen.
+Binance ključ je postavljen.
 
 **Korak F — Testnet alternativa (ako želiš vježbati bez pravog novca):**
 
-Umjesto pravog Binance accounta, možeš koristiti testnet:
+Umjesto pravog Binance accounta možeš koristiti testnet:
 
 1. Otvori `testnet.binance.vision`
-2. **Login with GitHub** (ne Binance account — odvojen sistem)
-3. Odmah dobiješ **10,000 lažnih USDT**
+2. **Login with GitHub** (ne Binance account — odvojen sustav)
+3. Odmah dobiješ **10 000 lažnih USDT**
 4. **Generate HMAC_SHA256 Key** → kopiraj API Key + Secret
 5. U CoinSight Manage → API → Binance API → paste ključeve → **Testnet switch ON** → Save → Test
 
@@ -1101,11 +1101,11 @@ Sada radimo **prvi pravi posao**. Pretpostavljamo da imaš Anthropic ključ akti
 ▶ **Napravi sad:**
 
 1. Tapni **[*] Watchlist** tab
-2. Budi na **New Listings** pod-tabu (prvi)
+2. Budi na pod-tabu **New Listings** (prvi)
 3. Pogledaj listu. Tapni zvjezdicu [*] na nekom coinu koji ti je zanimljiv — npr. onaj s najvećim 1H porastom
-4. Provjeri da je zvjezdica postala **ispunjena** (znači dodan je u watchlist)
+4. Provjeri da je zvjezdica postala **ispunjena** (znači da je dodan u watchlist)
 
-Alternativa: neka ti u My Watchlist-u ostaju defaultni Bitcoin/Ethereum/Solana — Claude će analizirati njih.
+Alternativa: neka ti u My Watchlistu ostaju defaultni Bitcoin/Ethereum/Solana — Claude će analizirati njih.
 
 ### 7.2 Pitaj Claudea
 
@@ -1116,11 +1116,11 @@ Alternativa: neka ti u My Watchlist-u ostaju defaultni Bitcoin/Ethereum/Solana �
 3. Tapni **[Analiziraj New Listings]**
 
 **Što se dogodi:**
-- Tvoja poruka "Analiziraj New Listings" se pojavi u chatu (desno, ljubičastom bojom)
+- Tvoja poruka "Analiziraj New Listings" pojavi se u chatu (desno, ljubičastom bojom)
 - App automatski dodaje tvoje watchlist coinove kao kontekst
 - Ako su prisutni Telegram signali, i oni se uključuju (vidiš narančasti badge koji nestaje)
 - Claude počinje "razmišljati" — vidiš spinner i "Thinking..."
-- Nakon 5-15 sekundi, Claude odgovara
+- Nakon 5-15 sekundi Claude odgovara
 
 ### 7.3 Što si upravo dobio
 
@@ -1145,9 +1145,9 @@ Ako je Telegram Monitor uhvatio relevantne signale (npr. whale alert za PEPR, li
 ### 7.4 Što primjećuješ
 
 1. Claude je analizirao **sve** coinove iz tvog watchlista — ne samo jedan
-2. Pri kraju je **odabrao jednog** (PEPR) za koji je dao **INTERESTING** oznaku
-3. Tekst **INTERESTING** je **bold** (`**INTERESTING**`) — to je način kako app detektira preporuku
-4. Telegram signali su automatski uključeni u analizu (ako su postojali)
+2. Pri kraju je **odabrao jednog** (PEPR) za koji je dao oznaku **INTERESTING**
+3. Tekst **INTERESTING** je **bold** (`**INTERESTING**`) — to je način na koji app detektira preporuku
+4. Telegram signali automatski su uključeni u analizu (ako su postojali)
 5. Ispod analize, u app-u će se pojaviti **Trade Action Bar** ako:
    - Imaš Binance postavljen
    - Nisi uključio auto-trade
@@ -1173,7 +1173,7 @@ Nakon oznake:
 - **1-2 rečenice razloga** — zašto baš ta oznaka
 - **Konkretan sljedeći korak** — npr. "Provjeri opet za 2 sata", "Pogledaj Twitter aktivnost", "Volume trend kroz sljedeći sat je ključan"
 
-Ako vidiš samo oznaku bez razloga, ili razlog bez oznake — Claude je imao lošu sesiju, pitaj ga ponovno.
+Ako vidiš samo oznaku bez razloga ili razlog bez oznake — Claude je imao lošu sesiju, pitaj ga ponovno.
 
 ### 8.3 Tri "objektiva" u kojima analizira
 
@@ -1197,21 +1197,21 @@ Claude (po svom system promptu) uvijek pokriva:
 
 ### 8.4 Telegram Intel u analizi
 
-U v3.0.0, ako je Telegram Monitor aktivan, Claude takodjer koristi četvrti "objektiv":
+U v3.0.0, ako je Telegram Monitor aktivan, Claude također koristi četvrti "objektiv":
 
 4. **Telegram Intelligence**:
    - Signali iz javnih kripto kanala (whale alerti, listing najave, breaking news)
    - Pouzdanost kanala (koliko % prethodnih signala se pokazalo točnima)
-   - Korelacija izmedju Telegram buzz-a i price action-a
+   - Korelacija između Telegram buzza i price actiona
 
-Claude eksplicitno navodi koje Telegram signale je uzeo u obzir i koliko su utjecali na preporuku.
+Claude eksplicitno navodi koje je Telegram signale uzeo u obzir i koliko su utjecali na preporuku.
 
 ### 8.5 Što Claude NIJE
 
 - **Nije proročanstvo.** Ako kaže INTERESTING, to znači "vrijedi razmotriti", ne "garantirano raste"
 - **Nije financijski savjetnik.** Završava s napomenom "analiza obrazaca, ne financijski savjet"
 - **Nema live podatke u stvarnom vremenu.** Analizira ono što app pošalje (snapshot u tom trenutku)
-- **Ne zna vijesti direktno.** Ali ako je Telegram Monitor aktivan, dobija signale iz kanala koji pokrivaju vijesti
+- **Ne zna vijesti direktno.** Ali ako je Telegram Monitor aktivan, dobiva signale iz kanala koji pokrivaju vijesti
 
 ### 8.6 Koliko vjerovati
 
@@ -1219,7 +1219,7 @@ Iz iskustva, u momentum tradingu:
 - INTERESTING preporuke pogode **~60-70%** vremena
 - Znači da **30-40%** vremena kupiš nešto što padne
 
-Zato je **risk management** (sekcija 11) tako važan.
+Zato je **risk management** (sekcija 11) toliko važan.
 
 ---
 
@@ -1237,7 +1237,7 @@ Provjeri:
 
 ▶ **Napravi sad prije prvog trade-a:**
 
-1. Tapni **[=] Manage** → **Trade** pod-tab
+1. Tapni **[=] Manage** → pod-tab **Trade**
 2. Postavi **konzervativno**:
    - **Max trade amount**: `5` (ne default 10 — za prvi trade još manje)
    - **Max open positions**: `1`
@@ -1263,12 +1263,12 @@ Vrati se na **[**] Analysis** tab. Ispod Claudeove INTERESTING poruke vidiš:
 ```
 
 **Detalji:**
-- **Coin koji targetiraš**: prvi coin iz My Watchlist-a (u našem primjeru PEPR)
+- **Coin koji targetiraš**: prvi coin iz My Watchlista (u našem primjeru PEPR)
 - **Uloži iznos**: preuzeto iz tvojih Risk Parametera ($5). Možeš ovdje editirati za ovaj trade (ne mijenja default)
 - **SL/TP**: preuzeto iz Risk Parametera, samo info
-- **Dva buttona**: BUY NOW i SKIP (u v3.0.0+ nema TELEGRAM buttona — Telegram je sada Monitor, ne notifikacijski bot)
+- **Dva buttona**: BUY NOW i SKIP (u v3.0.0+ nema TELEGRAM buttona — Telegram je sada Monitor, a ne notifikacijski bot)
 
-**Napomena (v4.0.0):** Ovaj Trade Action Bar je za **SHORT tier**. Ako si na **MID tier-u**, umjesto toga vidis **MID Action Bar** s CREATE PROJECT / SKIP buttonima. Na **LONG tier-u** vidis **LONG Action Bar** s CREATE HOLDING / DCA BUY / SKIP buttonima. Vidi sekciju 3A za detalje.
+**Napomena (v4.0.0):** Ovaj Trade Action Bar je za **SHORT tier**. Ako si na **MID tieru**, umjesto toga vidiš **MID Action Bar** s CREATE PROJECT / SKIP buttonima. Na **LONG tieru** vidiš **LONG Action Bar** s CREATE HOLDING / DCA BUY / SKIP buttonima. Vidi sekciju 3A za detalje.
 
 ### 9.4 Tap BUY NOW
 
@@ -1295,10 +1295,10 @@ Tapni **BUY NOW**. Otvara se confirmation dialog:
 ```
 
 **Što dialog pokazuje:**
-- Cijena u tom momentu
+- Cijenu u tom trenutku
 - Iznos koji ćeš uložiti ($5)
-- **Procijenjen broj tokena** (5 / 0.000423 = ~11820). Stvarni broj može malo varirati zbog slippage-a
-- SL i TP cijene (računate iz tvojih parametara)
+- **Procijenjen broj tokena** (5 / 0.000423 = ~11820). Stvarni broj može malo varirati zbog slippagea
+- SL i TP cijene (izračunate iz tvojih parametara)
 
 ### 9.5 CONFIRM BUY
 
@@ -1311,7 +1311,7 @@ Tapni **CONFIRM BUY**.
 4. App logira u **AnalysisLog** s oznakom `ENTERED`
 5. **SnackBar** se pojavljuje dolje: "Bought 11820.334 PEPR @ $0.000423"
 
-**LOT_SIZE handling (v3.0.0):** App sada automatski dohvaća `stepSize` iz Binance `/exchangeInfo` endpointa za svaki coin. To znači da se količina za sell order pravilno zaokružuje — nema više "Filter failure: LOT_SIZE" grešaka koje su postojale u ranijim verzijama.
+**LOT_SIZE handling (v3.0.0):** App sada automatski dohvaća `stepSize` iz Binance `/exchangeInfo` endpointa za svaki coin. To znači da se količina za sell order pravilno zaokružuje — nema više grešaka "Filter failure: LOT_SIZE" koje su postojale u ranijim verzijama.
 
 ### 9.6 Provjeri Portfolio
 
@@ -1338,7 +1338,7 @@ Vidjet ćeš:
 
 **Čestitam, kupio si svoj prvi coin kroz CoinSight.**
 
-### 9.7 Što se sada dogadja
+### 9.7 Što se sada događa
 
 Tvoja pozicija se **automatski prati** u pozadini:
 
@@ -1385,15 +1385,15 @@ Na svakoj kartici:
 
 **Automatski** svakih 5 minuta. Provjera ide:
 1. Za svaku otvorenu poziciju
-2. Dohvaća **trenutnu cijenu** s Binance-a
-3. Usporeduje s SL cijenom (entryPrice x (1 - SL%/100)) i TP cijenom
+2. Dohvaća **trenutnu cijenu** s Binancea
+3. Uspoređuje s SL cijenom (entryPrice x (1 - SL%/100)) i TP cijenom
 4. Ako cijena <= SL ili >= TP → **market sell**
 
 ### 10.4 Što ako cijena padne naglo
 
 Primjer: kupio si PEPR po $0.000423, SL na 10% → $0.000381.
 
-**Scenario A — Sporo opadanje:** Cijena polako pada. Timer u 10:00 vidi $0.000395, u 10:05 vidi $0.000380. SL triggera, sell po ~$0.000379 (malo slippage-a).
+**Scenario A — Sporo opadanje:** Cijena polako pada. Timer u 10:00 vidi $0.000395, u 10:05 vidi $0.000380. SL triggera, sell po ~$0.000379 (malo slippagea).
 - Stvarni gubitak: ~10.5% umjesto 10%
 
 **Scenario B — Flash crash:** Cijena u 10:03 pada s $0.000390 na $0.000300 u 10 sekundi. Timer u 10:05 vidi $0.000310. SL se okida ALI sell ide po trenutnoj cijeni $0.000308.
@@ -1401,13 +1401,13 @@ Primjer: kupio si PEPR po $0.000423, SL na 10% → $0.000381.
 
 **Zaključak:** SL je "safety net" koji se **povremeno ne aktivira idealno**. Zato:
 - Ne investiraj više nego što si spreman izgubiti
-- Za volatilne coinove razmisli o većem SL-u (15-20%) da se ne okine previše često na normalnoj buci
+- Za volatilne coinove razmisli o većem SL-u (15-20%) da se ne okida prečesto na normalnoj buci
 
 ### 10.5 Take-profit isto funkcionira
 
-Obrnuto od SL-a: ako cijena raste i dosegne TP granicu, app prodaje i zaključa profit. Isti timer, isti 5-minutni interval.
+Obrnuto od SL-a: ako cijena raste i dosegne TP granicu, app prodaje i zaključava profit. Isti timer, isti 5-minutni interval.
 
-**Pažnja:** ako coin naraste 50% u trenutku i padne nazad na 25% prije sljedećeg tick-a, TP (na 25%) se neće triggerati zapravo — jer timer je vidio 25% u već-padu, a ne vrh od 50%.
+**Pažnja:** ako coin naraste 50% u trenutku i padne nazad na 25% prije sljedećeg ticka, TP (na 25%) se neće triggerati zapravo — jer timer je vidio 25% u već-padu, a ne vrh od 50%.
 
 ### 10.6 Timestamp sinkronizacija (v3.0.0)
 
@@ -1415,11 +1415,11 @@ App automatski sinkronizira vrijeme sa Binance serverom putem `/api/v3/time` end
 
 Ako se pojavi greška **-1021 (Timestamp for this request is outside of the recvWindow)**, app automatski:
 1. Dohvaća server time
-2. Računa offset izmedju lokalnog i server vremena
+2. Računa offset između lokalnog i server vremena
 3. Dodaje offset na sve buduće zahtjeve
 4. Ponavlja neuspjeli zahtjev
 
-Ne moraš ručno intervenirati — app se sam sinkronizira.
+Ne moraš ručno intervenirati — app se sama sinkronizira.
 
 ---
 
@@ -1427,9 +1427,9 @@ Ne moraš ručno intervenirati — app se sam sinkronizira.
 
 ### 11.1 Zlatna pravila za početnika
 
-1. **Prva 2 tjedna: testnet ILI pravi novac ali max $5 po tradeu.** Naučiš se na mali iznos.
+1. **Prva 2 tjedna: testnet ILI pravi novac, ali max. $5 po tradeu.** Naučiš se na mali iznos.
 2. **Nikad ne kupuj više nego što si spreman izgubiti NA SVAKI DAN.** Ako ti nestanak $100 uzrokuje stres, CoinSight nije za tebe s tim iznosom.
-3. **Ne povećavaj iznos nakon gubitka.** "Chase the loss" je najbrži put do nule. Ako si izgubio 5 trejdova zaredom, **smanji** iznos ili stani.
+3. **Ne povećavaj iznos nakon gubitka.** "Chase the loss" najbrži je put do nule. Ako si izgubio 5 trejdova zaredom, **smanji** iznos ili stani.
 4. **Ne vjeruj svakom INTERESTING signalu.** 30-40% će biti gubitnici. To je normalno.
 
 ### 11.2 Preporuke za Risk Parameters
@@ -1469,7 +1469,7 @@ Auto-trade:          ON (ali pazi)
 S `maxOpenPositions = 3`:
 - 3 x $10 = $30 izloženosti
 - Čak i ako **svi** padnu na SL (-15%), gubiš $4.50
-- Ako 2 padne na SL i 1 pogodi TP (+30%), dobit je $3 - $3 = $0 (break-even)
+- Ako 2 padnu na SL i 1 pogodi TP (+30%), dobit je $3 - $3 = $0 (break-even)
 
 ### 11.4 Quiet hours — zašto postoji
 
@@ -1478,7 +1478,7 @@ Noć je vrijeme kad:
 - Scam-coinovi često rade pump-and-dump u 2-4h po Pacific vremenu (10-12h po našem)
 - Ti spavaš i ne možeš intervenirati
 
-Quiet hours (default 23-7) blokira **automatske kupnje**. Ako si **ručno** u 03:00 još budan i pokušavaš BUY NOW, radi normalno — blokada je samo za auto mode.
+Quiet hours (default 23-7) blokiraju **automatske kupnje**. Ako si **ručno** u 03:00 još budan i pokušavaš BUY NOW, radi normalno — blokada je samo za auto mode.
 
 ---
 
@@ -1490,7 +1490,7 @@ Quiet hours (default 23-7) blokira **automatske kupnje**. Ako si **ručno** u 03
 
 **Faza 3** (auto): kad Claude kaže INTERESTING, app **sama kupuje** bez tvoje potvrde.
 
-### 12.2 Uvjeti koje mora ispuniti prije auto-buy
+### 12.2 Uvjeti koje mora ispuniti prije auto-buya
 
 App neće automatski kupovati ako:
 - Auto-trade je **OFF** u Manage → Trade
@@ -1514,9 +1514,9 @@ Ako **sve** prolazi → auto-kupnja.
 
 ### 12.4 Kako uključiti
 
-1. Manage → **Trade** pod-tab → **Auto-trade toggle ON**
+1. Manage → pod-tab **Trade** → **Auto-trade toggle ON**
 2. Warning se prikaže: "Bot će automatski kupovati bez tvoje potvrde..."
-3. **Provjeri** da su parametri konzervativni (max $10-15 po tradeu, max 2 pozicije)
+3. **Provjeri** da su parametri konzervativni (max. $10-15 po tradeu, max. 2 pozicije)
 4. Napusti ekran — radi u pozadini
 
 ### 12.5 Kako isključiti u panici
@@ -1538,7 +1538,7 @@ Telegram Monitor je **potpuno drugačiji** od klasičnog Telegram bota. Ne šalj
 - **Sprema signale** lokalno
 - **Šalje signale Claudeu** kao dodatni kontekst pri sljedećoj analizi
 
-Zamišljaj ga kao **pasivnog obavještajca** koji sjedi u Telegram kanalima i sluša. Kad čuje nešto zanimljivo, zapisuje i prosljeduje AI-u.
+Zamišljaj ga kao **pasivnog obavještajca** koji sjedi u Telegram kanalima i sluša. Kad čuje nešto zanimljivo, zapisuje i prosljeđuje AI-u.
 
 ### 13.2 Zašto je ovo korisno
 
@@ -1547,7 +1547,7 @@ Bez Telegram Monitora, Claude analizira samo **brojke** — cijena, volumen, ran
 - Binance najavljuje listing novog coina (legitimni rast)
 - KuCoin community širi vijest o partnerstvu
 
-S Telegram Monitorom, Claude dobija i taj kontekst. Njegova analiza postaje preciznija jer vidi i **narativ** iza brojki.
+S Telegram Monitorom, Claude dobiva i taj kontekst. Njegova analiza postaje preciznija jer vidi i **narativ** iza brojki.
 
 ### 13.3 Setup — korak po korak
 
@@ -1561,7 +1561,7 @@ Možeš preskočiti ovu sekciju i dodati kasnije. App savršeno radi bez Telegra
 1. Otvori Telegram → traži `@BotFather` → Start
 2. Pošalji `/newbot`
 3. BotFather pita za ime (proizvoljno, npr. "MyCoinSightMonitor")
-4. BotFather pita za username (mora završiti s `bot`, npr. `coinsight_monitor_bot`)
+4. BotFather pita za username (mora završiti na `bot`, npr. `coinsight_monitor_bot`)
 5. Kopiraj **Bot Token** koji ti BotFather pošalje (dugi string s `:` u sredini, npr. `123456789:AAF...`)
 
 UPOZORENJE: Token se prikazuje jednom. Spremi ga na sigurno.
@@ -1576,17 +1576,17 @@ Za svaki kanal koji želiš pratiti:
    - Kanal Settings → Administrators → Add Administrator → traži username tvog bota
    - Dodaj ga s **minimalnim permissionima** (samo Read je dovoljno)
 
-**Napomena:** Mnogi veliki kanali (poput @binance) ne dozvoljavaju random korisnicima da dodaju admine. U tom slučaju, bot čita poruke kao subscriber ako je kanal javan. Bot Manager (sekcija 14) ima listu preporučenih kanala koji rade.
+**Napomena:** Mnogi veliki kanali (poput @binance) ne dopuštaju random korisnicima da dodaju admine. U tom slučaju bot čita poruke kao subscriber ako je kanal javan. Bot Manager (sekcija 14) ima listu preporučenih kanala koji rade.
 
 **Korak 3 — Upiši u CoinSight:**
-1. CoinSight → **[=] Manage** → **Bot** pod-tab
+1. CoinSight → **[=] Manage** → pod-tab **Bot**
 2. **Bot Token** polje: paste token
 3. Tapni **Save**
-4. Uključi **"Aktiviraj monitoring"** toggle
+4. Uključi toggle **"Aktiviraj monitoring"**
 
 Status indikator se mijenja u zeleno — monitor je aktivan.
 
-Telegram Monitor postavljen.
+Telegram Monitor je postavljen.
 
 ### 13.4 Chat ID — NIJE potreban
 
@@ -1630,7 +1630,7 @@ Kad poruka u kanalu sadrži jednu ili više ovih riječi, Monitor je sprema kao 
 1. Monitor čita kanal
 2. Poruka sadrži keyword → sprema se kao pending signal
 3. Na Analysis tabu pojavljuje se **narančasti badge**: "3 Telegram signala čekaju"
-4. Kad napišeš sljedeće pitanje Claudeu (ili tapneš suggestion chip), **svi pending signali** se automatski dodaju u kontekst
+4. Kad napišeš sljedeće pitanje Claudeu (ili tapneš suggestion chip), **svi pending signali** automatski se dodaju u kontekst
 5. Claude ih procesira i uključuje u analizu
 6. Signali se označavaju kao "consumed" (konzumirani) — badge nestaje
 
@@ -1657,7 +1657,7 @@ Telegram kanal --> Monitor --> Pending signali --> Claude kontekst --> Analiza
 
 ### 13A.1 Što je Intelligence Layer
 
-Intelligence Layer je **nadogradnja na Telegram Monitor** koja prikuplja podatke iz **5 nezavisnih izvora** i objedinjuje ih u jedinstveni obavještajni izvještaj (IntelligenceReport). Umjesto da se oslonjaš samo na cijenu i volumen, Claude sada dobija slojevitu sliku iz više perspektiva.
+Intelligence Layer je **nadogradnja na Telegram Monitor** koja prikuplja podatke iz **5 nezavisnih izvora** i objedinjuje ih u jedinstveni obavještajni izvještaj (IntelligenceReport). Umjesto da se oslanjaš samo na cijenu i volumen, Claude sada dobiva slojevitu sliku iz više perspektiva.
 
 ### 13A.2 Pet izvora podataka
 
@@ -1692,7 +1692,7 @@ Kako se računa score:
 
 **Kroz Analysis tab:**
 - Kad postoji aktivan Intelligence Report, Claude ga automatski koristi kao kontekst
-- Umjesto samo "cijena X, volumen Y, rank Z", Claude dobija: DEX likvidnost, GitHub aktivnost, Reddit sentiment, Telegram signale, i market podatke
+- Umjesto samo "cijena X, volumen Y, rank Z", Claude dobiva: DEX likvidnost, GitHub aktivnost, Reddit sentiment, Telegram signale i market podatke
 - Analiza je znatno preciznija jer vidi **narativ iz više kutova**
 
 **Kroz Portfolio tab:**
@@ -1714,9 +1714,9 @@ Dexscreener komponenta prati **6 blockchain lanaca**:
 | **Base** | Aerodrome, BaseSwap |
 
 Za svaki detektirani token prikazuje:
-- **Cijena** u USD
+- **Cijenu** u USD
 - **24h Volume** — koliko se trguje
-- **Liquidity** — koliko je likvidnosti u DEX pool-u
+- **Liquidity** — koliko je likvidnosti u DEX poolu
 - **V/L ratio** (Volume/Liquidity) — mjera aktivnosti u odnosu na pool veličinu. Viši ratio = aktivniji trading.
 
 ### 13A.6 GitHub Intelligence — detalji
@@ -1746,7 +1746,7 @@ Reddit signal je koristan za mjerenje **sentimenta zajednice** — ako se coin p
 
 - **Nije garancija.** Čak i confluence score 6.0 ne znači da će coin sigurno rasti.
 - **Nije real-time.** Podaci se prikupljaju u intervalima, ne u milisekundama.
-- **Nije zamjena za vlastitu procjenu.** Intelligence Layer daje podatke, ti i Claude interpretirate.
+- **Nije zamjena za vlastitu procjenu.** Intelligence Layer daje podatke, ti i Claude ih interpretirate.
 
 ---
 
@@ -1754,8 +1754,8 @@ Reddit signal je koristan za mjerenje **sentimenta zajednice** — ako se coin p
 
 ### 14.1 Kako otvoriti
 
-1. **[=] Manage** → **Bot** pod-tab
-2. Tapni **"Otvori Bot Manager"** button
+1. **[=] Manage** → pod-tab **Bot**
+2. Tapni button **"Otvori Bot Manager"**
 3. Otvara se full-screen ekran
 
 ### 14.2 Što vidiš
@@ -1797,7 +1797,7 @@ Za svaki aktivni kanal vidiš:
 - **Signals** — ukupni broj signala koje je Monitor uhvatio iz tog kanala
 - **Last signal** — koliko davno je zadnji signal stigao
 
-Ovi podaci se nakupljaju vremenom. Prvih tjedan dana nemoj očekivati precizne reliability brojke — treba barem 20-30 signala za smislenu statistiku.
+Ovi se podaci nakupljaju vremenom. Prvih tjedan dana nemoj očekivati precizne reliability brojke — treba barem 20-30 signala za smislenu statistiku.
 
 ### 14.4 Dodavanje kanala
 
@@ -1806,16 +1806,16 @@ Ovi podaci se nakupljaju vremenom. Prvih tjedan dana nemoj očekivati precizne r
 3. Tapni **Add**
 4. Monitor počinje pratiti taj kanal
 
-Alternativno, iz **Recommended Channels** sekcije tapni **[Add]** pored kanala.
+Alternativno, iz sekcije **Recommended Channels** tapni **[Add]** pored kanala.
 
 ### 14.5 Uklanjanje kanala
 
-Na aktivnom kanalu tapni **[Remove]**. Confirm dialog → kanal se uklanja. Postojeći signali iz tog kanala ostaju u povijesti, ali novi se više ne skupljaju.
+Na aktivnom kanalu tapni **[Remove]**. Confirm dialog → kanal se uklanja. Postojeći signali iz tog kanala ostaju u povijesti, ali se novi više ne skupljaju.
 
 ### 14.6 Preporuke za kanale
 
-- **Počni s default-ima** (@binance, @kucoincom, @whale_alert, @coingecko, @coinmarketcap)
-- **Dodaj specifične** tek kad vidiš da ti trebaju (npr. kanali fokusirani na DeFi, meme coinove, itd.)
+- **Počni s defaultima** (@binance, @kucoincom, @whale_alert, @coingecko, @coinmarketcap)
+- **Dodaj specifične** tek kad vidiš da ti trebaju (npr. kanali fokusirani na DeFi, meme coinove itd.)
 - **Prati Reliability %** — ako kanal ima <50% reliability nakon 50+ signala, razmisli o uklanjanju
 - **Ne dodaj previše** — 5-10 kanala je optimalno. Previše kanala = previše šuma
 
@@ -1832,7 +1832,7 @@ Na aktivnom kanalu tapni **[Remove]**. Confirm dialog → kanal se uklanja. Post
 3. [**] Analysis tab → primjećuješ narančasti badge "2 Telegram signala čekaju" — whale_alert i binance su nešto uhvatili preko noći
 4. Tapneš **"Analiziraj New Listings"**
 5. Claude analizira sva 3 + BTC/ETH/SOL referencu + Telegram signale
-6. Claude proglašava jednog **INTERESTING**, napominjući da Telegram intel potvrduje volumen trend
+6. Claude proglašava jednog **INTERESTING**, napominjući da Telegram intel potvrđuje volumen trend
 7. Trade Action Bar → BUY NOW → CONFIRM → pozicija otvorena
 8. [$] Portfolio → vidiš novu poziciju, Now cijena, P&L u realnom vremenu
 9. Zatvaraš app, ideš na posao
@@ -1860,16 +1860,16 @@ Na aktivnom kanalu tapni **[Remove]**. Confirm dialog → kanal se uklanja. Post
 1. Narančasti badge na Analysis tabu: "1 Telegram signal čeka"
 2. Otvoriš Analysis, signal kaže: "whale_alert: 200M XYZ transferred to Binance"
 3. Pitaš Claudea: "Koji coin sada ima momentum?"
-4. Claude odgovara: "XYZ je zanimljiv — whale alert potvrduje da se velika količina premješta na exchange, što može značiti predstojeći listing ili veliki trade. WATCH — provjeri za sat vremena je li volumen nastavio rasti."
+4. Claude odgovara: "XYZ je zanimljiv — whale alert potvrđuje da se velika količina premješta na exchange, što može značiti predstojeći listing ili veliki trade. WATCH — provjeri za sat vremena je li volumen nastavio rasti."
 5. Dodaješ XYZ u watchlist, čekaš sat, pitaš opet
 6. Claude: "XYZ volumen se utrostručio u zadnjem satu, consistent s Telegram signalom. INTERESTING."
-7. BUY NOW → pozicija otvorena s dodatnim kontekstom
+7. BUY NOW → pozicija je otvorena s dodatnim kontekstom
 
 ### 15.5 Scenarij E — Tjedan kasnije, pregled
 
 **Nedjelja večer** — pregled tjedna.
 
-1. [$] Portfolio tab → **Analysis History** sekcija (dolje)
+1. [$] Portfolio tab → sekcija **Analysis History** (dolje)
 2. Brojiš zapise:
    - 18 INTERESTING signala
    - Od toga 12 ENTERED (ušao)
@@ -1877,16 +1877,16 @@ Na aktivnom kanalu tapni **[Remove]**. Confirm dialog → kanal se uklanja. Post
    - 5 EXITED na SL
 3. **Hit rate: 7/12 = 58%**. Net rezultat: +$4.30 za tjedan
 4. Otvoriš Bot Manager → provjeravaš channel reliability — @whale_alert na 87%, @binance na 94%
-5. Koristiš to za kalibraciju — sljedeći tjedan prilagodavaš strategiju
+5. Koristiš to za kalibraciju — sljedeći tjedan prilagođavaš strategiju
 
 ### 15.6 Scenarij F — Korištenje App kontrola
 
 **Kraj mjeseca** — čistka.
 
-1. [=] Manage → **App** pod-tab
+1. [=] Manage → pod-tab **App**
 2. **Export logs to clipboard** → paste u bilješku ili pošalji developeru za debug
 3. **Clear analysis history** → briše stare Claude chat logove (pozicije na Binanceu ostaju netaknute)
-4. Po potrebi: **Full reset** → vraća sve na tvorničko stanje (korisno ako mijenjaš uredjaj ili počinješ iznova)
+4. Po potrebi: **Full reset** → vraća sve na tvorničko stanje (korisno ako mijenjaš uređaj ili počinješ iznova)
 
 ---
 
@@ -1896,11 +1896,11 @@ Na aktivnom kanalu tapni **[Remove]**. Confirm dialog → kanal se uklanja. Post
 
 **"Invalid API key"** → Manage → API → Anthropic → Remove → novi ključ s console.anthropic.com
 
-**"Rate limit exceeded"** → Pričekaj minutu, pa ponovi. Ne spamati.
+**"Rate limit exceeded"** → Pričekaj minutu pa ponovi. Ne spamaj.
 
 **"credit balance too low"** → Na console.anthropic.com dodaj kredit (par dolara dovoljno).
 
-**"Failed to get response. Check your connection."** → Provjeri internet. Pokušaj na WiFi-u ako si bio na mobilnim.
+**"Failed to get response. Check your connection."** → Provjeri internet. Pokušaj na WiFi-u ako si bio na mobilnim podacima.
 
 ### 16.2 Binance greške
 
@@ -1911,7 +1911,7 @@ Na aktivnom kanalu tapni **[Remove]**. Confirm dialog → kanal se uklanja. Post
 - Android: automatski time postavi (Settings → Date & time → Automatic)
 - App automatski dohvaća server time putem `/api/v3/time` i računa offset
 
-**"Insufficient USDT balance"** → Nemaš dovoljno USDT-a na **Spot wallet**-u. Možda ti je USDT u Funding ili Futures. Na Binanceu: Wallet → Transfer → prebaci u Spot.
+**"Insufficient USDT balance"** → Nemaš dovoljno USDT-a na **Spot walletu**. Možda ti je USDT u Fundingu ili Futuresu. Na Binanceu: Wallet → Transfer → prebaci u Spot.
 
 **"Max open positions reached"** → Zatvori neku poziciju prije kupnje nove.
 
@@ -1921,7 +1921,7 @@ Na aktivnom kanalu tapni **[Remove]**. Confirm dialog → kanal se uklanja. Post
 
 ### 16.3 Portfolio
 
-**Balance $0.00 ali imam USDT** → USDT vjerojatno nije u **Spot wallet-u**. Binance: Wallet → prebaci u Spot.
+**Balance $0.00 ali imam USDT** → USDT vjerojatno nije u **Spot walletu**. Binance: Wallet → prebaci u Spot.
 
 **Pozicija se ne pojavljuje** → Pull-to-refresh na Portfolio tabu. Ako i dalje ne → provjeri Binance web direktno jesi li stvarno kupio.
 
@@ -1938,7 +1938,7 @@ Na aktivnom kanalu tapni **[Remove]**. Confirm dialog → kanal se uklanja. Post
 
 **Signal badge se ne pojavljuje** → Provjeri da su kanali aktivni i da objavljuju sadržaj s keywordima. Otvori Bot Manager → provjeri "Last signal" za svaki kanal.
 
-**Bot Manager pokazuje Reliability 0%** → Normalno na početku. Treba barem 20-30 signala za smislenu statistiku. Daj mu tjedan-dva.
+**Bot Manager pokazuje Reliability 0%** → Normalno je na početku. Treba barem 20-30 signala za smislenu statistiku. Daj mu tjedan-dva.
 
 ### 16.5 App se zaglavi
 
@@ -1953,7 +1953,7 @@ Specifično za Binance — server odbija zahtjev jer je razlika u vremenu prevel
 2. Računa offset
 3. Ponavlja zahtjev
 
-Ako se greška uporno ponavlja (rijetko), provjeri da tvoj uredjaj ima **automatsko postavljanje vremena** uključeno.
+Ako se greška uporno ponavlja (rijetko), provjeri da tvoj uređaj ima uključeno **automatsko postavljanje vremena**.
 
 ---
 
@@ -1967,14 +1967,14 @@ Ako se greška uporno ponavlja (rijetko), provjeri da tvoj uredjaj ima **automat
 
 ### 17.2 Binance ključ MORA imati isključen Withdrawal
 
-Ponavljam jer je kritično: ako zaboraviš isključiti Withdrawal i netko ukrade ključ → izvuku ti novac. Ako je Withdrawal OFF, u najgorem slučaju mogu ti izgubiti novac kroz loše tradeove — ali ne mogu ga izvući.
+Ponavljam jer je kritično: ako zaboraviš isključiti Withdrawal i netko ukrade ključ → izvući će ti novac. Ako je Withdrawal OFF, u najgorem slučaju mogu ti izgubiti novac kroz loše tradeove — ali ne mogu ga izvući.
 
 ### 17.3 Device security
 
 Tvoj telefon/PC = tvoj sef.
 - **PIN / lozinka / biometrija**: obavezno
-- Ne ostavljaj uredjaj nezaključan
-- Ako izgubiš uredjaj: hitno → Binance web → API Management → delete sve ključeve. Anthropic console → revoke keys. Telegram → BotFather → `/revoke`.
+- Ne ostavljaj uređaj nezaključan
+- Ako izgubiš uređaj: hitno → Binance web → API Management → delete sve ključeve. Anthropic console → revoke keys. Telegram → BotFather → `/revoke`.
 
 ### 17.4 Backup
 
@@ -1982,7 +1982,7 @@ CoinSight čuva sve lokalno (u Hive bazi). Ako resetiraš telefon, gubiš:
 - Spremljene API ključeve (generiraš nove)
 - Watchlist izbor
 - Analysis history
-- Telegram Monitor konfiguraciju i signal povijest
+- Telegram Monitor konfiguraciju i povijest signala
 - Tvoju snimku pozicija (ali **pozicije ostaju na Binanceu** — vidiš ih kroz Binance web direktno)
 
 Preporuka: u sigurnu bilješku (password manager, Bitwarden/1Password/KeePass) zapiši:
@@ -1999,7 +1999,7 @@ CoinSight je open source (MIT licenca). To znači:
 - Zajednica može prijaviti sigurnosne probleme
 - Ti možeš verificirati da app radi upravo ono što kaže
 
-Ako nadješ sigurnosni problem u kodu, prijavi ga kao GitHub Issue.
+Ako nađeš sigurnosni problem u kodu, prijavi ga kao GitHub Issue.
 
 ### 17.6 Telegram Monitor sigurnost
 
@@ -2010,10 +2010,10 @@ Ako nadješ sigurnosni problem u kodu, prijavi ga kao GitHub Issue.
 
 ### 17.7 WalletConnect sigurnosna pravila
 
-- **Nikad ne odobravaj transakciju** u MetaMask/Phantom ako ne prepoznaješ što se traži
+- **Nikad ne odobravaj transakciju** u MetaMasku/Phantomu ako ne prepoznaješ što se traži
 - **Provjeri iznos i token** u MetaMask potvrdi prije tapanja "Confirm"
-- **Diskonektaj wallet** iz CoinSight kad ga ne koristiš (Portfolio tab → WalletConnect button → Disconnect)
-- **Koristit manji wallet** za DEX trading — nemoj spajati wallet s većinom svojih sredstava. Drži samo iznos koji planiraš koristiti za trading (npr. $50-100 u BNB/SOL za gas + tradeable iznos)
+- **Diskonektaj wallet** iz CoinSighta kad ga ne koristiš (Portfolio tab → WalletConnect button → Disconnect)
+- **Koristi manji wallet** za DEX trading — nemoj spajati wallet s većinom svojih sredstava. Drži samo iznos koji planiraš koristiti za trading (npr. $50-100 u BNB/SOL za gas + tradeable iznos)
 - **Seed phrase ostaje offline** — WalletConnect nikad ne traži seed phrase. Ako itko ili ikoja app traži seed phrase, to je scam.
 
 ---
@@ -2024,7 +2024,7 @@ Ako nadješ sigurnosni problem u kodu, prijavi ga kao GitHub Issue.
 A: Za Watchlist + Claude chat — ne. Za stvarno trgovanje — da. Binance je jedini podržani exchange.
 
 **Q: Mogu li koristiti Kraken / Coinbase / Revolut?**
-A: Trenutno ne. CoinSight je napravljen specifično za Binance Spot.
+A: Trenutačno ne. CoinSight je napravljen specifično za Binance Spot.
 
 **Q: Koliko košta mjesečno?**
 A: Anthropic AI: $5-30 (ovisno o aktivnosti). Binance fee: 0.1% po tradeu (za $100 trade = $0.10). CoinSight app: besplatno (open source).
@@ -2033,49 +2033,49 @@ A: Anthropic AI: $5-30 (ovisno o aktivnosti). Binance fee: 0.1% po tradeu (za $1
 A: Da, teoretski. Ako svi trejdovi završe na SL-u i nastaviš, možeš doći na nulu. **Zato postavljaj konzervativne parametre i ne ulaži više nego možeš izgubiti.**
 
 **Q: Je li CoinSight "get rich quick" shema?**
-A: Ne. Ovo je alat za discipliniran, sistematičan pristup momentum tradingu. Može biti profitabilan ako si **strpljiv** i **disciplinovan** s risk managementom.
+A: Ne. Ovo je alat za discipliniran, sustavan pristup momentum tradingu. Može biti profitabilan ako si **strpljiv** i **discipliniran** s risk managementom.
 
 **Q: Što ako Claude daje uzastopne loše signale?**
 A: Pauziraj trgovanje, pregledaj Analysis History u Portfolio tabu. Možda market uvjeti nisu za momentum. Vrati se za dan-dva.
 
 **Q: Kako isplatiti profite na Revolut?**
-A: Na Binanceu: Spot → Convert USDT u EUR → Withdraw SEPA na svoj Revolut IBAN. Traje 1-2 radna dana. CoinSight **ne** radi withdrawal.
+A: Na Binanceu: Spot → Convert USDT u EUR → Withdraw SEPA na svoj Revolut IBAN. Traje 1-2 radna dana. CoinSight **ne** obavlja withdrawal.
 
 **Q: Mogu li koristiti VPN s Binanceom?**
-A: Binance tehnički dozvoljava ali preporučuje da ne. Ako uključiš IP restrictions na ključu, VPN + IP restrictions = konflikt.
+A: Binance tehnički dopušta, ali preporučuje da ne. Ako uključiš IP restrictions na ključu, VPN + IP restrictions = konflikt.
 
 **Q: Što ako Binance banuje moj račun?**
-A: CoinSight nije odgovoran. Prati Binance TOS. API ključ bez withdrawal permission je manje rizičan za ban.
+A: CoinSight nije odgovoran. Prati Binance TOS. API ključ bez withdrawal permissiona manje je rizičan za ban.
 
 **Q: Mogu li CoinSight dijeliti s prijateljem?**
 A: Da! CoinSight je open source pod MIT licencom. Slobodno dijeli, forkaj, modificiraj. Izvorni kod je javno dostupan.
 
 **Q: Što ako ne razumijem Claudeov odgovor?**
-A: Pitaj Claudea dalje. "Objasni detaljnije." Ili "Na hrvatskom molim." Claude prilagodava jezik i detalj.
+A: Pitaj Claudea dalje. "Objasni detaljnije." Ili "Na hrvatskom, molim." Claude prilagođava jezik i detalj.
 
 **Q: Zašto nema detail view za coin (tap na karticu)?**
-A: Trenutno nema. Planirano za sljedeću verziju.
+A: Trenutačno nema. Planirano za sljedeću verziju.
 
 **Q: Što je Telegram Monitor i moram li ga koristiti?**
 A: Telegram Monitor pasivno čita javne kripto kanale i skuplja intelligence signale za Claudea. Nije obavezan — app radi i bez njega. Ali s njim Claude ima bolji kontekst za analizu.
 
 **Q: Treba li mi Chat ID za Telegram?**
-A: Ne. Chat ID više nije potreban. Telegram Monitor samo treba Bot Token jer čita kanale, ne šalje poruke tebi.
+A: Ne. Chat ID više nije potreban. Telegram Monitor treba samo Bot Token jer čita kanale, ne šalje poruke tebi.
 
 **Q: Zašto se više ne može slati signal na Telegram?**
 A: TELEGRAM button je uklonjen iz Trade Action Bara. Telegram je u v3.0.0 prenamijenjen iz notifikacijskog bota u intelligence monitor. Trade Action Bar sada ima samo BUY NOW i SKIP.
 
 **Q: Što je LOT_SIZE greška?**
-A: U ranijim verzijama, sell orderi ponekad nisu poštivali Binance-ov zahtjev za preciznost količine. U v3.0.0, app dinamički dohvaća `stepSize` iz `/exchangeInfo` i pravilno zaokružuje količinu. Greška bi trebala biti riješena.
+A: U ranijim verzijama sell orderi ponekad nisu poštivali Binanceov zahtjev za preciznost količine. U v3.0.0 app dinamički dohvaća `stepSize` iz `/exchangeInfo` i pravilno zaokružuje količinu. Greška bi trebala biti riješena.
 
-**Q: Što su tri tier-a (SHORT/MID/LONG) i koji koristiti?**
-A: Three-Tier Investment Framework (v4.0.0) ti omogucava tri razlicita pristupa investiranju. **SHORT** je za brzi momentum trading (sati do 48h) — isto kao sto je CoinSight radio prije. **MID** je za srednjorocne projekte s jasnim katalystom (tjedni do mjeseci) — koristis ga kad vidis coin s predstojecim launchom ili partnerstvom. **LONG** je za dugorocna fundamentalna ulaganja s DCA kupnjama (mjeseci+) — koristis ga za coinove u koje dugorocno vjerujes. Pocni s SHORT, prebaci na MID/LONG kad ti bude trebalo.
+**Q: Što su tri tiera (SHORT/MID/LONG) i koji koristiti?**
+A: Three-Tier Investment Framework (v4.0.0) ti omogućava tri različita pristupa investiranju. **SHORT** je za brzi momentum trading (sati do 48h) — isto kao što je CoinSight radio prije. **MID** je za srednjoročne projekte s jasnim katalystom (tjedni do mjeseci) — koristiš ga kad vidiš coin s predstojećim launchom ili partnerstvom. **LONG** je za dugoročna fundamentalna ulaganja s DCA kupnjama (mjeseci+) — koristiš ga za coinove u koje dugoročno vjeruješ. Počni sa SHORT, prebaci se na MID/LONG kad ti bude trebalo.
 
 **Q: Što je Intelligence Layer i kako ga koristiti?**
-A: Intelligence Layer je sustav koji prikuplja podatke iz 5 izvora (Dexscreener, GitHub, Reddit, Telegram, Market Cap) i gradi obavještajni izvještaj s confluence score-om (0-6.0). Najlakše ga koristiš tapom na "Analiziraj" button na DEX Early kartici. Vidi sekciju 13A za detalje.
+A: Intelligence Layer je sustav koji prikuplja podatke iz 5 izvora (Dexscreener, GitHub, Reddit, Telegram, Market Cap) i gradi obavještajni izvještaj s confluence scoreom (0-6.0). Najlakše ga koristiš tapom na "Analiziraj" button na DEX Early kartici. Vidi sekciju 13A za detalje.
 
 **Q: Što je confluence score?**
-A: Mjera koliko nezavisnih izvora se slaže oko signala za coin. Score ide od 0 do 6.0. Viši score = više izvora potvrduje isti trend = jači signal. Score 3+ znači da barem 3 izvora daju pozitivan signal.
+A: Mjera koliko se nezavisnih izvora slaže oko signala za coin. Score ide od 0 do 6.0. Viši score = više izvora potvrđuje isti trend = jači signal. Score 3+ znači da barem 3 izvora daju pozitivan signal.
 
 **Q: Što ako mi se app resetira?**
 A: Koristi Manage → App → Export logs before reset. Za potpuni reset: Manage → App → Full reset. Binance pozicije ostaju na Binanceu neovisno o app-u.
@@ -2083,8 +2083,8 @@ A: Koristi Manage → App → Export logs before reset. Za potpuni reset: Manage
 **Q: Koliko testova ima CoinSight?**
 A: Test suite sadrži **280 testova** koji pokrivaju servise, widgete i integracije.
 
-**Q: Što znači "Timestamp out of sync" greška?**
-A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 automatski sinkronizira putem `/api/v3/time`. Ako se greška ponovi, provjeri da je automatsko vrijeme uključeno na uredjaju.
+**Q: Što znači greška "Timestamp out of sync"?**
+A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 automatski sinkronizira putem `/api/v3/time`. Ako se greška ponovi, provjeri da je automatsko vrijeme uključeno na uređaju.
 
 **Q: Trebam li WalletConnect za korištenje CoinSighta?**
 A: Ne. WalletConnect je opcionalan. App savršeno radi bez njega — možeš analizirati, pratiti i trgovati kroz Binance. WalletConnect dodaješ samo ako planiraš DEX trading s MetaMask walletom.
@@ -2093,7 +2093,7 @@ A: Ne. WalletConnect je opcionalan. App savršeno radi bez njega — možeš ana
 A: Da. WalletConnect **nikad** ne daje CoinSightu pristup tvojim privatnim ključevima ili seed phrase-u. Svaka transakcija zahtijeva tvoje eksplicitno odobrenje u MetaMask/Phantom aplikaciji. Bez tvog tapa "Approve" — ništa se ne događa.
 
 **Q: Što je P&L Dashboard i komu služi?**
-A: P&L Dashboard (Manage → Portfolio → banner) prikazuje ukupne performanse svih tvojih trade-ova: equity curve (grafikon rasta/pada), win rate (% profitabilnih trejdova), R/R ratio (prosječni profit vs gubitak), i breakdown po tieru. Koristan nakon prvih 5-10 trejdova — do tada je previše malo podataka za smislene zaključke.
+A: P&L Dashboard (Manage → Portfolio → banner) prikazuje ukupne performanse svih tvojih trade-ova: equity curve (grafikon rasta/pada), win rate (% profitabilnih trejdova), R/R ratio (prosječni profit vs. gubitak) i breakdown po tieru. Koristan je nakon prvih 5-10 trejdova — do tada je premalo podataka za smislene zaključke.
 
 ---
 
@@ -2106,21 +2106,21 @@ A: P&L Dashboard (Manage → Portfolio → banner) prikazuje ukupne performanse 
 | **Bot Manager** | Full-screen ekran za upravljanje Telegram Monitor kanalima i statistikama |
 | **Bot Token** | Tajni ključ za Telegram bota, dobiven od @BotFather |
 | **BUY NOW** | Button u Trade Action Baru koji pokreće kupnju nakon potvrde |
-| **ClosedTrade** | Model za zatvoreni trade — cuva entry/exit price, P&L, tier, razlog zatvaranja |
+| **ClosedTrade** | Model za zatvoreni trade — čuva entry/exit price, P&L, tier, razlog zatvaranja |
 | **CoinGecko** | Besplatan crypto market data servis. CoinSight ga koristi za Watchlist podatke |
-| **Confluence Score** | Mjera koliko nezavisnih izvora se slaže oko signala (0-6.0). Viši = jači signal |
+| **Confluence Score** | Mjera koliko se nezavisnih izvora slaže oko signala (0-6.0). Viši = jači signal |
 | **Confirm LIVE** | Warning dialog kad prebacuješ s testnet-a na pravi Binance |
 | **DCA (Dollar-Cost Averaging)** | Strategija kupnje fiksnog iznosa u redovitim intervalima, neovisno o cijeni — smanjuje utjecaj volatilnosti |
 | **DEX** | Decentralizirana burza (Decentralized Exchange) — trgovanje bez posrednika, direktno na blockchainu (npr. Uniswap, PancakeSwap) |
-| **DEX Early** | Prvi pod-tab Watchlist-a, prikazuje svježe DEX listinge detektirane putem Dexscreenera |
-| **DEX Position Screen** | Ekran za upravljanje DEX pozicijama — rucni unos trade-ova, automatski price refresh, SL/TP monitoring |
-| **DexPosition** | Model za rucno pracenu DEX poziciju: token, entry cijena, kolicina, DEX, chain, SL/TP razine |
+| **DEX Early** | Prvi pod-tab Watchlista, prikazuje svježe DEX listinge detektirane putem Dexscreenera |
+| **DEX Position Screen** | Ekran za upravljanje DEX pozicijama — ručni unos trade-ova, automatski price refresh, SL/TP monitoring |
+| **DexPosition** | Model za ručno praćenu DEX poziciju: token, entry cijena, količina, DEX, chain, SL/TP razine |
 | **Dexscreener** | Servis koji prati nove tokene na decentraliziranim burzama. Intelligence Layer ga koristi za DEX Early tab |
 | **ENTERED** | Oznaka u Analysis History za trenutak kad si otvorio poziciju |
 | **Equity Curve** | Grafikon kumulativnog P&L-a kroz vrijeme — prikazuje ukupni rast ili pad portfolija |
 | **EXITED** | Oznaka u Analysis History za trenutak kad si zatvorio poziciju |
 | **exchangeInfo** | Binance endpoint koji vraća pravila za svaki trading par (stepSize, minNotional, itd.) |
-| **Faza 2** | Manualni mode — ti potvrduješ BUY kroz Trade Action Bar |
+| **Faza 2** | Manualni mode — ti potvrđuješ BUY kroz Trade Action Bar |
 | **Faza 3** | Automatski mode — app sama kupuje na INTERESTING |
 | **Fundamental Hold** | LONG tier pristup — kupnja coina na osnovu duboke fundamentalne analize (team, tech, adoption) |
 | **Full reset** | Opcija u Manage → App koja briše sve lokalne podatke i vraća app na tvorničko stanje |
@@ -2128,36 +2128,36 @@ A: P&L Dashboard (Manage → Portfolio → banner) prikazuje ukupne performanse 
 | **Intelligence Layer** | Multi-source obavještajni sustav koji prikuplja podatke iz 5 izvora (DEX, GitHub, Reddit, Telegram, MCap) |
 | **Intelligence Report** | Obavještajni izvještaj koji Intelligence Layer generira, sadrži podatke iz svih izvora i confluence score |
 | **IntelligenceAggregator** | Komponenta koja objedinjuje podatke iz svih 5 izvora u IntelligenceReport |
-| **InvestmentTier** | Enum koji definira tri investicijska moda: SHORT, MID, LONG — kontrolira ponasanje Analysis i Portfolio tabova |
+| **InvestmentTier** | Enum koji definira tri investicijska moda: SHORT, MID, LONG — kontrolira ponašanje Analysis i Portfolio tabova |
 | **INTERESTING** | Claude preporuka "razmatraj ulaz s malim iznosom" |
 | **Keyword filtering** | Filtriranje Telegram poruka po ključnim riječima (listing, whale, alert...) |
 | **KYC** | "Know Your Customer" — Binance verifikacija identiteta (osobna + selfie) |
-| **Liquidity** | Količina sredstava dostupnih u DEX pool-u za trgovanje. Veća likvidnost = manji slippage |
-| **LONG Research** | Pod-tab u Watchlist-u (LONG tier), prikazuje filtrirani top 200 coinova po market capu za fundamentalnu analizu |
-| **LONG tier** | Dugorocni investicijski mod (mjeseci do godine+) — fokus na fundamentalnu analizu, DCA kupnje, i praćenje fundamentala |
-| **LongHoldingDetailScreen** | Detaljan ekran za LONG holding s 4 taba: Osnove, Fundamentali, DCA, Biljeske |
+| **Liquidity** | Količina sredstava dostupnih u DEX poolu za trgovanje. Veća likvidnost = manji slippage |
+| **LONG Research** | Pod-tab u Watchlistu (LONG tier), prikazuje filtrirani top 200 coinova po market capu za fundamentalnu analizu |
+| **LONG tier** | Dugoročni investicijski mod (mjeseci do godine+) — fokus na fundamentalnu analizu, DCA kupnje i praćenje fundamentala |
+| **LongHoldingDetailScreen** | Detaljan ekran za LONG holding s 4 taba: Osnove, Fundamentali, DCA, Bilješke |
 | **LOT_SIZE** | Binance filter koji definira minimalnu i maksimalnu količinu tokena te stepSize za trade |
 | **Manage tab** | Četvrti tab u navigaciji (ikona tune), sadrži 5 pod-tabova: API, Bot, Trade, Tiers, App |
 | **Market cap** | Ukupna vrijednost svih coinova u opticaju u USD |
-| **MID Discovery** | Pod-tab u Watchlist-u (MID tier), prikazuje live GitHub trending kripto projekte |
-| **MID tier** | Srednjorocni investicijski mod (tjedni do mjeseci) — fokus na projekte s katalystom, target price, i deadline praćenje |
-| **MidProjectDetailScreen** | Detaljan ekran za MID projekt — editiranje thesis, GitHub linka, entry plana, upravljanje statusom i biljeske |
+| **MID Discovery** | Pod-tab u Watchlistu (MID tier), prikazuje live GitHub trending kripto projekte |
+| **MID tier** | Srednjoročni investicijski mod (tjedni do mjeseci) — fokus na projekte s katalystom, target price i deadline praćenje |
+| **MidProjectDetailScreen** | Detaljan ekran za MID projekt — editiranje thesisa, GitHub linka, entry plana, upravljanje statusom i bilješke |
 | **Market order** | Kupnja/prodaja **po trenutnoj tržišnoj cijeni** (ne limit) |
 | **MIT licenca** | Open source licenca koja dozvoljava slobodno korištenje, modifikaciju i distribuciju |
 | **My Watchlist** | Tvoj izbor coinova (označeni zvjezdicom) |
-| **New Listings** | Drugi pod-tab Watchlist-a, small-cap coinovi s 1h momentum-om |
+| **New Listings** | Drugi pod-tab Watchlista, small-cap coinovi s 1h momentumom |
 | **P&L** | "Profit and Loss" — koliko si trenutno u plusu/minusu |
 | **P&L Dashboard** | Full-screen ekran s equity curve, win rate, R/R ratio, per-tier breakdown i trade history |
-| **PnlAnalytics** | Model koji racuna P&L metrike: win rate, R/R ratio, equity curve podatke, per-tier statistike |
+| **PnlAnalytics** | Model koji računa P&L metrike: win rate, R/R ratio, podatke za equity curve, per-tier statistike |
 | **Quiet hours** | Sati kad auto-trade NE kupuje (default 23:00-07:00) |
-| **Rank** | Market cap rank — pozicija po veličini medju svim coinovima |
+| **Rank** | Market cap rank — pozicija po veličini među svim coinovima |
 | **Reliability %** | Postotak točnosti signala iz pojedinog Telegram kanala (prikazan u Bot Manageru) |
-| **R/R Ratio (Risk/Reward)** | Prosjecni omjer profita naspram gubitka na trade-ovima — visi R/R = bolje upravljanje rizikom |
+| **R/R Ratio (Risk/Reward)** | Prosječni omjer profita naspram gubitka na trade-ovima — viši R/R = bolje upravljanje rizikom |
 | **Risk Parameters** | Tvoje postavke u Manage → Trade: max iznos, max pozicije, SL%, TP% |
 | **Signal badge** | Narančasti banner na Analysis tabu koji pokazuje broj pending Telegram signala |
 | **SKIP** | Claude preporuka "previše rizično, ne diraj" |
-| **Slippage** | Razlika izmedju očekivane i stvarne cijene pri tradu (tipično <1% kod većih coinova) |
-| **Sparkline** | Mini 7-dnevni grafikon u CoinCard-u |
+| **Slippage** | Razlika između očekivane i stvarne cijene pri tradu (tipično <1% kod većih coinova) |
+| **Sparkline** | Mini 7-dnevni grafikon u CoinCardu |
 | **Spot** | Direktno trgovanje coinom (kupuješ, imaš ga, prodaš). Za razliku od Futures |
 | **stepSize** | Minimalni inkrement količine za Binance order (npr. 0.001 znači 3 decimale) |
 | **Stop-loss (SL)** | Donja granica cijene kod koje app prodaje (zaustavi gubitak) |
@@ -2166,19 +2166,19 @@ A: P&L Dashboard (Manage → Portfolio → banner) prikazuje ukupne performanse 
 | **Telegram Intel** | Obavještajni podaci prikupljeni iz Telegram kanala putem Monitora |
 | **Telegram Monitor** | Pasivni sustav koji čita javne Telegram kanale i filtrira signale za AI analizu |
 | **Testnet** | Binance simulator s lažnim novcem (testnet.binance.vision) |
-| **TierModeSelector** | UI widget (banner ispod AppBara) s tri buttona (SHORT/MID/LONG) za prebacivanje aktivnog investicijskog tier-a |
+| **TierModeSelector** | UI widget (banner ispod AppBara) s tri buttona (SHORT/MID/LONG) za prebacivanje aktivnog investicijskog tiera |
 | **Tier-1 exchange** | Veliki, regulirani exchange (Binance, Coinbase, Kraken) |
 | **Timestamp sync** | Automatska sinkronizacija vremena s Binance serverom putem /api/v3/time |
-| **Top Coins** | Četvrti pod-tab Watchlist-a, top 25 coinova po market capu |
+| **Top Coins** | Četvrti pod-tab Watchlista, top 25 coinova po market capu |
 | **Trade Action Bar** | Okvir u Analysis tabu koji se pojavljuje kod INTERESTING signala (BUY NOW / SKIP) |
 | **USDT** | Tether — stablecoin (1 USDT = ~$1). Koristi se kao "keš" u Binance Spot tradingu |
-| **V/L ratio** | Volume/Liquidity omjer — mjera aktivnosti tradinga u odnosu na likvidnost DEX pool-a |
-| **Value Discovery** | MID tier pristup — identifikacija coinova s neotkrivenom vrijednoscu i predstojecim katalystom |
+| **V/L ratio** | Volume/Liquidity omjer — mjera aktivnosti tradinga u odnosu na likvidnost DEX poola |
+| **Value Discovery** | MID tier pristup — identifikacija coinova s neotkrivenom vrijednošću i predstojećim katalystom |
 | **Volume** | 24h trading volumen u USD-u |
 | **WATCH** | Claude preporuka "ima potencijal, provjeri opet kasnije" |
 | **WalletConnect** | Otvoreni protokol za sigurno spajanje crypto walleta na dApps — CoinSight koristi v2 za wallet konekciju i swap inicijaciju |
-| **Withdrawal** | Povlačenje novca s Binance-a (CoinSight NE koristi; API ključ NE smije imati) |
-| **Win Rate** | Postotak trade-ova koji su zavrsili s profitom — kljucna metrika u P&L Dashboardu |
+| **Withdrawal** | Povlačenje novca s Binancea (CoinSight NE koristi; API ključ NE smije imati) |
+| **Win Rate** | Postotak trade-ova koji su završili s profitom — ključna metrika u P&L Dashboardu |
 
 ---
 
@@ -2203,7 +2203,7 @@ A: P&L Dashboard (Manage → Portfolio → banner) prikazuje ukupne performanse 
 
 1. **Binance API** — Withdrawal dozvola mora biti **ISKLJUČENA**
 2. **Seed phrase** — samo na papiru, nikad digitalno, nikad ne dijeli
-3. **Počni malim** — $5 po trejdu, 1 pozicija, prvih 2 tjedna
+3. **Počni malim** — $5 po trejdu, 1 pozicija, prva 2 tjedna
 4. **Stop-loss je obavezan** — uvijek postavljaj, bez iznimke
 5. **INTERESTING nije garancija** — 30-40% trejdova će biti gubitnici (normalno)
 6. **Konzistentnost pobjeđuje** — bolje 60% win rate s malim iznosima nego 90% win rate koji se ne može ponoviti

@@ -1291,8 +1291,8 @@ flutter build windows → OK (Session 1)
 | Fajl | Svrha |
 |------|-------|
 | `CLAUDE.md` | Projektne instrukcije za Claude Code — identitet, pravila rada, arhitektura, API integracije |
-| `README.md` | GitHub dokumentacija: Features, Tech Stack, Architecture, Setup, Security, MIT |
-| `LICENSE` | MIT License (Copyright (c) 2026 Neven Roksandic) |
+| `README.md` | GitHub dokumentacija: Features, Tech Stack, Architecture, Setup, Security, License |
+| `LICENSE` | Proprietary — All Rights Reserved (© 2026 Neven Roksa) |
 | `WORKLOG.md` | Granularni per-sesija log: svaki fajl, linija, komanda, dependency — forenzicki |
 | `MANUAL.md` | Korisnicki prirucnik: setup, koristenje tabova, risk management, ceste greske |
 | `OVERVIEW.md` | **Ovaj dokument** — narativna konsolidacija kroz sve sesije |

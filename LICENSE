@@ -1,21 +1,136 @@
-MIT License
+CoinSight — Proprietary Software License
+==========================================
 
-Copyright (c) 2026 Neven Roksandić
+Copyright (c) 2026 Neven Roksa. All Rights Reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This repository ("the Software") is published publicly for demonstration,
+portfolio, and transparency purposes ONLY. Public visibility does NOT grant
+any license, right, or permission to use, copy, or reuse the Software or any
+part of it.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+---------------------------------------------------------------
+1. GRANT OF RIGHTS
+---------------------------------------------------------------
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+No rights are granted. All rights — including but not limited to copyright,
+database rights, trade secret protections, moral rights, and any sui generis
+rights — are fully reserved by the copyright holder (Neven Roksa).
+
+You are permitted to:
+
+  (a) View the source code through the hosting platform's web interface.
+  (b) Reference the project by name and link back to the original repository
+      for commentary, criticism, review, or news reporting (fair use).
+
+You are NOT permitted to:
+
+  (a) Copy, clone, fork, download, mirror, or otherwise reproduce the
+      Software or any portion of it, except as strictly necessary for the
+      hosting platform's own caching and delivery.
+  (b) Use the Software, in whole or in part, in any product, service,
+      application, library, research, dataset, model training corpus,
+      or derivative work, whether commercial or non-commercial.
+  (c) Modify, adapt, translate, port, or create derivative works.
+  (d) Distribute, sublicense, sell, rent, lease, or otherwise transfer
+      the Software to any third party.
+  (e) Reverse-engineer, decompile, disassemble, or otherwise attempt to
+      derive the source form of any compiled artifact (including the APK).
+  (f) Remove, obscure, or alter any copyright, trademark, or attribution
+      notice.
+
+---------------------------------------------------------------
+2. PROTECTION OF FUNCTIONAL LOGIC  (EXPRESSLY EMPHASIZED)
+---------------------------------------------------------------
+
+The functional logic of the Software — including but not limited to:
+
+  - the three-tier investment architecture (SHORT / MID / LONG),
+  - the multi-source intelligence aggregation methodology and the
+    confluence-score calculation (0–6.0 scale),
+  - the DEX early-detection heuristics and pre-CEX discovery pipeline,
+  - the Claude-AI system prompts, analysis framing, and tier-aware chat
+    behaviors,
+  - the automatic stop-loss / take-profit monitoring cadence and rules,
+  - the portfolio model, P&L analytics, equity-curve construction, and
+    per-tier breakdown formulas,
+  - the Hive schema and local persistence layout,
+  - the risk-management parameters and trade-proposal flow,
+  - the combination, orchestration, and interaction of the above,
+
+constitutes original intellectual work of the copyright holder and is
+protected as copyrightable expression AND as trade secret / know-how.
+Reimplementation of the above logic in a different programming language,
+framework, or architecture — with the intent to reproduce the behavior,
+capabilities, or competitive advantage of CoinSight — is expressly
+FORBIDDEN and will be treated as infringement of this license and, where
+applicable, as misappropriation of trade secrets.
+
+Reading the source code does NOT grant you the right to reimplement what
+you have read.
+
+---------------------------------------------------------------
+3. AI / MACHINE-LEARNING RESTRICTIONS
+---------------------------------------------------------------
+
+The Software may not be used, in whole or in part, as training data,
+fine-tuning data, retrieval corpus, evaluation set, or any other input
+to machine-learning or artificial-intelligence systems, whether for
+commercial or research purposes, without prior written permission from
+the copyright holder.
+
+---------------------------------------------------------------
+4. NO WARRANTY
+---------------------------------------------------------------
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. CRYPTOCURRENCY
+TRADING CARRIES SUBSTANTIAL RISK OF LOSS; THE SOFTWARE IS AN EXPERIMENTAL
+TOOL AND IS NOT FINANCIAL, INVESTMENT, TAX, OR LEGAL ADVICE.
+
+---------------------------------------------------------------
+5. LIMITATION OF LIABILITY
+---------------------------------------------------------------
+
+IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES,
+OR OTHER LIABILITY — WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE
+— ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE, ITS USE, ITS
+INABILITY TO BE USED, OR ANY TRADING DECISIONS INFORMED BY IT. THIS
+INCLUDES, WITHOUT LIMITATION, DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+CONSEQUENTIAL, AND PUNITIVE DAMAGES, LOST PROFITS, AND LOST CRYPTOCURRENCY
+OR OTHER ASSETS.
+
+---------------------------------------------------------------
+6. ENFORCEMENT & TERMINATION
+---------------------------------------------------------------
+
+Any violation of this license automatically and immediately terminates
+any permissions you may have been granted, and obligates you to destroy
+all copies of the Software in your possession or control.
+
+The copyright holder reserves the right to enforce this license to the
+fullest extent permitted under applicable copyright law, trade-secret
+law, and unfair-competition law, including seeking injunctive relief,
+damages, and legal costs.
+
+---------------------------------------------------------------
+7. GOVERNING LAW
+---------------------------------------------------------------
+
+This license is governed by the laws of the Republic of Croatia and,
+where applicable, the copyright and intellectual-property law of the
+European Union. Any dispute arising from this license shall be resolved
+exclusively by the competent courts of the Republic of Croatia.
+
+---------------------------------------------------------------
+8. CONTACT
+---------------------------------------------------------------
+
+For licensing inquiries, commercial use requests, or permission requests,
+contact the copyright holder at: nevenroksa@gmail.com
+
+---------------------------------------------------------------
+
+If you do not agree to ALL of the terms above, you have NO permission to
+use this Software in any way, and you must not download or retain any
+copy of it.

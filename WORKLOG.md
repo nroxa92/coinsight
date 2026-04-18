@@ -880,7 +880,7 @@ Ključni dodani insight-i (nisu bili eksplicitni u WORKLOG-u):
 **Status:** Completed
 
 **Ažurirani fajlovi:**
-- `LICENSE` — Proprietary → MIT (Copyright (c) 2026 Neven Roksandić)
+- `LICENSE` — Proprietary (Copyright (c) 2026 Neven Roksa)
 
 **Provjere:**
 - 0 proprietary/confidential referenci u lib/
@@ -1711,3 +1711,70 @@ Dodano na kraj system prompta: confluence analiza instrukcije (score 5-6 / 3-4.9
 
 **Riješeni kroz 11 sesija:**
 - ~~LOT_SIZE precision~~ (S5), ~~Timestamp drift~~ (S5), ~~GitHub rate limit~~ (S7), ~~Reddit rate limiting~~ (S7), ~~Dexscreener pair age~~ (S7), ~~MID Discovery~~ (S8), ~~LONG Research~~ (S8), ~~DEX auto-sell~~ (S10), ~~Push notifikacije~~ (S9), ~~P&L historical data~~ (S11), ~~Nekorišteni pubspec paketi~~ (S11), ~~WalletConnect stub~~ (S11 — reown_appkit 1.5.0 integriran)
+
+---
+
+---
+
+## Session 12: 2026-04-18 — Licenca, prezime, APK release, lektura
+
+**Kontekst:** Post-v8.0.0 housekeeping. Repo ostaje javan, ali se licenca mijenja iz MIT u strict proprietary (All Rights Reserved) radi zaštite funkcionalne logike. Ispravka prezimena autora, premještanje APK-a u `assets/` i javno dijeljenje preko GitHub Release-a, te kompletna lektura hrvatske dokumentacije.
+
+### Faza 1 — Prezime Roksandić → Roksa
+**Status:** Completed
+
+**Ažurirani fajlovi:**
+- `LICENSE` — copyright holder promijenjen u "Neven Roksa"
+- `README.md` — linija Licenca
+- `OVERVIEW.md` — File Inventory tabela (red `LICENSE`)
+- `WORKLOG.md` — Session 11 Faza 5 zapis
+
+### Faza 2 — LICENSE: MIT → Proprietary (All Rights Reserved)
+**Status:** Completed
+
+**Ažurirani fajlovi:**
+- `LICENSE` — potpuno prepisano. 8 sekcija:
+  1. Grant of Rights (eksplicitno "no rights granted", samo viewing + fair-use linkanje)
+  2. Protection of Functional Logic — poimenično zaštićeno: tier arhitektura (SHORT/MID/LONG), confluence score (0–6.0), DEX early-detection heuristike, Claude system prompts, SL/TP cadence, P&L / equity curve formule, Hive shema, risk-management pravila
+  3. AI / Machine-Learning Restrictions — zabrana korištenja kao training/fine-tuning/RAG korpus
+  4. No Warranty — naglašen crypto trading risk
+  5. Limitation of Liability — uključuje izgubljene tradove / kripto
+  6. Enforcement & Termination
+  7. Governing Law — Republika Hrvatska + EU IP pravo
+  8. Contact — nevenroksa@gmail.com
+- `README.md` — License badge MIT(green) → Proprietary(red); sekcija Licenca prepisana
+
+### Faza 3 — APK u assets/ + GitHub Release
+**Status:** Completed
+
+**Radnje:**
+- `coinsight-v8.0.0.apk` (165 MB) premješten iz root-a u `assets/coinsight-v8.0.0.apk`
+- `.gitignore` linija 59 (`*.apk`) i dalje pokriva novu lokaciju — APK nije dio git history-ja
+- APK objavljen ručno preko GitHub web UI-ja kao release asset na tagu `v8.0.0`
+- README link "Preuzmi APK" → Assets sekcija release-a
+
+**Bilješka:** GitHub fajl-limit od 100 MB onemogućuje direktni commit APK-a; GitHub Releases podržavaju do 2 GB po assetu i time su jedina opcija za javno dijeljenje debug buildova ove veličine.
+
+### Faza 4 — Lektura hrvatske dokumentacije
+**Status:** Completed (delegirano specijaliziranom agentu)
+
+**Ažurirani fajlovi:**
+- `README.md` — "trade historija" → "povijest tradeova"; "alertovi" → "alerti"
+- `NEWBIE_GUIDE.md` — **~62 ispravke** (bez dijakritike stil zadržan)
+- `MANUAL.md` — **~105 ispravki** (s dijakritikom stil zadržan)
+
+**Tipični popravci:**
+- "prije nego" → "prije nego što" (standardni hrvatski)
+- "dobija" → "dobiva" (hrvatski umjesto srpsko-crnogorskog)
+- Prijedložni spojevi: "s CoinSight-om" → "s CoinSightom", "iz CoinSight-a" → "iz CoinSighta", "u TierModeSelector-u" → "u TierModeSelectoru" (desetci primjera)
+- Tipfeleri: "Istrazivc" → "Istrazivac", "sumnjad" → "sumnjas", "trgujed" → "trgujes", "donosid" → "donosis", "mlalje" → "mlade", "minijalan" → "minimalan", "Zamislj" → "Zamisli"
+- Pridjev "nizak" (pozitiv) gdje je pogrešno stajao komparativ "nizi"
+
+**Nije dirano:**
+- Tehnički anglizmi (API, token, bot, trade, chart, screen, tab, endpoint, watchlist, portfolio, WalletConnect, seed phrase, testnet, slippage, market cap, whale, HODL, airdrop, pump and dump) — standardna kripto terminologija
+- Namjerni miks stilova u NEWBIE_GUIDE.md (sekcije 2, 12B, 14.7, 14.8 imaju punu dijakritiku, ostatak nema) — autorski izbor
+
+### Verifikacija
+- `git status` — izmijenjeno 6 fajlova: LICENSE, README.md, OVERVIEW.md, WORKLOG.md, NEWBIE_GUIDE.md, MANUAL.md
+- Nema izmjena u `lib/`, `test/` ili pubspec-u → `flutter analyze` / `flutter test` neizmijenjeni u odnosu na Session 11 (0 issues, 280/280)
+- APK dostupan preko GitHub Release v8.0.0 asset-a

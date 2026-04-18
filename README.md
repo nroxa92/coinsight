@@ -6,7 +6,7 @@
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.41+-02569B?logo=flutter)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.11+-0175C2?logo=dart)](https://dart.dev)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-8.0.0-blue)](pubspec.yaml)
 [![Tests](https://img.shields.io/badge/Tests-280%2F280-brightgreen)]()
 [![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android)](https://android.com)
@@ -53,7 +53,7 @@ Simultano skenira **5 izvora** i kalkulira **confluence score (0-6.0)**:
 - Automatski stop-loss i take-profit (5-min monitoring tick)
 - DEX position tracking — manualni entry, auto price refresh
 - WalletConnect v2 — spajanje MetaMask/Trust Wallet
-- P&L Dashboard — equity curve, win rate, R/R ratio, trade historija
+- P&L Dashboard — equity curve, win rate, R/R ratio, povijest tradeova
 
 ### Grafovi i Vizualizacija
 
@@ -64,7 +64,7 @@ Simultano skenira **5 izvora** i kalkulira **confluence score (0-6.0)**:
 | LONG | 2 godine (daily) | 6 mjeseci |
 
 ### Push Notifikacije
-- Stop-Loss i Take-Profit alertovi
+- Stop-Loss i Take-Profit alerti
 - INTERESTING signal alert (confluence score)
 
 ### Detail Screeni
@@ -133,7 +133,7 @@ Novi korisnik? [NEWBIE_GUIDE.md](NEWBIE_GUIDE.md)
 
 ## Licenca
 
-MIT (c) 2026 Neven Roksandic — [LICENSE](LICENSE)
+Proprietary — All Rights Reserved. © 2026 Neven Roksa. See [LICENSE](LICENSE).
 
 <div align="center">
 Izradeno s Claude AI

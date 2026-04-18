@@ -2,11 +2,11 @@
 
 **Verzija:** 7.0.0 | **Datum:** 2026  
 **Jezik:** Hrvatski (HR)  
-**Ciljna publika:** Potpuni pocetnici — nikad koristili kripto, wallet ili trading app
+**Ciljna publika:** Potpuni pocetnici — nikad nisu koristili kripto, wallet ili trading app
 
 > Ovaj vodic objasnjava SVE sto trebas znati da postavis i koristis
 > CoinSight, cak i ako nikad nisi cuo za API kljuceve, crypto wallet
-> ili decentralizirane burze. Kreci polako, korak po korak.
+> ili decentralizirane burze. Krecemo polako, korak po korak.
 
 ---
 
@@ -35,7 +35,7 @@
 
 CoinSight je tvoj **pametni asistent za pracenje cryptocurrency trzista**.
 
-Zamisli ga ovako: umjesto da sam satima sijedis i pratis grafikone,
+Zamisli ga ovako: umjesto da sam satima sjedis i pratis grafikone,
 citas vijesti na 10 razlicitih kanala, analiziras podatke i pokusavas
 zakljuciti sto se dogadja na trzistu — CoinSight to radi za tebe.
 
@@ -72,7 +72,7 @@ strategiju ulaganja:
 |------|-------|--------------------|-------|---------|
 | ⚡ | SHORT | Sati do dana | Visok | Iskusnije korisnike |
 | 📈 | MID | Tjedni do mjeseci | Srednji | Vecinu korisnika |
-| 🏛️ | LONG | Mjeseci do godina | Nizi | Sve korisnike |
+| 🏛️ | LONG | Mjeseci do godina | Niski | Sve korisnike |
 
 Vise o svakom tieru u [poglavlju 9](#9-razumijevanje-tri-tiera-shortmidlong).
 
@@ -127,7 +127,7 @@ Dan 6+: Pocni s malim iznosima (5-25 EUR) --> prati rezultate
 
 Claude je umjetna inteligencija koju je napravio Anthropic. CoinSight
 koristi Claudea za analizu kripto podataka — salje mu sve prikupljene
-informacije i Claude vraca strukturiranu analizu s ocjenom i preporukom.
+informacije, a Claude vraca strukturiranu analizu s ocjenom i preporukom.
 
 **Svaka analiza kosta oko ~0.003 USD** (manje od 1 lipe). Cak i ako
 napravis 100 analiza dnevno, to je oko 0.30 USD (~2 kune).
@@ -149,7 +149,7 @@ napravis 100 analiza dnevno, to je oko 0.30 USD (~2 kune).
 1. Nakon sto si ulogiran, idi na **"Billing"** u lijevom meniju
 2. Klikni **"Add Payment Method"**
 3. Unesi podatke kartice (Visa ili Mastercard)
-4. Nece ti se odmah nista naplatiti — placa se samo ono sto potrosis
+4. Nece ti se odmah nista naplatiti — placa se samo ono sto potrosis.
 
 > 💡 **Savjet:** Anthropic obicno daje $5 besplatnog kredita novim
 > korisnicima. To je dovoljno za ~1600 analiza!
@@ -168,7 +168,7 @@ sk-ant-api03-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 6. **ODMAH GA KOPIRAJ!** Ovo je jedini put kad ces ga vidjeti u cijelosti.
 
-> ⚠️ **VAZNO:** Ako zatvaris prozor bez kopiranja, moras generirati novi kljuc.
+> ⚠️ **VAZNO:** Ako zatvoris prozor bez kopiranja, moras generirati novi kljuc.
 > Stari vise neces moci vidjeti.
 
 **Korak 3.4 — Unesi kljuc u CoinSight**
@@ -229,7 +229,7 @@ kanalu, CoinSight ce to pokupiti i ukljuciti u analizu.
 2. U trazilici upisi: `@BotFather`
 3. Otvori razgovor s BotFatherom (ima plavu kvacicu ✅)
 4. Posalji poruku: `/newbot`
-5. BotFather ce te pitati za ime bota — upisi npr:
+5. BotFather ce te pitati za ime bota — upisi npr.:
    ```
    MyCoinSightBot
    ```
@@ -262,7 +262,7 @@ Bot mora biti dodan kao **administrator** kanala koje zelis pratiti.
 2. Idi na **Settings** kanala (ili info)
 3. **Administrators** --> **Add Administrator**
 4. Pretrazi username svog bota (npr. `@my_coinsight_bot`)
-5. Dodaj ga s minimalnim dozvolama (samo citanje je dovoljno)
+5. Dodaj ga s minimalnim dozvolama (samo citanje je dovoljno).
 
 **Preporuceni kanali za pracenje:**
 
@@ -287,8 +287,8 @@ Bot mora biti dodan kao **administrator** kanala koje zelis pratiti.
 
 ### Sto je crypto wallet?
 
-Crypto wallet (digitalni novcani) je aplikacija koja cuva tvoje
-kriptovalute. Zamislj ga kao digitalni novcanik — ali umjesto kuna i
+Crypto wallet (digitalni novcanik) je aplikacija koja cuva tvoje
+kriptovalute. Zamisli ga kao digitalni novcanik — ali umjesto kuna i
 eura, u njemu drzis Bitcoin, Ethereum, BNB i ostale tokene.
 
 **Vazna razlika od banke:** Banka moze resetirati tvoju lozinku.
@@ -325,7 +325,7 @@ BSC je jedina razumna opcija jer su naknade zanemarive.
    - **iOS** --> Apple App Store
    - **Desktop** --> Chrome/Firefox/Brave extension
 
-> ⚠️ **VAZNO:** NIKADA ne preuzimaj MetaMask s nesluzbenjih izvora.
+> ⚠️ **VAZNO:** NIKADA ne preuzimaj MetaMask s nesluzbenih izvora.
 > Samo metamask.io ili sluzbeni app store.
 
 **Korak 5.2 — Kreiraj novi wallet**
@@ -366,8 +366,8 @@ BSC je jedina razumna opcija jer su naknade zanemarive.
 
 > 🔐 **Zasto je seed phrase vazan?**
 > Seed phrase = tvoj novac. Tko ima seed phrase, ima pristup svemu
-> u walletu. Ako izgubis telefon ali imas seed phrase — mozes
-> povratiti wallet na novom uredjaju. Ako nemas seed phrase —
+> u walletu. Ako izgubis telefon, ali imas seed phrase — mozes
+> vratiti wallet na novom uredjaju. Ako nemas seed phrase —
 > novac je zauvijek izgubljen.
 
 **Korak 5.4 — Dodaj BSC mrezu**
@@ -403,7 +403,7 @@ Trebas malo BNB-a za placanje transakcijskih naknada (gas):
 3. Odaberi **BNB**
 4. Za mrezu odaberi **BSC (BEP20)** — NE ERC20!
 5. Zalijepi svoju MetaMask adresu (pocinje s `0x...`)
-6. Iznos: **5-10 EUR** vrijednosti BNB je dovoljno za stotine transakcija
+6. Iznos: **5-10 EUR** vrijednosti BNB dovoljno je za stotine transakcija
 7. Potvrdi withdrawal
 
 > ⚠️ **PAZI na mrezu!** Ako posaljes BNB preko krive mreze (npr. ERC20
@@ -431,7 +431,7 @@ Trebas malo BNB-a za placanje transakcijskih naknada (gas):
 ### Sto je Phantom?
 
 Phantom je **wallet za Solana blockchain** — isto kao sto je MetaMask
-za Ethereum/BSC. Solana i Ethereum su potpuno razliciti blockchains
+za Ethereum/BSC. Solana i Ethereum su potpuno razliciti blockchaini
 koji ne komuniciraju medjusobno, pa trebas poseban wallet za svaki.
 
 ### Zasto Solana?
@@ -478,7 +478,7 @@ na Solani.
 7. Potvrdi withdrawal
 
 > 💡 Na Solani je gas fee tako nizak (~$0.001) da 0.1 SOL (~1.5 EUR)
-> traje za otprilike 10,000+ transakcija. Zaista minijalan trosak.
+> traje za otprilike 10,000+ transakcija. Zaista minimalan trosak.
 
 ```
 +-----------------------------------------+
@@ -518,7 +518,7 @@ CEX (Binance, Coinbase)          DEX (Uniswap, PancakeSwap)
 +---------------------------+    +---------------------------+
 | - Registracija + KYC      |    | - Bez registracije        |
 | - Veci izbor parova       |    | - Samo novi/mali tokeni   |
-| - Nize naknade             |    | - Vise naknade (gas)      |
+| - Nize naknade             |    | - Vece naknade (gas)      |
 | - Fiat deposit (EUR, USD)  |    | - Samo kripto             |
 | - Regulirano               |    | - Neregulirano            |
 | - Veca sigurnost           |    | - Ti si odgovoran         |
@@ -549,8 +549,8 @@ KYC (Know Your Customer) je obavezan postupak provjere identiteta:
 5. Napravi selfie za provjeru
 6. Cekaj odobrenje (obicno 10 min - 24h)
 
-> 💡 Bez KYC verifikacije ne mozes deponirati novac niti povlaciti
-> vece iznose. KYC je regulatorni zahtjev, ne Binanceov hir.
+> 💡 Bez KYC verifikacije ne mozes deponirati novac ni povlaciti
+> vece iznose. KYC je regulatorni zahtjev, a ne Binanceov hir.
 
 **Korak 7.3 — Deposit (uplata novca)**
 
@@ -558,7 +558,7 @@ KYC (Know Your Customer) je obavezan postupak provjere identiteta:
 2. Odaberi **EUR**
 3. Odaberi metodu:
    - **Kartica (Visa/Mastercard)** — odmah, ali visa naknada (~1.8%)
-   - **SEPA transfer** — 0 naknada, ali traje 1-3 radna dana
+   - **SEPA transfer** — bez naknade, ali traje 1-3 radna dana
 4. Unesi iznos (za pocetak preporucamo 50-100 EUR)
 5. Potvrdi uplatu
 
@@ -590,7 +590,7 @@ KYC (Know Your Customer) je obavezan postupak provjere identiteta:
 > 🔐 **Zasto je "Enable Withdrawals" ISKLJUCENO?**
 > Bez te dozvole, cak i ako netko dobije tvoj API kljuc, moze
 > samo kupovati i prodavati na tvom racunu — ali NE MOZE poslati
-> tvoj novac van Binancea. To je kriticna sigurnosna mjera.
+> tvoj novac izvan Binancea. To je kriticna sigurnosna mjera.
 
 7. Kopiraj **API Key** i **Secret Key**
 
@@ -611,12 +611,12 @@ Secret Key: fG7hI9jK2lM4nO6pQ8rS0tU1vW3xY5zA
 
 **Korak 7.6 — Testnet za vjezbanje (PREPORUCENO)**
 
-Prije nego pocnes s pravim novcem, testiraj na Binance testnet-u:
+Prije nego sto pocnes s pravim novcem, testiraj na Binance testnetu:
 
 1. Idi na **https://testnet.binance.vision**
 2. Registriraj se (odvojen account od pravog Binancea)
 3. Generiraj testnet API kljuceve
-4. U CoinSightu ukljuci **"Use Testnet"** opciju
+4. U CoinSightu ukljuci opciju **"Use Testnet"**
 5. Vjezbaj kupnju/prodaju s virtualnim novcima — bez rizika
 
 ```
@@ -708,7 +708,7 @@ LINK (Chainlink)    — infrastrukturni projekt (oracle)
 
 ### ⚡ SHORT Tier — Brzi lovac
 
-**Sto je:** Trazenje coinova koji su tek izlistani na decentraliziranim
+**Sto je:** Trazenje coinova koji su tek uvrsteni na decentraliziranim
 burzama (DEX) i imaju potencijal za brzi rast.
 
 **Vremenski horizont:** Sati do nekoliko dana
@@ -717,7 +717,7 @@ burzama (DEX) i imaju potencijal za brzi rast.
 
 ```
 1. CoinSight skenira DEX-ove (Uniswap, PancakeSwap, Raydium)
-   za nove parove mlalje od 48h
+   za nove parove mlade od 48h
 
 2. Filtrira po volumenu, likvidnosti i drugim metrikama
 
@@ -741,7 +741,7 @@ jednu SHORT poziciju.
 
 ---
 
-### 📈 MID Tier — Istrazivc
+### 📈 MID Tier — Istrazivac
 
 **Sto je:** Trazenje legitimnih projekata koji su jos nepoznati siroj
 publici, ali imaju solidne temelje i tim iza sebe.
@@ -756,11 +756,11 @@ publici, ali imaju solidne temelje i tim iza sebe.
 2. Claude evaluira:
    - Tim iza projekta
    - Tehnologiju
-   - Tokenomics (distribucija tokena)
+   - Tokenomics (distribuciju tokena)
    - Zajednicu i aktivnost
    - Partnerstva
 
-3. Ako je analiza pozitivna --> kupis na Binanceu (ili DEX-u)
+3. Ako je analiza pozitivna --> kupujes na Binanceu (ili DEX-u)
 
 4. Postavljas SL/TP za automatski izlaz
 
@@ -769,10 +769,10 @@ publici, ali imaju solidne temelje i tim iza sebe.
 
 **Rizik:** Srednji. Bolji projekti, ali i dalje nesigurno.
 
-**Pravilo:** Diversificiraj — 5-10 razlicitih pozicija, svaka maks 10%
+**Pravilo:** Diversificiraj — 5-10 razlicitih pozicija, svaka maks. 10%
 budzeta.
 
-**Koristis:** Binance (za coinove koji su vec izlistani) ili DEX wallet
+**Koristis:** Binance (za coinove koji su vec uvrsteni) ili DEX wallet
 
 ---
 
@@ -788,18 +788,18 @@ drzanje. Ovo su projekti koji grade temelj kripto ekosustava.
 ```
 1. Claude radi dubinsku analizu:
    - Whitepaper review
-   - On-chain metrike (aktivni addressi, TVL)
+   - On-chain metrike (aktivne adrese, TVL)
    - Competitive analysis
    - Makroekonomski kontekst
 
-2. Odlucujes o DCA strategiji (kupujes malo po malo)
+2. Odlucujes o DCA strategiji (kupujes malo-pomalo)
 
 3. Drzis dugorocno, ne reagiras na dnevne oscilacije
 
 4. Periodicki (mjesecno) trazis novu analizu
 ```
 
-**Rizik:** Nizi (u kontekstu kriptovaluta — i dalje rizicnije od
+**Rizik:** Niski (u kontekstu kriptovaluta — i dalje rizicnije od
 tradicionalnih investicija).
 
 **Pravilo:** Ulazi samo u projekte koje razumijes i u koje vjerujes
@@ -821,14 +821,14 @@ drzanje
 +--------+------------+--------+-----------+------------------+
 | MID    | Tjedni-mj. | Srednji| 30-50%    | Binance / DEX    |
 +--------+------------+--------+-----------+------------------+
-| LONG   | Mj.-godine | Nizi   | 30-50%    | Binance /        |
+| LONG   | Mj.-godine | Niski  | 30-50%    | Binance /        |
 |        |            |        |           | Hardware wallet  |
 +--------+------------+--------+-----------+------------------+
 ```
 
-> 💡 **Savjet za pocetnika:** Pocni SAMO s LONG tierom. Kupi malo BTC
-> i ETH na Binanceu, prati ih na Watchlistu, koristi Claude analizu
-> za ucenje. Tek kad se osjecas sigurno, isprobaj MID pa onda SHORT.
+> 💡 **Savjet za pocetnika:** Pocni SAMO s LONG tierom. Kupi malo BTC-a
+> i ETH-a na Binanceu, prati ih na Watchlistu, koristi Claude analizu
+> za ucenje. Tek kad se osjecas sigurno, isprobaj MID, pa onda SHORT.
 
 ---
 
@@ -841,7 +841,7 @@ drzanje
 **Korak 10.1 — Otvori Analiza tab**
 
 1. U CoinSightu tapni na **"Analiza"** tab
-2. Vidjet ces chat sucelje slicno messaging aplikaciji
+2. Vidjet ces chat sucelje slicno messaging aplikaciji.
 
 **Korak 10.2 — Postavi pitanje**
 
@@ -888,9 +888,9 @@ Claude ce ti vratiti strukturiranu analizu:
 ```
 
 **Sto znace ovi pojmovi:**
-- **Confluence Score** — ukupna ocjena iz svih izvora (0-6.0). Vise = bolje
+- **Confluence Score** — ukupna ocjena iz svih izvora (0 – 6.0). Vise = bolje
 - **Sentiment** — opci dojam (BULLISH = optimistican, BEARISH = pesimistican)
-- **ACCUMULATE** — preporuka da kupujes postepeno (DCA)
+- **ACCUMULATE** — preporuka da kupujes postupno (DCA)
 - **Rizik 3/5** — srednji rizik
 
 **Korak 10.4 — Postavi follow-up pitanja**
@@ -913,7 +913,7 @@ Chat je konverzacijski — mozes nastaviti pitati:
 ### Preporuka: Pocni s Binance testnetom
 
 Prije pravog tradinga, napravi barem 5-10 testnih tradova na
-testnet-u da razumijes kako sustav funkcionira.
+testnetu da razumijes kako sustav funkcionira.
 
 ### Korak po korak: MID tier kupnja na Binanceu
 
@@ -952,9 +952,9 @@ testnet-u da razumijes kako sustav funkcionira.
 
 **Korak 11.3 — Postavi Stop-Loss i Take-Profit**
 
-- **Stop-Loss (SL):** Cijena pri kojoj automatski prodajes da
+- **Stop-Loss (SL):** cijena pri kojoj automatski prodajes da
   ogranicis gubitak. Npr. 15-20% ispod kupovne cijene.
-- **Take-Profit (TP):** Cijena pri kojoj automatski prodajes da
+- **Take-Profit (TP):** cijena pri kojoj automatski prodajes da
   osiguras profit. Npr. 30-50% iznad kupovne cijene.
 
 > 💡 **Zlatno pravilo:** UVIJEK postavi Stop-Loss. Bez njega,
@@ -982,9 +982,9 @@ testnet-u da razumijes kako sustav funkcionira.
 
 **Korak 11.5 — Cekaj i reagiraj**
 
-- Ako cijena padne do SL --> CoinSight te obavjestava, pozicija se zatvara
-- Ako cijena naraste do TP --> CoinSight te obavjestava, pozicija se zatvara
-- Mozes rucno zatvoriti poziciju bilo kad
+- Ako cijena padne do SL --> CoinSight te obavjescuje, pozicija se zatvara
+- Ako cijena naraste do TP --> CoinSight te obavjescuje, pozicija se zatvara
+- Mozes rucno zatvoriti poziciju bilo kada
 
 ---
 
@@ -1020,7 +1020,7 @@ Horizontalna os. Mozes odabrati raspon: 1h, 24h, 7d, 30d, 1y.
 
 **Volumen (Volume):**
 Stupci na dnu grafikona. Veci volumen = vise se trguje.
-Visok volumen potvdjuje trend — ako cijena raste s visokim volumenom,
+Visok volumen potvrdjuje trend — ako cijena raste s visokim volumenom,
 to je jaci signal nego rast s niskim volumenom.
 
 ```
@@ -1061,11 +1061,11 @@ pokazuje 4 informacije:
 
 1. **Opci trend** — ide li cijena uglavnom gore ili dolje?
 2. **Volumen** — trguje li se aktivno ili je mirno?
-3. **Veliki skokovi** — nagle promjene obicno znace veliku vijest
-4. **Support/Resistance** — razine na kojima se cijena "odbija"
+3. **Veliki skokovi** — nagle promjene obicno znace veliku vijest.
+4. **Support/Resistance** — razine na kojima se cijena "odbija".
 
-> 💡 **Savjet:** Ne pokusavaj postati ekspert za tehnicku analizu
-> odmah. Claude radi tehnicku analizu za tebe. Grafikoni su tu da
+> 💡 **Savjet:** Ne pokusavaj odmah postati ekspert za tehnicku analizu.
+> Claude radi tehnicku analizu za tebe. Grafikoni su tu da
 > vizualno razumijes sto se dogadja.
 
 ---
@@ -1075,7 +1075,7 @@ pokazuje 4 informacije:
 ### Sto je WalletConnect?
 
 WalletConnect je nacin da sigurno **spojis svoj crypto wallet** (MetaMask,
-Trust Wallet, Phantom i drugi) s CoinSight-om. Zamisli to kao Bluetooth
+Trust Wallet, Phantom i drugi) s CoinSightom. Zamisli to kao Bluetooth
 pairing — tvoj wallet i CoinSight se "upoznaju", ali wallet i dalje
 ima kontrolu nad tvojim novcem.
 
@@ -1084,15 +1084,15 @@ ili seed phrase. Svaku transakciju moras odobriti u svom walletu.
 
 ### Zasto bih koristio WalletConnect?
 
-Bez WalletConnect-a, kad trgujed na DEX-u (PancakeSwap, Uniswap...),
-moras rucno unositi podatke o trade-ovima u CoinSight. S WalletConnect-om
+Bez WalletConnecta, kad trgujes na DEX-u (PancakeSwap, Uniswap...),
+moras rucno unositi podatke o trade-ovima u CoinSight. S WalletConnectom
 mozes:
 
 - **Vidjeti svoju wallet adresu** direktno u CoinSightu
-- **Pokrenuti swap** iz CoinSight-a (ali ga odobri u walletu)
+- **Pokrenuti swap** iz CoinSighta (ali ga odobri u walletu)
 - **Povezati DEX pozicije** s walletom automatski
 
-### Korak po korak: Postavljanje WalletConnect-a
+### Korak po korak: Postavljanje WalletConnecta
 
 **Korak 12A.1 — Registriraj se na WalletConnect Cloud**
 
@@ -1103,7 +1103,7 @@ mozes:
    - Klikni **"Create Project"** ili **"New Project"**
    - Daj ime projektu, npr. `CoinSight`
    - Odaberi tip: **App**
-5. Na stranici projekta vidjet ces **Project ID** — dugacak string
+5. Na stranici projekta vidjet ces **Project ID** — dugacki string
    koji izgleda ovako:
    ```
    a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
@@ -1147,7 +1147,7 @@ mozes:
 | Problem | Rjesenje |
 |---------|----------|
 | "Invalid Project ID" | Provjeri da si kopirao cijeli ID s cloud.reown.com |
-| QR kod ne radi | Provjeri internet konekciju na oba uredaja |
+| QR kod ne radi | Provjeri internet konekciju na oba uredjaja |
 | Wallet se ne pojavljuje | Azuriraj wallet app na najnoviju verziju |
 | Konekcija se prekida | Normalno kad se app zatvori — reconnect je automatski |
 
@@ -1158,7 +1158,7 @@ mozes:
 ### Sto je P&L Dashboard?
 
 P&L Dashboard je tvoj **osobni izvjestaj o performansama**. Kao sto
-sportasi imaju statistiku (golovi, asistencije, pobjedeni%), tako i
+sportasi imaju statistiku (golovi, asistencije, postotak pobjeda), tako i
 ti imas statistiku svojih trade-ova.
 
 **P&L = Profit and Loss** = koliko si zaradio ili izgubio.
@@ -1167,7 +1167,7 @@ ti imas statistiku svojih trade-ova.
 
 1. Otvori **Portfolio** tab
 2. Na vrhu ces vidjeti **P&L banner** s kljucnim brojkama
-3. Tapni banner za otvaranje full-screen **P&L Dashboard-a**
+3. Tapni banner za otvaranje full-screen **P&L Dashboarda**
 
 ### Sto znace brojke na Dashboardu
 
@@ -1192,18 +1192,18 @@ ti imas statistiku svojih trade-ova.
 
 **Win Rate (62%):**
 Od svih trade-ova koje si napravio, 62% ih je zavrsilo u plusu.
-To je kao u kosarci — koliko posto suteva je pogodilo.
+To je kao u kosarci — koliko posto suteva je pogodilo kos.
 
 **R/R Ratio (1.8):**
 Kad zaradis, prosjecno zaradis 1.8x vise nego sto izgubis kad
 gubis. Npr. prosjecno zaradis $9 po dobrom trade-u i izgubis
-$5 po losom. $9/$5 = 1.8.
+$5 po losem. $9/$5 = 1.8.
 
-Sto je R/R visi, to bolje. R/R iznad 1.5 je solidno za pocetnika.
+Sto je R/R visi, to bolje. R/R iznad 1.5 solidan je za pocetnika.
 
 **Equity Curve (graf):**
-Zamislji ga kao grafikon tvog "stanja racuna" kroz vrijeme.
-Ako linija ide GORE — generalno zaradujes. Ako ide DOLJE —
+Zamisli ga kao grafikon tvog "stanja racuna" kroz vrijeme.
+Ako linija ide GORE — generalno zaradjujes. Ako ide DOLJE —
 generalno gubis. Idealno: linija koja postupno raste s malim
 padovima tu i tamo (normalna volatilnost).
 
@@ -1213,17 +1213,17 @@ Razdvojene statistike za svaku strategiju:
 - **MID** — srednjorocni projekti (tjedni do mjeseci)
 - **LONG** — dugorocna drzanja (mjeseci do godina)
 
-Ovo ti pomaze vidjeti koja strategija ti najbolje lezi.
+Ovo ti pomaze vidjeti koja ti strategija najbolje lezi.
 
 ### Savjeti za pocetnike
 
-- **Ne brini** se o Dashboardu prvih tjedan dana — nemas dovoljno
+- **Ne brini** o Dashboardu prvih tjedan dana — nemas dovoljno
   podataka za smislenu statistiku
 - **Win Rate ispod 50%** ne znaci nuzno gubitak — ako je R/R visok
   (npr. 3.0), mozes gubiti 60% trade-ova i i dalje biti u plusu
-- **Equity Curve pad** kroz vise dana znaci da trebas **pauzirati**
+- **Pad Equity Curve** kroz vise dana znaci da trebas **pauzirati**
   i preispitati strategiju
-- **Per-tier breakdown** koristiti za fokusiranje na tier koji ti
+- **Per-tier breakdown** koristi za fokusiranje na tier koji ti
   najbolje ide
 
 ### Kako čitati equity curve
@@ -1263,7 +1263,7 @@ Ovo je problem — konzistentno padanje. Znači strategija ne radi, parametri su
 | 3-4 | Pratiti vlastitu win rate statistiku | Dramatično povećati iznose |
 | Mjesec 2+ | Konzistentna profitabilnost s malim iznosima | Brzo bogatstvo |
 
-**Ključna istina:** Momentum trading je vještina. Kao svaka vještina — treba tjedne prakse. CoinSight daje alat, iskustvo dolaziš sam.
+**Ključna istina:** Momentum trading je vještina. Kao svaka vještina — treba tjedne prakse. CoinSight daje alat, do iskustva dolaziš sam.
 
 ---
 
@@ -1289,7 +1289,7 @@ Svaka kriptovaluta osim Bitcoina. Ethereum, Solana, BNB — sve su
 altcoini.
 
 **API Key (API kljuc)**
-Lozinka za programatski pristup servisu. CoinSight koristi API
+Lozinka za programski pristup servisu. CoinSight koristi API
 kljuceve za komunikaciju s Claudeom, Binanceom i Telegramom.
 Format: dugacki string alfanumerickih znakova.
 
@@ -1316,7 +1316,7 @@ Suprotno od bearish.
 
 **Burn**
 Trajno uklanjanje tokena iz opticaja (slanje na "mrtvu" adresu).
-Smanjuje ukupnu ponudu, teorijski povecava vrijednost preostalih.
+Smanjuje ukupnu ponudu, teoretski povecava vrijednost preostalih.
 
 **Candlestick**
 Tip grafikona koji prikazuje otvaranje, zatvaranje, najvisu i
@@ -1335,16 +1335,16 @@ Raspon: 0 do 6.0. Vise = jaci signal.
 
 **Contract Address**
 Jedinstvena adresa smart contracta tokena na blockchainu.
-Koristis ju za provjeru da kupujes pravi token (a ne kopiju/scam).
+Koristis je za provjeru da kupujes pravi token (a ne kopiju/scam).
 
 **DCA (Dollar Cost Averaging)**
 Strategija kupovanja u vise navrata po razlicitim cijenama, umjesto
-sve odjednom. Smanjuje rizik loseg tajminga. Npr: kupi $50 BTC
+sve odjednom. Smanjuje rizik loseg tajminga. Npr. kupi $50 BTC-a
 svaki tjedan, neovisno o cijeni.
 
 **ClosedTrade**
 Zapis o trade-u koji je zavrsen (zatvoren). Cuva podatke o entry/exit
-cijeni, profitu ili gubitku, tieru, i razlogu zatvaranja (SL, TP,
+cijeni, profitu ili gubitku, tieru i razlogu zatvaranja (SL, TP,
 rucno). Koristi se za P&L Dashboard statistike.
 
 **DeFi (Decentralized Finance)**
@@ -1362,7 +1362,7 @@ da je dobra. CoinSight analizira — ti odlucujes.
 
 **Equity Curve**
 Grafikon koji prikazuje kumulativni profit ili gubitak kroz vrijeme.
-Ako linija ide gore — strategija zaradduje. Ako ide dolje — gubi.
+Ako linija ide gore — strategija zaradjuje. Ako ide dolje — gubi.
 Vidljiv u P&L Dashboardu.
 
 **Entry Point**
@@ -1370,8 +1370,8 @@ Cijena po kojoj planiras kupiti coin. Dobar entry point je kad je
 cijena niza od tvoje procjene fer vrijednosti.
 
 **ERC-20**
-Standard za tokene na Ethereum blockchainu. Vecina ETH tokena je
-ERC-20 kompatibilna.
+Standard za tokene na Ethereum blockchainu. Vecina ETH tokena
+kompatibilna je s ERC-20.
 
 **Fiat**
 Tradicionalne valute koje izdaju drzave: EUR, USD, HRK.
@@ -1407,7 +1407,7 @@ Postupak provjere identiteta koji zahtijevaju regulirane burze
 **Leverage**
 Trgovanje s posudjenim novcem. Npr. 10x leverage znaci da
 kontroliras 10x veci iznos. IZRAZITO RIZICNO — mozes izgubiti
-vise nego si ulozio. CoinSight NE koristi leverage.
+vise nego sto si ulozio. CoinSight NE koristi leverage.
 
 **Limit Order**
 Narudzba za kupnju/prodaju po odredjenoj cijeni. Izvrsava se
@@ -1423,9 +1423,9 @@ Dodavanje coina na burzu. "Binance listing" znaci da se coin
 moze kupiti na Binanceu. Novi listingi cesto izazovu rast cijene.
 
 **LP (Liquidity Pool)**
-Bazen tokena zaklucanih u smart contractu koji omogucavaju
+Bazen tokena zakljucanih u smart contractu koji omogucavaju
 trgovanje na DEX-u. Korisnici mogu dodavati likvidnost i
-zaraddivati naknade.
+zaradjivati naknade.
 
 **Market Cap (Trzisna kapitalizacija)**
 Ukupna vrijednost svih tokena u opticaju.
@@ -1438,7 +1438,7 @@ Izvrsava se odmah, ali cijena moze malo varirati (slippage).
 
 **Memecoin**
 Kriptovaluta nastala kao sala ili meme (DOGE, PEPE, SHIB).
-Izrazito spekulativna, cesto bez realne korisnosti.
+Izrazito je spekulativna, cesto bez realne korisnosti.
 
 **MetaMask**
 Najpopularniji crypto wallet za Ethereum i BSC ecosystem.
@@ -1463,11 +1463,11 @@ Dobit ili gubitak na poziciji. Prikazuje se u apsolutnom iznosu
 **P&L Dashboard**
 Centralizirani ekran u CoinSightu koji prikazuje equity curve,
 win rate, R/R ratio, per-tier breakdown i trade history. Pristupa
-se iz Portfolio taba tapom na P&L banner.
+mu se iz Portfolio taba tapom na P&L banner.
 
 **PnlAnalytics**
 Interni model koji racuna sve P&L metrike iz zatvorenih trade-ova:
-win rate, prosjecni profit/gubitak, R/R ratio, equity curve podatke.
+win rate, prosjecni profit/gubitak, R/R ratio, podatke za equity curve.
 
 **Pair (Par)**
 Dva tokena koji se trguju jedan za drugi. BTC/USDT znaci da
@@ -1494,7 +1494,7 @@ Ako cijena probije resistance, to je bullish signal.
 
 **R/R Ratio (Risk/Reward)**
 Omjer prosjecnog profita naspram prosjecnog gubitka. R/R 2.0 znaci
-da prosjecno zaradis dvaput vise kad zaradis nego sto izgubis kad
+da prosjecno zaradis dvostruko vise kad zaradis nego sto izgubis kad
 gubis. Prikazan u P&L Dashboardu.
 
 **ROI (Return on Investment)**
@@ -1502,12 +1502,12 @@ Povrat na investiciju. Ako si ulozio $100 i sad vrijedi $150,
 ROI je 50%.
 
 **Rug Pull**
-Tip scama gdje developeri projekta povuku svu likvidnost iz
+Tip scama u kojem developeri projekta povuku svu likvidnost iz
 LP-a i nestanu s novcem. Cest na DEX-ovima s novim tokenima.
 
 **Seed Phrase (Recovery Phrase)**
 12 ili 24 rijeci koje su master kljuc za tvoj wallet. S njima
-mozes povratiti wallet na bilo kojem uredjaju. NIKAD NE DIJELI!
+mozes vratiti wallet na bilo kojem uredjaju. NIKAD NE DIJELI!
 Vidi poglavlje 5.3 za detalje.
 
 **Slippage**
@@ -1518,7 +1518,7 @@ Npr. ocekujes kupiti po $1.00, kupis po $1.03 = 3% slippage.
 **Smart Contract**
 Automatski program koji zivi na blockchainu. Izvrsava se tocno
 onako kako je napisan, bez mogucnosti promjene. DEX-ovi, tokeni
-i DeFi protokoli su svi smart contracti.
+i DeFi protokoli svi su smart contracti.
 
 **SOL (Solana)**
 Kriptovaluta Solana blockchaina. Koristi se za gas fee na Solani.
@@ -1537,7 +1537,7 @@ USDT, USDC, DAI — svi vrijede ~$1. Koristis ih kao "digitalne
 dolare" za trgovanje.
 
 **Staking**
-Zaklucavanje tokena u mrezi za zaradu nagrada. Slicno stednom
+Zakljucavanje tokena u mrezi za zaradu nagrada. Slicno stednom
 racunu u banci, ali s vecim prinosima i rizicima.
 
 **Stop-Loss (SL)**
@@ -1569,7 +1569,7 @@ opticaju, kako se distribuiraju, postoji li burn mehanizam.
 Ukupan broj tokena koji ce ikad postojati. BTC: 21 milijun.
 
 **TVL (Total Value Locked)**
-Ukupna vrijednost tokena zaklucanih u DeFi protokolu. Veci TVL
+Ukupna vrijednost tokena zakljucanih u DeFi protokolu. Veci TVL
 = vise povjerenja i koristenja platforme.
 
 **USDT (Tether)**
@@ -1577,7 +1577,7 @@ Najpopularniji stablecoin. 1 USDT = ~1 USD. Koristis ga kao
 "digitalni dolar" za trgovanje parovima na burzama.
 
 **Validator**
-Cvor u mrezsi koji potvdjuje transakcije i dodaje nove blokove.
+Cvor u mrezi koji potvrdjuje transakcije i dodaje nove blokove.
 Na Proof-of-Stake blockchainima (Ethereum, Solana) validatori
 moraju stakati tokene kao kolateral.
 
@@ -1624,7 +1624,7 @@ se u godisnjim postocima (APY — Annual Percentage Yield).
 
 ### Zlatna pravila sigurnosti
 
-Ovo su pravila koja NIKADA ne smis krsiti. Krsenje bilo kojeg od
+Ovo su pravila koja NIKADA ne smijes krsiti. Krsenje bilo kojeg od
 ovih pravila moze rezultirati **trajnim gubitkom novca**.
 
 ---
@@ -1644,17 +1644,17 @@ ovih pravila moze rezultirati **trajnim gubitkom novca**.
 ```
 
 - ❌ NIKADA ne radi screenshot seed phrasea
-- ❌ NIKADA ne spremi u Notes app, email ili cloud (iCloud, Google Drive)
-- ❌ NIKADA ne dijeli s nikim — ni s "podriskom", ni s "adminima"
+- ❌ NIKADA ne spremaj u Notes app, email ili cloud (iCloud, Google Drive)
+- ❌ NIKADA ne dijeli ni s kim — ni s "podriskom", ni s "adminima"
 - ❌ NIKADA ne upisuj na web stranicu
 - ❌ NIKADA ne salji u chat, DM ili bilo koji digitalni kanal
 - ✅ ZAPISI na papir, citljivo, tocnim redoslijedom
-- ✅ Napravi 2 kopije i spremi na 2 fizicki odvojena mjesta
-- ✅ Razmotri metalnu plocu za dugotrajno cuvanje (otpornije od papira)
+- ✅ Napravi 2 kopije i spremi ih na 2 fizicki odvojena mjesta
+- ✅ Razmotri metalnu plocu za dugotrajno cuvanje (otpornija je od papira)
 
 > ⚠️ **Cesti scamovi:** "Posalji nam seed phrase za verifikaciju
 > walleta" — SCAM. Nijedan legitimni servis NIKADA nece traziti
-> tvoj seed phrase. Cak ni CoinSight ga NE trazi i NE treba.
+> tvoj seed phrase. Cak ni CoinSight ga NE trazi i ne treba.
 
 ---
 
@@ -1671,12 +1671,12 @@ Binance API kljuc:
 ```
 
 **Zasto?** Bez Withdrawal dozvole, cak i ako netko ukrade tvoj API
-kljuc, NE MOZE poslati tvoj novac van Binancea. Najgore sto moze
-napraviti je kupiti/prodati — ali novac ostaje na tvom racunu.
+kljuc, NE MOZE poslati tvoj novac izvan Binancea. Najgore sto moze
+napraviti jest kupiti/prodati — ali novac ostaje na tvom racunu.
 
 Dodatne mjere:
 - Postavi **IP whitelist** na Binanceu (samo tvoja IP adresa)
-- Periodicki rotiraj API kljuceve (svakih 3-6 mjeseci)
+- Periodicki rotiraj API kljuceve (svakih 3 – 6 mjeseci)
 - Nikada ne dijeli API Secret Key
 
 ---
@@ -1685,10 +1685,10 @@ Dodatne mjere:
 
 Prije nego sto napravis BILO STO s pravim novcem:
 
-1. Testiraj na **Binance Testnet** (testnet.binance.vision)
+1. Testiraj na **Binance Testnetu** (testnet.binance.vision)
 2. Napravi barem 5-10 test tradova
 3. Provjeri da SL i TP rade ispravno
-4. Tek onda prebaci na pravi (mainnet) racun
+4. Tek onda se prebaci na pravi (mainnet) racun
 
 **Testnet je besplatan i koristi virtualni novac.** Nema razloga
 preskociti ovaj korak.
@@ -1718,7 +1718,7 @@ Prva pozicija: 5-10 EUR (ne vise!)
 
 ### Pravilo 5: DYOR — Uvijek istrazuj sam
 
-CoinSight ti daje analizu i podatke. Ali **TI** donosid konacnu
+CoinSight ti daje analizu i podatke. Ali **TI** donosis konacnu
 odluku. Nikada ne ulazi u investiciju samo zato sto:
 
 - Claude je rekao da je bullish
@@ -1728,13 +1728,13 @@ odluku. Nikada ne ulazi u investiciju samo zato sto:
 
 **Uvijek se pitaj:**
 1. Razumijem li sto ovaj projekt radi?
-2. Mogu li si priustiti izgubiti ovaj novac?
+2. Mogu li si priustiti da izgubim ovaj novac?
 3. Imam li plan za izlaz (SL/TP)?
-4. Jesam li emocionalan ili racionalan upravo sad?
+4. Jesam li upravo sada emocionalan ili racionalan?
 
 ---
 
-### Pravilo 6: Nikada ne ulazi vise nego mozes izgubiti
+### Pravilo 6: Nikada ne ulazi vise nego sto mozes izgubiti
 
 ```
 +----------------------------------------------------------+
@@ -1748,7 +1748,7 @@ odluku. Nikada ne ulazi u investiciju samo zato sto:
 |   - Hitne troskove                                       |
 |   - Otplatu duga                                         |
 |                                                          |
-|   Ulazi SAMO novac kojeg mozes                           |
+|   Ulazi SAMO novac koji mozes                            |
 |   100% izgubiti bez utjecaja na zivot.                   |
 |                                                          |
 +----------------------------------------------------------+
@@ -1758,27 +1758,27 @@ odluku. Nikada ne ulazi u investiciju samo zato sto:
 
 ### Sigurnosna provjera prije svakog tradea
 
-Prije nego kliknes "Buy", prodi kroz ovu listu:
+Prije nego sto kliknes "Buy", prodji kroz ovu listu:
 
 - [ ] Imam li postavljen Stop-Loss?
 - [ ] Jesam li na pravoj mrezi (BSC, Solana, Ethereum)?
-- [ ] Provjerio sam contract address tokena?
-- [ ] Iznos je unutar mog budzeta za rizik?
+- [ ] Jesam li provjerio contract address tokena?
+- [ ] Je li iznos unutar mog budzeta za rizik?
 - [ ] Nisam emocionalno uzbudjen (FOMO)?
-- [ ] Razumijem sto kupujem?
+- [ ] Razumijem li sto kupujem?
 
-Ako na bilo koji odgovor NE MOZES odgovoriti "DA" — ne trguj.
+Ako na bilo koje pitanje NE MOZES odgovoriti "DA" — ne trguj.
 
 ---
 
-### Sto napraviti ako sumnjad na problem
+### Sto napraviti ako sumnjas na problem
 
 | Situacija | Akcija |
 |-----------|--------|
 | Mislis da je API kljuc kompromitiran | Odmah ga obrisi na Binanceu i generiraj novi |
 | Dobio si poruku "posalji seed phrase" | SCAM! Ignoriraj i blokiraj posiljatelja |
 | MetaMask trazi seed phrase na webu | Zatvori stranicu — to je phishing |
-| Coin je pao 50%+ odjednom | NE panicaraj. Provjeri vijesti, Claude analizu |
+| Coin je pao 50%+ odjednom | NE panicari. Provjeri vijesti, Claude analizu |
 | Ne razumijes sto se dogadja | ZAUSTAVI SE. Pitaj Claudea za objasnjenje |
 
 ---
@@ -1786,9 +1786,9 @@ Ako na bilo koji odgovor NE MOZES odgovoriti "DA" — ne trguj.
 ### 14.7 WalletConnect sigurnosna pravila
 
 - **Nikad ne dijeli seed phrase** — WalletConnect je POTPUNO DRUGAČIJI od seed phrase-a. WalletConnect je privremena veza između app-e i walleta. Seed phrase je master ključ.
-- **Koristit namjenski "trading wallet"** — Kreiraj novi MetaMask wallet samo za CoinSight trading. Na njega stavi samo iznos koji planiraš tradati. Tvoje "glavne" uštedine drži odvojeno.
+- **Koristi namjenski "trading wallet"** — Kreiraj novi MetaMask wallet samo za CoinSight trading. Na njega stavi samo iznos koji planiraš tradati. Tvoje "glavne" uštedjevine drži odvojeno.
 - **Disconnect kad ne koristiš** — U Portfolio tabu, kad završiš s tradingom, tapni WalletConnect button → Disconnect.
-- **Provjeri svaku transakciju u MetaMask** — Kad CoinSight inicira swap, MetaMask otvori prozor s detaljima. Pročitaj koji token, koji iznos, koja gas naknada. Tek tada tapni Confirm.
+- **Provjeri svaku transakciju u MetaMasku** — Kad CoinSight inicira swap, MetaMask otvori prozor s detaljima. Pročitaj koji token, koji iznos, koja gas naknada. Tek tada tapni Confirm.
 
 ### 14.8 Što napraviti ako posumnjate da ste hakirani
 
@@ -1803,11 +1803,11 @@ Ako na bilo koji odgovor NE MOZES odgovoriti "DA" — ne trguj.
 
 ## Zavrsna rijec
 
-CoinSight je mocaan alat, ali je i dalje samo alat. Najvaznije
-stvari za uspjeh su:
+CoinSight je mocan alat, ali je i dalje samo alat. Najvaznije
+stvari za uspjeh jesu:
 
 1. **Strpljenje** — ne juri za brzim profitom
-2. **Disciplina** — uvijek postavi SL/TP, drzji se plana
+2. **Disciplina** — uvijek postavi SL/TP, drzi se plana
 3. **Edukacija** — svaki dan nauci nesto novo
 4. **Kontrola emocija** — ne trguj kad si uzbudjen ili u panici
 5. **Upravljanje rizikom** — mali iznosi, diversifikacija
@@ -1817,7 +1817,7 @@ Kreni polako. Dan po dan. Korak po korak. Sretno! 🚀
 ---
 
 *CoinSight je alat za analizu i pracenje. Nije financijski savjet.
-Cryptocurrency trading nosi visok rizik gubitka kapitala. Proslji
+Cryptocurrency trading nosi visok rizik gubitka kapitala. Prosli
 rezultati ne garantiraju buduce prinose.*
 
 ---
