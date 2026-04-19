@@ -2,7 +2,7 @@
 
 **Verzija:** 7.0.0
 **Datum generiranja:** 2026-04-16
-**Status projekta:** v7.0.0 release — 280 testova, 10 sesija, Three-Tier Investment Framework (SHORT/MID/LONG) + Intelligence Layer + Detail Screens + DEX Position Tracking + Charts & Visualization + Push Notifications + P&L Dashboard + WalletConnect v2
+**Status projekta:** v8.0.0 release — 352 testa, 12 sesija, Three-Tier Investment Framework (SHORT/MID/LONG) + Intelligence Layer + Detail Screens + DEX Position Tracking + Charts & Visualization + Push Notifications + P&L Dashboard + WalletConnect v2
 **Autor:** Neven (developer) + Claude Code (implementacija)
 **Licenca:** MIT (Copyright (c) 2026 Neven Roksa)
 
@@ -1083,7 +1083,7 @@ Pristup iz Portfolio taba putem P&L bannera.
 
 **Session 10 verifikacija:**
 
-- `flutter test` — **280/280 passed** (+24 od v6.0.0)
+- `flutter test` — **280/280 passed** (+24 od v6.0.0; Session 12 naknadno proširio na 352/352)
 - `flutter analyze` — 0 issues
 
 **Session 10 rezultat:** CoinSight prosiren s P&L Dashboard-om za centralizirani pregled performansi (equity curve, win rate, R/R ratio, per-tier breakdown), WalletConnect v2 za spajanje eksternih walleta i iniciranje swapova, te Trade History za kompletnu evidenciju zatvorenih trade-ova.
@@ -1230,7 +1230,7 @@ Pristup iz Portfolio taba putem P&L bannera.
 
 ```
 flutter analyze      → 0 issues
-flutter test         → 280/280 passed
+flutter test         → 352/352 passed
 flutter build apk    → OK (debug)
 flutter build windows → OK (Session 1)
 ```
@@ -1253,18 +1253,19 @@ flutter build windows → OK (Session 1)
 | v5.0.0 | 2026-04-16 | Session 8: Detail Screens + DEX Position Tracking + MID Discovery/LONG Research + 243 testova |
 | v6.0.0 | 2026-04-16 | Session 9: Charts & Visualization + Push Notifications + 267 testova |
 | v7.0.0 | 2026-04-16 | Session 10: P&L Dashboard + WalletConnect v2 + Trade History + 280 testova |
+| v8.0.0 | 2026-04-18 | Session 11–12: Dokumentacijski rebrand, lektura, License (Proprietary), Test expansion → 352 testa |
 
 ### 9.5 Test Coverage Breakdown
 
 | Kategorija | Fajlova | Testova | Pokriva |
 |-----------|---------|---------|---------|
-| Unit/Models | 20 | 168 | coin, coin_position, **closed_trade**, **pnl_analytics**, **dex_position**, risk_parameters, analysis_log, trade_proposal, trade_result, telegram_signal, monitored_channel, dexscreener_signal, github_signal, reddit_signal, intelligence_report, investment_tier, mid_term_project, long_term_holding, tier_provider, **price_chart_data** |
-| Unit/Services | 11 | 86 | coingecko, claude, binance (+LOT_SIZE +timeSync), trade, telegram_monitor, dexscreener, github_intelligence, reddit_monitor, **chart_data_service**, **notification_service**, **wallet_service** |
-| Widget | 5 | 18 | coin_card, chat_bubble, sparkline_chart, **price_chart_widget**, **wallet_connect_button** |
+| Unit/Models | 19 | ~165 | coin, coin_position, closed_trade, pnl_analytics, dex_position, risk_parameters, analysis_log, trade_proposal, trade_result, telegram_signal, monitored_channel, dexscreener_signal, github_signal, reddit_signal, intelligence_report, investment_tier, mid_term_project, long_term_holding, price_chart_data |
+| Unit/Services | 13 | ~120 | coingecko, claude, binance (+LOT_SIZE +timeSync), trade, telegram_monitor, dexscreener, github_intelligence, reddit_monitor, chart_data_service, **storage_service**, **intelligence_aggregator**, **wallet_service** |
+| Unit/Providers | 4 | ~26 | **tier_provider**, **watchlist_provider**, **analysis_provider**, **portfolio_provider** |
+| Widget | 7 | ~22 | coin_card, chat_bubble, sparkline_chart, **dex_signal_card**, **price_chart_widget**, **tier_mode_selector**, **wallet_connect_button** |
 | Integration | 1 | 4 | app navigation (4 tabs, sections) |
-| Screen | 3 | 10 | dex_position_screen, detail_screens, **chart_screen**, **pnl_dashboard_screen** |
-| Legacy | 1 | 9 | widget_test navigation + tab switching |
-| **UKUPNO** | **41** | **280** | |
+| Legacy | 1 | 2 | widget_test navigation + tab switching |
+| **UKUPNO** | **45** | **352** | |
 
 ### 9.6 Identified Issues
 
@@ -1563,7 +1564,7 @@ CoinSight je u **10 sesija** narastao od praznog Flutter scaffolda do **multi-st
 
 **v7.0.0 milestone:**
 - **55 lib/ fajl** rasporeden u 6 direktorija (+5 fajlova od v6.0.0)
-- **280 testova** (unit models, unit services, widget, screen, integration) s mocktail
+- **352 testa** (unit models, unit services, unit providers, widget, integration) s mocktail + shared `hive_test_setup.dart` helper
 - **9 Hive box-ova** za persistenciju (+closed_trades od v7.0.0)
 - **8 eksternih API-ja** integrirano (CoinGecko, Anthropic, Binance, Telegram, Dexscreener, GitHub, Reddit, WalletConnect)
 - **5-source intelligence agregacija** s confluence scoring (0–6.0)

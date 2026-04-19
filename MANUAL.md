@@ -2081,7 +2081,7 @@ A: Mjera koliko se nezavisnih izvora slaže oko signala za coin. Score ide od 0 
 A: Koristi Manage → App → Export logs before reset. Za potpuni reset: Manage → App → Full reset. Binance pozicije ostaju na Binanceu neovisno o app-u.
 
 **Q: Koliko testova ima CoinSight?**
-A: Test suite sadrži **280 testova** koji pokrivaju servise, widgete i integracije.
+A: Test suite sadrži **352 testa** koji pokrivaju modele, servise, providere, widgete i integracije.
 
 **Q: Što znači greška "Timestamp out of sync"?**
 A: Binance zahtijeva da se tvoj sat poklapa sa server vremenom. App u v3.0.0 automatski sinkronizira putem `/api/v3/time`. Ako se greška ponovi, provjeri da je automatsko vrijeme uključeno na uređaju.
@@ -2208,6 +2208,6 @@ A: P&L Dashboard (Manage → Portfolio → banner) prikazuje ukupne performanse 
 5. **INTERESTING nije garancija** — 30-40% trejdova će biti gubitnici (normalno)
 6. **Konzistentnost pobjeđuje** — bolje 60% win rate s malim iznosima nego 90% win rate koji se ne može ponoviti
 
-**CoinSight v7.0.0** — Open Source, MIT License, 280/280 testova
+**CoinSight v8.0.0** — Proprietary, 352/352 testa
 
 Sretno!

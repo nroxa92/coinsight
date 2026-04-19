@@ -1778,3 +1778,80 @@ Dodano na kraj system prompta: confluence analiza instrukcije (score 5-6 / 3-4.9
 - `git status` — izmijenjeno 6 fajlova: LICENSE, README.md, OVERVIEW.md, WORKLOG.md, NEWBIE_GUIDE.md, MANUAL.md
 - Nema izmjena u `lib/`, `test/` ili pubspec-u → `flutter analyze` / `flutter test` neizmijenjeni u odnosu na Session 11 (0 issues, 280/280)
 - APK dostupan preko GitHub Release v8.0.0 asset-a
+
+---
+
+## Session 12: 2026-04-18 — Test Suite Expansion (280 → 352)
+
+### Faza 1 — Plan
+**Status:** Completed
+
+**Opis:** Usporedba s `claude_betsight` test suiteom i identifikacija praznina. CoinSight je imao 280 testova (19 model, 9 service, 3 widget, 1 integration). Betsight ima strukturiran `helpers/hive_test_setup.dart` + `unit/providers/` folder + `test/README.md` — ništa od toga nije postojalo kod CoinSighta.
+
+**Identificirane praznine:**
+- `test/helpers/hive_test_setup.dart` — ne postoji
+- `unit/providers/` — potpuno prazan, iako postoje WatchlistProvider, AnalysisProvider, PortfolioProvider, TierProvider
+- Nedostaju service testovi: StorageService, IntelligenceAggregator, WalletService
+- Nedostaju widget testovi: TierModeSelector, DexSignalCard, PriceChartWidget, WalletConnectButton
+- Nedostaje `test/README.md`
+
+### Faza 2 — Shared Hive helper
+**Status:** Completed
+
+**Kreirani fajlovi:**
+- `test/helpers/hive_test_setup.dart` (57 linija): `setUpHive()` otvara u temp direktoriju svih 9 Hive boxeva koje StorageService očekuje (`settings`, `watchlist`, `analysis_logs`, `positions`, `monitored_channels_detail`, `mid_term_projects`, `long_term_holdings`, `dex_positions`, `closed_trades`) i stubira `dexterous.com/flutter/local_notifications` MethodChannel kako AnalysisProvider callback koji poziva NotificationService ne puca u host okruženju. `tearDownHive()` zatvara Hive i briše temp.
+
+### Faza 3 — Provider testovi
+**Status:** Completed
+
+**Kreirani fajlovi:**
+- `test/unit/providers/tier_provider_test.dart` — 5 testova: initial tier (short), konstruktor čita iz StorageService, setTier persistira + notificira, setTier na isti tier je no-op, shortAsRiskParameters vraća default
+- `test/unit/providers/watchlist_provider_test.dart` — 7 testova: default watchlist (btc/eth/sol), toggleWatchlist persistira, fetchTopCoins populira + čisti error, fetchTopCoins surfaces CoinGeckoException, refreshWatchlist prazan watchlist skip, _updateWatchlistCoins filtrira, fetchDexListings silent fail
+- `test/unit/providers/portfolio_provider_test.dart` — 6 testova: loads positions iz storage-a, totalInvested/totalValue/totalPnl agregacija, totalPnlPercent na praznom portfelju, hasCredentials reflects state, clearError notificira, stopAutoRefresh safe bez prior start
+- `test/unit/providers/analysis_provider_test.dart` — 8 testova: initial state, setApiKey/removeApiKey, suggestionChips per tier, clearChat/clearError notify, pendingSignalsCount, lastReport/isGatheringIntelligence
+
+**Pattern:** svi koriste `setUpHive()`/`tearDownHive()` iz helper-a. HTTP-ovisni providers dobijaju `HttpClientFactory.returning(body)` mockove.
+
+### Faza 4 — Service testovi
+**Status:** Completed
+
+**Kreirani fajlovi:**
+- `test/unit/services/storage_service_test.dart` — 25 testova u 11 grupa: api key, watchlist, analysis logs, binance credentials (uključujući testnet default true), risk parameters roundtrip, positions (keyed by coinId, sorted by entryTime desc), monitored channels (updateChannelStats kreiranje + inkrement, toggleChannelActive, removeMonitoredChannel uklanja iz oba lista), active tier, github/wallet tokens, closed trades (roundtrip + tier filtering + clear), resetAll
+- `test/unit/services/intelligence_aggregator_test.dart` — 4 testa: buildReportForSymbol s praznim izvorima, stopAutoScan bez prior starta, cached liste start empty, symbol handling
+- `test/unit/services/wallet_service_test.dart` — 6 testova: initial state (disconnected), chainName fallback, shortAddress edge, initialize bez projectId no-op, disconnectWallet idempotent, initiateSwap null kad nije spojen
+
+**Odluka:** `NotificationService` nije pokriven — `FlutterLocalNotificationsPlatform.instance` je `late` final koji se inicijalizira samo kroz platform-specific conditional import. Host unit testovi na Windows-u ga ne mogu instantiirati. Stub MethodChannela u `hive_test_setup.dart` i dalje sprječava rušenje u testovima koji usput pozivaju callback koji dalje zove NotificationService (npr. AnalysisProvider high-score signal callback).
+
+### Faza 5 — Widget testovi
+**Status:** Completed
+
+**Kreirani fajlovi:**
+- `test/widget/tier_mode_selector_test.dart` — 1 test: renders all three tier labels kroz `ChangeNotifierProvider<TierProvider>`. Originalno su bila tri testa (uključujući tap-to-change) ali `AnimatedContainer` + async Hive write pokretan iz `setTier` unutar widget testa je uzrokovao neizdan ticker koji blokira tearDown. Reduciran na jedan statički render test; funkcionalnost `setTier` već je pokrivena `tier_provider_test.dart`-om.
+- `test/widget/dex_signal_card_test.dart` — 5 testova: DEX + chain badges + pair + token name, positive 1h change s "+" prefiksom, negative 1h change, volume/liquidity formatting (M/K), onAnalyze/onTrack callback firing
+- `test/widget/price_chart_widget_test.dart` — 4 testa: SHORT legend + "24h pred." label, MID "30d pred.", LONG "6mj pred.", empty historical renders "Nema podataka" fallback
+- `test/widget/wallet_connect_button_test.dart` — 1 test: renders nothing dok `WalletService.isInitialized == false`
+
+### Faza 6 — Test README
+**Status:** Completed
+
+**Kreirani fajlovi:**
+- `test/README.md` — struktura, trenutno stanje (352/352), coverage breakdown po sloju, uzorci za Hive boxeve + HTTP mockove + widget testove + objašnjenje za notification service ograničenje.
+
+### Faza 7 — Dokumentacija
+**Status:** Completed
+
+**Ažurirani fajlovi:**
+- `README.md` — Tests badge 280/280 → 352/352
+- `OVERVIEW.md` — status projekta v7.0.0 → v8.0.0, 10 sesija → 12 sesija, dodan retka v8.0.0 u povijest verzija, Test Coverage Breakdown prepisan (45 fajlova, 352 testa, nova Unit/Providers kategorija), referenca "280 testova" → "352 testa"
+- `MANUAL.md` — FAQ "Koliko testova" 280 → 352, footer "v7.0.0 MIT License 280/280" → "v8.0.0 Proprietary 352/352"
+
+### Verifikacija
+- `flutter analyze` — **No issues found!** (139.1s)
+- `flutter test` — **352/352 passed** (+72 od v7.0.0)
+- Trajanje punog test runa: ~52s
+
+### Session 12 rezultat
+Test suite proširen s 280 na **352 testa** (+25.7%), pokrivajući sve 4 providera koji prije nisu imali niti jedan test, StorageService (najteže pokriven dio app-a s 9 Hive boxeva), IntelligenceAggregator (orchestrator 5 izvora), WalletService i 4 widgeta. Uvedeno shared `hive_test_setup.dart` koje zamjenjuje inline Hive init logiku koja se ponavljala u postojećim testovima (opcionalno, stari testovi nisu migrirani — rade i dalje).
+
+### Identified Issues
+Nema novih. Ograničenje `NotificationService` host-testing-a dokumentirano u `test/README.md` i `WORKLOG.md`.

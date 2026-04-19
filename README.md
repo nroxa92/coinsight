@@ -8,7 +8,7 @@
 [![Dart](https://img.shields.io/badge/Dart-3.11+-0175C2?logo=dart)](https://dart.dev)
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-8.0.0-blue)](pubspec.yaml)
-[![Tests](https://img.shields.io/badge/Tests-280%2F280-brightgreen)]()
+[![Tests](https://img.shields.io/badge/Tests-352%2F352-brightgreen)]()
 [![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android)](https://android.com)
 
 **CoinSight** kombinira multi-source intelligence monitoring, Claude AI analizu
