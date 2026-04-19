@@ -2,7 +2,7 @@
 
 **Verzija:** 7.0.0
 **Datum generiranja:** 2026-04-16
-**Status projekta:** v8.0.0 release — 352 testa, 12 sesija, Three-Tier Investment Framework (SHORT/MID/LONG) + Intelligence Layer + Detail Screens + DEX Position Tracking + Charts & Visualization + Push Notifications + P&L Dashboard + WalletConnect v2
+**Status projekta:** v8.0.0 release — 352 testa, 13 sesija, Three-Tier Investment Framework (SHORT/MID/LONG) + Intelligence Layer + Detail Screens + DEX Position Tracking + Charts & Visualization + Push Notifications + P&L Dashboard + WalletConnect v2
 **Autor:** Neven (developer) + Claude Code (implementacija)
 **Licenca:** MIT (Copyright (c) 2026 Neven Roksa)
 
@@ -1253,7 +1253,8 @@ flutter build windows → OK (Session 1)
 | v5.0.0 | 2026-04-16 | Session 8: Detail Screens + DEX Position Tracking + MID Discovery/LONG Research + 243 testova |
 | v6.0.0 | 2026-04-16 | Session 9: Charts & Visualization + Push Notifications + 267 testova |
 | v7.0.0 | 2026-04-16 | Session 10: P&L Dashboard + WalletConnect v2 + Trade History + 280 testova |
-| v8.0.0 | 2026-04-18 | Session 11–12: Dokumentacijski rebrand, lektura, License (Proprietary), Test expansion → 352 testa |
+| v8.0.0 | 2026-04-18 | Session 11–12: Dokumentacijski rebrand, lektura, License (Proprietary) |
+| v8.0.0 | 2026-04-19 | Session 13: Test expansion 280 → 352 (+72 testa: 4 providera, storage/intelligence/wallet services, 4 widgeta, shared hive_test_setup helper) |
 
 ### 9.5 Test Coverage Breakdown
 
