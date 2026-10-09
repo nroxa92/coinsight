@@ -4,7 +4,7 @@
 
 > Android aplikacija za iskusne kripto tradere koja prepoznaje tokene u ranoj fazi kroz pet izvora podataka, analizira ih Claudeom kroz tri investicijska horizonta i izvršava Binance Spot trgovanje sa stop-lossom i take-profitom.
 
-![License](https://img.shields.io/badge/license-proprietary-red) ![Status](https://img.shields.io/badge/status-active-green) ![Flutter](https://img.shields.io/badge/Flutter-Dart%203.11-blue) ![Platform](https://img.shields.io/badge/platform-Android-blue) ![Tests](https://img.shields.io/badge/tests-352%2F352-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-green) ![Status](https://img.shields.io/badge/status-active-green) ![Flutter](https://img.shields.io/badge/Flutter-Dart%203.11-blue) ![Platform](https://img.shields.io/badge/platform-Android-blue) ![Tests](https://img.shields.io/badge/tests-352%2F352-brightgreen)
 
 ## Sadržaj
 
@@ -272,4 +272,4 @@ Za prvu sesiju s pravim novcem dokumentacija preporučuje oprezna ograničenja: 
 
 ## Licenca
 
-Vlasnički softver — sva prava pridržana. Vidi [LICENSE](LICENSE).
+Objavljeno pod [MIT licencom](LICENSE) — slobodno za korištenje, izmjene i dijeljenje.

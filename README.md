@@ -4,7 +4,7 @@
 
 > An Android app for experienced crypto traders that spots early-stage tokens across five intelligence sources, analyses them with Claude through three investment horizons, and executes Binance Spot trades with stop-loss and take-profit.
 
-![License](https://img.shields.io/badge/license-proprietary-red) ![Status](https://img.shields.io/badge/status-active-green) ![Flutter](https://img.shields.io/badge/Flutter-Dart%203.11-blue) ![Platform](https://img.shields.io/badge/platform-Android-blue) ![Tests](https://img.shields.io/badge/tests-352%2F352-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-green) ![Status](https://img.shields.io/badge/status-active-green) ![Flutter](https://img.shields.io/badge/Flutter-Dart%203.11-blue) ![Platform](https://img.shields.io/badge/platform-Android-blue) ![Tests](https://img.shields.io/badge/tests-352%2F352-brightgreen)
 
 ## Contents
 
@@ -274,4 +274,4 @@ The documents are in Croatian.
 
 ## License
 
-Proprietary — all rights reserved. See [LICENSE](LICENSE).
+Released under the [MIT License](LICENSE) — free to use, modify and share.
